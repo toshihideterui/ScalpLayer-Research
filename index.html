@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScalpLayer Research v1.0</title>
+  <style>
+    :root {
+      --bg1:#0057d9; --bg2:#003f75; --bg3:#07111f; --card:#101827; --input:#020617;
+      --border:#475569; --text:#fff; --muted:#cbd5e1; --green:#4ade80; --blue:#0b5ed7;
+      --red:#ef4444; --orange:#f97316; --yellow:#facc15;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,var(--bg1),var(--bg2) 42%,var(--bg3));
+      color:var(--text); padding:18px; line-height:1.7; min-height:100vh;
+    }
+    .container { max-width:960px; margin:0 auto; }
+    .hero { text-align:center; padding:12px 0 22px; }
+    h1 { margin:0 0 8px; font-size:30px; }
+    h2 { margin-top:0; font-size:22px; }
+    .card {
+      background:rgba(16,24,39,.96); border:1px solid rgba(148,163,184,.2);
+      border-radius:20px; padding:22px; margin-bottom:18px; box-shadow:0 10px 28px rgba(0,0,0,.28);
+    }
+    .notice { border-color:rgba(250,204,21,.5); background:rgba(250,204,21,.08); color:#fde68a; }
+    input, select, button, textarea {
+      width:100%; padding:13px 14px; margin:0 0 14px; border-radius:14px;
+      border:1px solid var(--border); background:var(--input); color:var(--text); font-size:15px;
+    }
+    button { border:0; font-weight:900; cursor:pointer; }
+    .blue { background:var(--blue); }
+    .green { background:var(--green); color:#052e16; }
+    .red { background:var(--red); }
+    .orange { background:var(--orange); }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .statBox {
+      background:rgba(2,6,23,.7); border:1px solid rgba(148,163,184,.22);
+      border-radius:16px; padding:16px; text-align:center;
+    }
+    .statBox strong { display:block; font-size:25px; margin-top:4px; }
+    .small { color:var(--muted); font-size:14px; }
+    .pill {
+      display:inline-block; padding:5px 10px; border-radius:999px; background:rgba(56,189,248,.14);
+      border:1px solid rgba(56,189,248,.28); color:#bae6fd; margin:3px; font-size:13px; font-weight:800;
+    }
+    table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+    th, td { border-bottom:1px solid rgba(148,163,184,.18); padding:8px 6px; text-align:right; }
+    th:first-child, td:first-child { text-align:left; }
+    th { color:#fff; }
+    .good { color:#bbf7d0; font-weight:900; }
+    .bad { color:#fecaca; font-weight:900; }
+    .warn { color:#fde68a; font-weight:900; }
+    .log {
+      max-height:360px; overflow:auto; background:rgba(2,6,23,.55); border-radius:14px;
+      border:1px solid rgba(148,163,184,.18); padding:10px;
+    }
+    .logItem {
+      padding:10px; border-bottom:1px solid rgba(148,163,184,.14); color:var(--muted); font-size:13px;
+    }
+    @media (max-width:700px) { .grid,.grid3 { grid-template-columns:1fr; } body{padding:12px;} h1{font-size:24px;} }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>ScalpLayer Research v1.0</h1>
+      <p class="small">Dukascopy等のUSD/JPY 1分足CSVを読み込み、買い入口・売り入口が「順方向で勝つのか」「逆方向で勝つのか」を検証します。</p>
+    </section>
+
+    <section class="card notice">
+      これは検証用ツールです。実取引や利益を保証するものではありません。BIDデータのみの場合、買い取引のASKスプレッドは厳密には反映されません。必要に応じてスプレッドpipsを入力してください。
+    </section>
+
+    <section class="card">
+      <h2>① CSV読み込み</h2>
+      <input id="csvFiles" type="file" accept=".csv,.txt" multiple />
+      <div class="grid">
+        <div>
+          <label>想定スプレッドpips</label>
+          <input id="spreadPips" type="number" step="0.1" value="2.0" />
+        </div>
+        <div>
+          <label>最小サイン間隔（分）</label>
+          <input id="minSignalGap" type="number" step="1" value="5" />
+        </div>
+      </div>
+      <button class="green" onclick="loadFiles()">CSVを読み込む</button>
+      <p id="loadStatus" class="small">CSVを選択してください。複数ファイルをまとめて読み込めます。</p>
+    </section>
+
+    <section class="card">
+      <h2>② ScalpLayer簡易ロジック設定</h2>
+      <p class="small">v5.0研究用の簡易再現ロジックです。現在のScalpLayer完全再現ではなく、「買い入口/売り入口が短期天井・底になっていないか」を調べるための研究版です。</p>
+      <div class="grid3">
+        <div>
+          <label>EMA距離上限pips</label>
+          <input id="emaMax" type="number" step="0.1" value="5" />
+        </div>
+        <div>
+          <label>RSI買われすぎ</label>
+          <input id="rsiHigh" type="number" step="1" value="70" />
+        </div>
+        <div>
+          <label>RSI売られすぎ</label>
+          <input id="rsiLow" type="number" step="1" value="30" />
+        </div>
+      </div>
+      <button class="blue" onclick="runBacktest()">バックテスト実行</button>
+      <p id="testStatus" class="small">CSV読み込み後に実行できます。</p>
+    </section>
+
+    <section class="card">
+      <h2>③ 結果サマリー</h2>
+      <div class="grid3">
+        <div class="statBox">ローソク足<strong id="barCount">--</strong></div>
+        <div class="statBox">買い入口<strong id="buyCount">--</strong></div>
+        <div class="statBox">売り入口<strong id="sellCount">--</strong></div>
+      </div>
+      <div id="verdict" class="statBox" style="margin-top:14px;">判定待ち</div>
+      <div id="summaryPills" style="margin-top:10px;"></div>
+    </section>
+
+    <section class="card">
+      <h2>④ 通常ロジック vs 逆ロジック</h2>
+      <div id="resultTable" class="small">まだ結果はありません。</div>
+    </section>
+
+    <section class="card">
+      <h2>⑤ 買い入口だけ / 売り入口だけ</h2>
+      <div class="grid">
+        <div>
+          <h3>買い入口</h3>
+          <div id="buyTable" class="small">未集計</div>
+        </div>
+        <div>
+          <h3>売り入口</h3>
+          <div id="sellTable" class="small">未集計</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>⑥ サインログ</h2>
+      <button class="blue" onclick="downloadResultsCsv()">結果CSVをダウンロード</button>
+      <div id="log" class="log small">まだログはありません。</div>
+    </section>
+  </main>
+
+<script>
+let candles = [];
+let signals = [];
+let results = [];
+const horizons = [1,3,5,10,30];
+
+function parseNumber(v){ const n = Number(String(v).replace(/,/g,"").trim()); return Number.isFinite(n) ? n : null; }
+
+function detectDelimiter(line){
+  const candidates = [",",";","\t"];
+  return candidates.sort((a,b)=> line.split(b).length - line.split(a).length)[0];
+}
+
+function parseCsvText(text){
+  const lines = text.trim().split(/\r?\n/).filter(Boolean);
+  if(lines.length < 2) return [];
+  const delim = detectDelimiter(lines[0]);
+  const header = lines[0].split(delim).map(h => h.trim().toLowerCase().replace(/^"|"$/g,""));
+  const idx = {
+    time: header.findIndex(h => ["datetime","date","time","gmt time","local time"].includes(h) || h.includes("time") || h.includes("date")),
+    open: header.findIndex(h => h === "open" || h.includes("open")),
+    high: header.findIndex(h => h === "high" || h.includes("high")),
+    low: header.findIndex(h => h === "low" || h.includes("low")),
+    close: header.findIndex(h => h === "close" || h.includes("close")),
+    volume: header.findIndex(h => h.includes("volume") || h.includes("vol"))
+  };
+  // Dukascopyなどヘッダー無しっぽい場合
+  const start = idx.open >= 0 && idx.high >= 0 && idx.low >= 0 && idx.close >= 0 ? 1 : 0;
+  const rows = [];
+  for(let i=start;i<lines.length;i++){
+    const cols = lines[i].split(delim).map(c => c.trim().replace(/^"|"$/g,""));
+    let time, open, high, low, close, volume;
+    if(start === 1){
+      time = cols[idx.time] || cols[0];
+      open = parseNumber(cols[idx.open]);
+      high = parseNumber(cols[idx.high]);
+      low = parseNumber(cols[idx.low]);
+      close = parseNumber(cols[idx.close]);
+      volume = idx.volume >= 0 ? parseNumber(cols[idx.volume]) : null;
+    } else {
+      time = cols[0];
+      open = parseNumber(cols[1]);
+      high = parseNumber(cols[2]);
+      low = parseNumber(cols[3]);
+      close = parseNumber(cols[4]);
+      volume = parseNumber(cols[5]);
+    }
+    const dt = new Date(String(time).replace(" ", "T").replace(/\./g,"-"));
+    if(open && high && low && close && Number.isFinite(dt.getTime())){
+      rows.push({time: dt, open, high, low, close, volume});
+    }
+  }
+  return rows;
+}
+
+async function loadFiles(){
+  const files = Array.from(document.getElementById("csvFiles").files || []);
+  if(!files.length){ alert("CSVファイルを選択してください。"); return; }
+  const all = [];
+  for(const file of files){
+    const text = await file.text();
+    const rows = parseCsvText(text);
+    all.push(...rows);
+  }
+  candles = all.sort((a,b)=>a.time-b.time);
+  // 重複除去
+  const map = new Map();
+  candles.forEach(c => map.set(c.time.getTime(), c));
+  candles = Array.from(map.values()).sort((a,b)=>a.time-b.time);
+  document.getElementById("loadStatus").textContent = `${files.length}ファイル、${candles.length}本のローソク足を読み込みました。`;
+  document.getElementById("barCount").textContent = candles.length;
+}
+
+function ema(values, period){
+  const out = Array(values.length).fill(null);
+  if(values.length < period) return out;
+  let sum = 0;
+  for(let i=0;i<period;i++) sum += values[i];
+  let prev = sum / period;
+  out[period-1] = prev;
+  const k = 2/(period+1);
+  for(let i=period;i<values.length;i++){
+    prev = values[i]*k + prev*(1-k);
+    out[i] = prev;
+  }
+  return out;
+}
+
+function sma(values, period){
+  const out = Array(values.length).fill(null);
+  let sum = 0;
+  for(let i=0;i<values.length;i++){
+    sum += values[i];
+    if(i>=period) sum -= values[i-period];
+    if(i>=period-1) out[i] = sum/period;
+  }
+  return out;
+}
+
+function stdev(values, period, means){
+  const out = Array(values.length).fill(null);
+  for(let i=period-1;i<values.length;i++){
+    const mean = means[i];
+    let s=0;
+    for(let j=i-period+1;j<=i;j++) s += Math.pow(values[j]-mean,2);
+    out[i] = Math.sqrt(s/period);
+  }
+  return out;
+}
+
+function rsi(values, period=14){
+  const out = Array(values.length).fill(null);
+  if(values.length <= period) return out;
+  let gain=0, loss=0;
+  for(let i=1;i<=period;i++){
+    const d = values[i]-values[i-1];
+    if(d>=0) gain += d; else loss -= d;
+  }
+  let avgG = gain/period, avgL = loss/period;
+  out[period] = avgL === 0 ? 100 : 100 - 100/(1+avgG/avgL);
+  for(let i=period+1;i<values.length;i++){
+    const d = values[i]-values[i-1];
+    const g = d>0 ? d : 0, l = d<0 ? -d : 0;
+    avgG = (avgG*(period-1)+g)/period;
+    avgL = (avgL*(period-1)+l)/period;
+    out[i] = avgL === 0 ? 100 : 100 - 100/(1+avgG/avgL);
+  }
+  return out;
+}
+
+function heikinAshi(c){
+  const out = [];
+  for(let i=0;i<c.length;i++){
+    const close = (c[i].open+c[i].high+c[i].low+c[i].close)/4;
+    const open = i===0 ? (c[i].open+c[i].close)/2 : (out[i-1].open+out[i-1].close)/2;
+    const high = Math.max(c[i].high, open, close);
+    const low = Math.min(c[i].low, open, close);
+    out.push({open, high, low, close});
+  }
+  return out;
+}
+
+function countHaStreak(ha, i){
+  const dir = ha[i].close > ha[i].open ? "bull" : ha[i].close < ha[i].open ? "bear" : "flat";
+  if(dir==="flat") return {dir, count:0};
+  let count=0;
+  for(let j=i;j>=0;j--){
+    const d = ha[j].close > ha[j].open ? "bull" : ha[j].close < ha[j].open ? "bear" : "flat";
+    if(d!==dir) break;
+    count++;
+  }
+  return {dir, count};
+}
+
+function bbPosition(close, mid, upper, lower){
+  if(mid==null || upper==null || lower==null) return "不足";
+  const width = upper-lower;
+  if(width <= 0) return "不足";
+  if(close >= upper) return "上バンド超え";
+  if(close <= lower) return "下バンド割れ";
+  if(close > upper - width*0.15) return "上バンド付近";
+  if(close < lower + width*0.15) return "下バンド付近";
+  if(Math.abs(close-mid) < width*0.12) return "ミドル付近";
+  return close > mid ? "ミドル上" : "ミドル下";
+}
+
+function runBacktest(){
+  if(candles.length < 100){ alert("ローソク足データが不足しています。"); return; }
+  const spread = Number(document.getElementById("spreadPips").value || 0);
+  const minGap = Number(document.getElementById("minSignalGap").value || 5);
+  const emaMax = Number(document.getElementById("emaMax").value || 5);
+  const rsiHigh = Number(document.getElementById("rsiHigh").value || 70);
+  const rsiLow = Number(document.getElementById("rsiLow").value || 30);
+
+  const closes = candles.map(c=>c.close);
+  const ema9 = ema(closes, 9);
+  const ema20 = ema(closes, 20);
+  const rsi14 = rsi(closes, 14);
+  const mid = sma(closes, 20);
+  const sd = stdev(closes, 20, mid);
+  const upper = sd.map((s,i)=>s==null?null:mid[i]+2*s);
+  const lower = sd.map((s,i)=>s==null?null:mid[i]-2*s);
+  const ha = heikinAshi(candles);
+
+  signals = [];
+  results = [];
+  let lastSignalIndex = -9999;
+
+  for(let i=35; i<candles.length-31; i++){
+    if(i-lastSignalIndex < minGap) continue;
+
+    const c = candles[i], p = candles[i-1], p2 = candles[i-2];
+    const haStreak = countHaStreak(ha, i);
+    const emaDist = Math.abs(c.close - ema9[i]) * 100;
+    const bb = bbPosition(c.close, mid[i], upper[i], lower[i]);
+
+    let buyScore = 0, sellScore = 0;
+    const reasons = [];
+
+    // 方向系
+    if(c.close > ema20[i] && ema20[i] > ema20[i-3]) { buyScore += 2; reasons.push("EMA上向き買い+2"); }
+    if(c.close < ema20[i] && ema20[i] < ema20[i-3]) { sellScore += 2; reasons.push("EMA下向き売り+2"); }
+
+    if(haStreak.dir === "bull") { buyScore += Math.min(3, haStreak.count); reasons.push(`平均足陽線${haStreak.count}本`); }
+    if(haStreak.dir === "bear") { sellScore += Math.min(3, haStreak.count); reasons.push(`平均足陰線${haStreak.count}本`); }
+
+    if(c.close > p.high) { buyScore += 2; reasons.push("前高値上抜け"); }
+    if(c.close < p.low) { sellScore += 2; reasons.push("前安値下抜け"); }
+
+    if(c.close > p.close && p.close >= p2.close) buyScore += 1;
+    if(c.close < p.close && p.close <= p2.close) sellScore += 1;
+
+    // 過熱フィルター/減点
+    if(emaDist > emaMax) { buyScore -= 1; sellScore -= 1; reasons.push(`EMA距離${emaDist.toFixed(1)}pips過熱`); }
+    if(rsi14[i] != null && rsi14[i] >= rsiHigh) { buyScore -= 2; sellScore += 1; reasons.push("RSI高値圏"); }
+    if(rsi14[i] != null && rsi14[i] <= rsiLow) { sellScore -= 2; buyScore += 1; reasons.push("RSI安値圏"); }
+    if(bb === "上バンド超え" || bb === "上バンド付近") { buyScore -= 2; sellScore += 1; reasons.push("BB上限"); }
+    if(bb === "下バンド割れ" || bb === "下バンド付近") { sellScore -= 2; buyScore += 1; reasons.push("BB下限"); }
+
+    let signal = null;
+    if(buyScore >= 5 && buyScore - sellScore >= 2) signal = "buy";
+    if(sellScore >= 5 && sellScore - buyScore >= 2) signal = "sell";
+
+    if(signal){
+      const sig = {
+        index:i, time:c.time, signal, price:c.close, buyScore, sellScore,
+        rsi:rsi14[i], emaDist, bb, haStreak: `${haStreak.dir}:${haStreak.count}`, reasons: reasons.join(" / ")
+      };
+      signals.push(sig);
+      lastSignalIndex = i;
+      for(const h of horizons){
+        const future = candles[i+h];
+        if(!future) continue;
+        const diffPips = (future.close - c.close) * 100;
+        const normal = signal === "buy" ? diffPips - spread : -diffPips - spread;
+        const reverse = signal === "buy" ? -diffPips - spread : diffPips - spread;
+        results.push({...sig, horizon:h, futurePrice:future.close, normalPips:normal, reversePips:reverse});
+      }
+    }
+  }
+
+  renderAll();
+}
+
+function stats(rows){
+  const n = rows.length;
+  if(!n) return {n:0, winN:0, winRate:0, avg:0, total:0};
+  const winN = rows.filter(r=>r>0).length;
+  const total = rows.reduce((a,b)=>a+b,0);
+  return {n, winN, winRate:Math.round(winN/n*100), avg:total/n, total};
+}
+
+function renderStatsTable(target, filterFn){
+  const rows = horizons.map(h=>{
+    const rs = results.filter(r=>r.horizon===h && (!filterFn || filterFn(r)));
+    const normal = stats(rs.map(r=>r.normalPips));
+    const reverse = stats(rs.map(r=>r.reversePips));
+    return {h, normal, reverse};
+  });
+  const html = `<table><thead><tr><th>時間</th><th>通常勝率</th><th>通常平均</th><th>通常合計</th><th>逆勝率</th><th>逆平均</th><th>逆合計</th><th>優位</th></tr></thead><tbody>`+
+    rows.map(r=>{
+      const better = r.reverse.avg > r.normal.avg ? "逆" : r.normal.avg > r.reverse.avg ? "通常" : "同等";
+      const cls = better==="逆" ? "warn" : better==="通常" ? "good" : "";
+      return `<tr><td>${r.h}分後</td><td>${r.normal.winRate}%</td><td>${r.normal.avg.toFixed(2)}</td><td>${r.normal.total.toFixed(1)}</td><td>${r.reverse.winRate}%</td><td>${r.reverse.avg.toFixed(2)}</td><td>${r.reverse.total.toFixed(1)}</td><td class="${cls}">${better}</td></tr>`;
+    }).join("")+`</tbody></table>`;
+  document.getElementById(target).innerHTML = html;
+}
+
+function renderAll(){
+  document.getElementById("barCount").textContent = candles.length;
+  document.getElementById("buyCount").textContent = signals.filter(s=>s.signal==="buy").length;
+  document.getElementById("sellCount").textContent = signals.filter(s=>s.signal==="sell").length;
+  document.getElementById("testStatus").textContent = `${signals.length}件のサインを検出しました。`;
+
+  renderStatsTable("resultTable");
+  renderStatsTable("buyTable", r=>r.signal==="buy");
+  renderStatsTable("sellTable", r=>r.signal==="sell");
+
+  const shortReverse = [1,3,5].map(h=>{
+    const rs = results.filter(r=>r.horizon===h);
+    return {h, n: stats(rs.map(r=>r.normalPips)), rv: stats(rs.map(r=>r.reversePips))};
+  });
+  const revBetter = shortReverse.filter(x=>x.rv.winRate >= 55 && x.rv.avg > x.n.avg).length;
+  const normal30 = stats(results.filter(r=>r.horizon===30).map(r=>r.normalPips));
+  const reverse30 = stats(results.filter(r=>r.horizon===30).map(r=>r.reversePips));
+  let verdict = "データ不足";
+  let cls = "";
+  if(signals.length >= 10){
+    if(revBetter >= 2 && normal30.winRate >= 55 && normal30.avg > reverse30.avg) {
+      verdict = "短期は逆方向が有利、30分後は順方向が有利の可能性";
+      cls = "warn";
+    } else if(revBetter >= 2) {
+      verdict = "短期逆張り有利の可能性：買い入口/売り入口が上限・下限検出になっているかも";
+      cls = "warn";
+    } else if(normal30.winRate >= 55 && normal30.avg > reverse30.avg) {
+      verdict = "通常方向が中期で優位の可能性：スキャルより短期デイトレ寄りかも";
+      cls = "good";
+    } else {
+      verdict = "通常/逆とも明確な優位なし：ノイズまたは条件再設計が必要";
+      cls = "bad";
+    }
+  }
+  document.getElementById("verdict").innerHTML = `<strong class="${cls}">${verdict}</strong>`;
+  document.getElementById("summaryPills").innerHTML = horizons.map(h=>{
+    const rs = results.filter(r=>r.horizon===h);
+    const n = stats(rs.map(r=>r.normalPips));
+    const rv = stats(rs.map(r=>r.reversePips));
+    return `<span class="pill">${h}分 通常${n.winRate}% / 逆${rv.winRate}%</span>`;
+  }).join("");
+
+  const log = signals.slice(0,200).map(s=>{
+    const r5 = results.find(r=>r.index===s.index && r.horizon===5);
+    return `<div class="logItem">${s.time.toLocaleString()}｜${s.signal==="buy"?"買い入口":"売り入口"}｜${s.price.toFixed(3)}｜5分 通常:${r5?r5.normalPips.toFixed(1):"--"} / 逆:${r5?r5.reversePips.toFixed(1):"--"}｜BB:${s.bb}｜RSI:${s.rsi?s.rsi.toFixed(1):"--"}｜EMA距離:${s.emaDist.toFixed(1)}pips</div>`;
+  }).join("");
+  document.getElementById("log").innerHTML = log || "サインが検出されませんでした。";
+}
+
+function downloadResultsCsv(){
+  if(!results.length){ alert("結果がありません。"); return; }
+  const header = ["time","signal","entryPrice","futureMinutes","futurePrice","normalPips","reversePips","buyScore","sellScore","rsi","emaDist","bb","haStreak","reasons"];
+  const rows = results.map(r=>[
+    r.time.toISOString(), r.signal, r.price, r.horizon, r.futurePrice, r.normalPips.toFixed(3), r.reversePips.toFixed(3),
+    r.buyScore, r.sellScore, r.rsi==null?"":r.rsi.toFixed(2), r.emaDist.toFixed(2), r.bb, r.haStreak, `"${String(r.reasons).replace(/"/g,'""')}"`
+  ].join(","));
+  const blob = new Blob([header.join(",")+"\n"+rows.join("\n")], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "scalplayer_research_results.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
