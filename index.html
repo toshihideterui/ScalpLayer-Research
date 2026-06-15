@@ -1,485 +1,487 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ScalpLayer Research v1.0</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="scalplayer-version" content="finder-v1.0">
+  <title>ScalpLayer Finder v1</title>
   <style>
     :root {
-      --bg1:#0057d9; --bg2:#003f75; --bg3:#07111f; --card:#101827; --input:#020617;
-      --border:#475569; --text:#fff; --muted:#cbd5e1; --green:#4ade80; --blue:#0b5ed7;
-      --red:#ef4444; --orange:#f97316; --yellow:#facc15;
+      --bg: #05070d;
+      --panel: #10131c;
+      --panel2: #151a25;
+      --line: rgba(212, 175, 55, .28);
+      --gold: #d4af37;
+      --gold2: #f6d76b;
+      --text: #f8fafc;
+      --muted: #b8c0cc;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #facc15;
     }
-    * { box-sizing:border-box; }
+    * { box-sizing: border-box; }
     body {
-      margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:linear-gradient(180deg,var(--bg1),var(--bg2) 42%,var(--bg3));
-      color:var(--text); padding:18px; line-height:1.7; min-height:100vh;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(212,175,55,.18), transparent 26%),
+        linear-gradient(180deg, #121620, var(--bg) 45%);
+      line-height: 1.65;
     }
-    .container { max-width:960px; margin:0 auto; }
-    .hero { text-align:center; padding:12px 0 22px; }
-    h1 { margin:0 0 8px; font-size:30px; }
-    h2 { margin-top:0; font-size:22px; }
+    .container { max-width: 1180px; margin: 0 auto; }
+    .hero { text-align: center; padding: 12px 0 24px; }
+    h1 { margin: 0; font-size: 32px; letter-spacing: .02em; }
+    h2 { margin: 0 0 14px; font-size: 21px; color: var(--gold2); }
+    h3 { margin: 18px 0 8px; color: #fff; }
+    .sub { color: var(--muted); margin: 6px 0 0; }
     .card {
-      background:rgba(16,24,39,.96); border:1px solid rgba(148,163,184,.2);
-      border-radius:20px; padding:22px; margin-bottom:18px; box-shadow:0 10px 28px rgba(0,0,0,.28);
+      background: rgba(16,19,28,.96);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 18px 38px rgba(0,0,0,.32);
+      overflow: hidden;
     }
-    .notice { border-color:rgba(250,204,21,.5); background:rgba(250,204,21,.08); color:#fde68a; }
-    input, select, button, textarea {
-      width:100%; padding:13px 14px; margin:0 0 14px; border-radius:14px;
-      border:1px solid var(--border); background:var(--input); color:var(--text); font-size:15px;
+    .notice {
+      background: rgba(212,175,55,.09);
+      color: #f8e7a2;
     }
-    button { border:0; font-weight:900; cursor:pointer; }
-    .blue { background:var(--blue); }
-    .green { background:var(--green); color:#052e16; }
-    .red { background:var(--red); }
-    .orange { background:var(--orange); }
-    .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
-    .statBox {
-      background:rgba(2,6,23,.7); border:1px solid rgba(148,163,184,.22);
-      border-radius:16px; padding:16px; text-align:center;
+    label { display: block; color: var(--muted); font-weight: 800; margin: 8px 0 6px; }
+    input, button {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 10px;
+      border: 1px solid rgba(212,175,55,.38);
+      background: #070a11;
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 15px;
+      margin-bottom: 10px;
     }
-    .statBox strong { display:block; font-size:25px; margin-top:4px; }
-    .small { color:var(--muted); font-size:14px; }
+    button {
+      border: none;
+      background: linear-gradient(135deg, var(--gold), #9f7d1d);
+      color: #111827;
+      font-weight: 950;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .stat {
+      background: rgba(5,7,13,.68);
+      border: 1px solid rgba(212,175,55,.22);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .stat span { display: block; color: var(--muted); font-size: 13px; }
+    .stat strong { display: block; font-size: 24px; margin-top: 4px; }
+    .small { color: var(--muted); font-size: 13px; }
+    .tableWrap { overflow-x: auto; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    th, td {
+      border-bottom: 1px solid rgba(148,163,184,.16);
+      padding: 9px 8px;
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+    th { color: #fff; background: rgba(5,7,13,.9); }
+    .rankTable th:first-child, .rankTable td:first-child { width: 52px; text-align: center; }
+    .heat-high { background: rgba(34,197,94,.20); color: #d9fbe4; font-weight: 900; }
+    .heat-mid { background: rgba(250,204,21,.18); color: #fff3b0; font-weight: 900; }
+    .heat-low { background: rgba(239,68,68,.18); color: #ffd2d2; font-weight: 900; }
     .pill {
-      display:inline-block; padding:5px 10px; border-radius:999px; background:rgba(56,189,248,.14);
-      border:1px solid rgba(56,189,248,.28); color:#bae6fd; margin:3px; font-size:13px; font-weight:800;
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(212,175,55,.12);
+      border: 1px solid rgba(212,175,55,.28);
+      color: #f7e6a5;
+      margin: 2px;
+      white-space: nowrap;
     }
-    table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
-    th, td { border-bottom:1px solid rgba(148,163,184,.18); padding:8px 6px; text-align:right; }
-    th:first-child, td:first-child { text-align:left; }
-    th { color:#fff; }
-    .good { color:#bbf7d0; font-weight:900; }
-    .bad { color:#fecaca; font-weight:900; }
-    .warn { color:#fde68a; font-weight:900; }
-    .log {
-      max-height:360px; overflow:auto; background:rgba(2,6,23,.55); border-radius:14px;
-      border:1px solid rgba(148,163,184,.18); padding:10px;
+    @media (max-width: 720px) {
+      body { padding: 12px; }
+      h1 { font-size: 25px; }
+      .card { padding: 16px; border-radius: 12px; }
+      .grid, .two { grid-template-columns: 1fr; }
+      table { min-width: 680px; }
     }
-    .logItem {
-      padding:10px; border-bottom:1px solid rgba(148,163,184,.14); color:var(--muted); font-size:13px;
-    }
-    @media (max-width:700px) { .grid,.grid3 { grid-template-columns:1fr; } body{padding:12px;} h1{font-size:24px;} }
   </style>
 </head>
 <body>
   <main class="container">
     <section class="hero">
-      <h1>ScalpLayer Research v1.0</h1>
-      <p class="small">Dukascopy等のUSD/JPY 1分足CSVを読み込み、買い入口・売り入口が「順方向で勝つのか」「逆方向で勝つのか」を検証します。</p>
+      <h1>ScalpLayer Finder v1</h1>
+      <p class="sub">USDJPY M1 CSVを読み込み、人間では見つけにくい優位性のある過去パターンを探す研究所です。</p>
     </section>
 
     <section class="card notice">
-      これは検証用ツールです。実取引や利益を保証するものではありません。BIDデータのみの場合、買い取引のASKスプレッドは厳密には反映されません。必要に応じてスプレッドpipsを入力してください。
+      このツールは売買シグナルを出すものではありません。過去データの研究・分析用です。外部APIは使わず、CSVファイルだけでローカル分析します。
     </section>
 
     <section class="card">
-      <h2>① CSV読み込み</h2>
-      <input id="csvFiles" type="file" accept=".csv,.txt" multiple />
-      <div class="grid">
-        <div>
-          <label>想定スプレッドpips</label>
-          <input id="spreadPips" type="number" step="0.1" value="2.0" />
-        </div>
-        <div>
-          <label>最小サイン間隔（分）</label>
-          <input id="minSignalGap" type="number" step="1" value="5" />
-        </div>
-      </div>
-      <button class="green" onclick="loadFiles()">CSVを読み込む</button>
-      <p id="loadStatus" class="small">CSVを選択してください。複数ファイルをまとめて読み込めます。</p>
+      <h2>CSV読込</h2>
+      <label for="csvFile">USDJPY M1 CSV</label>
+      <input id="csvFile" type="file" accept=".csv,text/csv">
+      <button onclick="runAnalysis()">分析を実行</button>
+      <div id="status" class="small">日時・始値・高値・安値・終値を含むCSVを選択してください。</div>
     </section>
 
     <section class="card">
-      <h2>② ScalpLayer簡易ロジック設定</h2>
-      <p class="small">v5.0研究用の簡易再現ロジックです。現在のScalpLayer完全再現ではなく、「買い入口/売り入口が短期天井・底になっていないか」を調べるための研究版です。</p>
-      <div class="grid3">
-        <div>
-          <label>EMA距離上限pips</label>
-          <input id="emaMax" type="number" step="0.1" value="5" />
-        </div>
-        <div>
-          <label>RSI買われすぎ</label>
-          <input id="rsiHigh" type="number" step="1" value="70" />
-        </div>
-        <div>
-          <label>RSI売られすぎ</label>
-          <input id="rsiLow" type="number" step="1" value="30" />
-        </div>
-      </div>
-      <button class="blue" onclick="runBacktest()">バックテスト実行</button>
-      <p id="testStatus" class="small">CSV読み込み後に実行できます。</p>
-    </section>
-
-    <section class="card">
-      <h2>③ 結果サマリー</h2>
-      <div class="grid3">
-        <div class="statBox">ローソク足<strong id="barCount">--</strong></div>
-        <div class="statBox">買い入口<strong id="buyCount">--</strong></div>
-        <div class="statBox">売り入口<strong id="sellCount">--</strong></div>
-      </div>
-      <div id="verdict" class="statBox" style="margin-top:14px;">判定待ち</div>
-      <div id="summaryPills" style="margin-top:10px;"></div>
-    </section>
-
-    <section class="card">
-      <h2>④ 通常ロジック vs 逆ロジック</h2>
-      <div id="resultTable" class="small">まだ結果はありません。</div>
-    </section>
-
-    <section class="card">
-      <h2>⑤ 買い入口だけ / 売り入口だけ</h2>
-      <div class="grid">
-        <div>
-          <h3>買い入口</h3>
-          <div id="buyTable" class="small">未集計</div>
-        </div>
-        <div>
-          <h3>売り入口</h3>
-          <div id="sellTable" class="small">未集計</div>
-        </div>
+      <h2>データ概要</h2>
+      <div id="summary" class="grid">
+        <div class="stat"><span>総データ数</span><strong>--</strong></div>
+        <div class="stat"><span>期間</span><strong>--</strong></div>
+        <div class="stat"><span>分析対象</span><strong>--</strong></div>
+        <div class="stat"><span>研究モード</span><strong>待機中</strong></div>
       </div>
     </section>
 
     <section class="card">
-      <h2>⑥ サインログ</h2>
-      <button class="blue" onclick="downloadResultsCsv()">結果CSVをダウンロード</button>
-      <div id="log" class="log small">まだログはありません。</div>
+      <h2>時間帯別分析</h2>
+      <div id="hourAnalysis" class="tableWrap small">分析後に表示します。</div>
+      <h3>時間帯ランキング 上位5件</h3>
+      <div id="hourTop5" class="tableWrap small">--</div>
+    </section>
+
+    <section class="card">
+      <h2>曜日別分析</h2>
+      <div id="weekdayAnalysis" class="tableWrap small">分析後に表示します。</div>
+    </section>
+
+    <section class="card">
+      <h2>連続ローソク分析</h2>
+      <p class="small">直近3本の合計pipsごとに、その後5分間の上昇・下落を集計します。</p>
+      <div id="candleAnalysis" class="tableWrap small">分析後に表示します。</div>
+    </section>
+
+    <section class="card">
+      <h2>EMA分析</h2>
+      <p class="small">EMA20と現在価格の距離ごとに、その後5分間の勝率を表示します。</p>
+      <div id="emaAnalysis" class="tableWrap small">分析後に表示します。</div>
+    </section>
+
+    <section class="card">
+      <h2>RSI分析</h2>
+      <p class="small">RSI14の帯ごとに、出現回数と次5分の上昇率・下落率を表示します。</p>
+      <div id="rsiAnalysis" class="tableWrap small">分析後に表示します。</div>
+    </section>
+
+    <section class="card">
+      <h2>優位性ランキング TOP10</h2>
+      <p class="small">単独条件と2条件の組み合わせから、期待値の高い条件をランキングします。</p>
+      <div id="edgeRanking" class="tableWrap small">分析後に表示します。</div>
     </section>
   </main>
 
-<script>
-let candles = [];
-let signals = [];
-let results = [];
-const horizons = [1,3,5,10,30];
+  <script>
+    const PIP = 100;
+    const EMA_PERIOD = 20;
+    const RSI_PERIOD = 14;
+    let bars = [];
 
-function parseNumber(v){ const n = Number(String(v).replace(/,/g,"").trim()); return Number.isFinite(n) ? n : null; }
-
-function detectDelimiter(line){
-  const candidates = [",",";","\t"];
-  return candidates.sort((a,b)=> line.split(b).length - line.split(a).length)[0];
-}
-
-function parseCsvText(text){
-  const lines = text.trim().split(/\r?\n/).filter(Boolean);
-  if(lines.length < 2) return [];
-  const delim = detectDelimiter(lines[0]);
-  const header = lines[0].split(delim).map(h => h.trim().toLowerCase().replace(/^"|"$/g,""));
-  const idx = {
-    time: header.findIndex(h => ["datetime","date","time","gmt time","local time"].includes(h) || h.includes("time") || h.includes("date")),
-    open: header.findIndex(h => h === "open" || h.includes("open")),
-    high: header.findIndex(h => h === "high" || h.includes("high")),
-    low: header.findIndex(h => h === "low" || h.includes("low")),
-    close: header.findIndex(h => h === "close" || h.includes("close")),
-    volume: header.findIndex(h => h.includes("volume") || h.includes("vol"))
-  };
-  // Dukascopyなどヘッダー無しっぽい場合
-  const start = idx.open >= 0 && idx.high >= 0 && idx.low >= 0 && idx.close >= 0 ? 1 : 0;
-  const rows = [];
-  for(let i=start;i<lines.length;i++){
-    const cols = lines[i].split(delim).map(c => c.trim().replace(/^"|"$/g,""));
-    let time, open, high, low, close, volume;
-    if(start === 1){
-      time = cols[idx.time] || cols[0];
-      open = parseNumber(cols[idx.open]);
-      high = parseNumber(cols[idx.high]);
-      low = parseNumber(cols[idx.low]);
-      close = parseNumber(cols[idx.close]);
-      volume = idx.volume >= 0 ? parseNumber(cols[idx.volume]) : null;
-    } else {
-      time = cols[0];
-      open = parseNumber(cols[1]);
-      high = parseNumber(cols[2]);
-      low = parseNumber(cols[3]);
-      close = parseNumber(cols[4]);
-      volume = parseNumber(cols[5]);
-    }
-    const dt = new Date(String(time).replace(" ", "T").replace(/\./g,"-"));
-    if(open && high && low && close && Number.isFinite(dt.getTime())){
-      rows.push({time: dt, open, high, low, close, volume});
-    }
-  }
-  return rows;
-}
-
-async function loadFiles(){
-  const files = Array.from(document.getElementById("csvFiles").files || []);
-  if(!files.length){ alert("CSVファイルを選択してください。"); return; }
-  const all = [];
-  for(const file of files){
-    const text = await file.text();
-    const rows = parseCsvText(text);
-    all.push(...rows);
-  }
-  candles = all.sort((a,b)=>a.time-b.time);
-  // 重複除去
-  const map = new Map();
-  candles.forEach(c => map.set(c.time.getTime(), c));
-  candles = Array.from(map.values()).sort((a,b)=>a.time-b.time);
-  document.getElementById("loadStatus").textContent = `${files.length}ファイル、${candles.length}本のローソク足を読み込みました。`;
-  document.getElementById("barCount").textContent = candles.length;
-}
-
-function ema(values, period){
-  const out = Array(values.length).fill(null);
-  if(values.length < period) return out;
-  let sum = 0;
-  for(let i=0;i<period;i++) sum += values[i];
-  let prev = sum / period;
-  out[period-1] = prev;
-  const k = 2/(period+1);
-  for(let i=period;i<values.length;i++){
-    prev = values[i]*k + prev*(1-k);
-    out[i] = prev;
-  }
-  return out;
-}
-
-function sma(values, period){
-  const out = Array(values.length).fill(null);
-  let sum = 0;
-  for(let i=0;i<values.length;i++){
-    sum += values[i];
-    if(i>=period) sum -= values[i-period];
-    if(i>=period-1) out[i] = sum/period;
-  }
-  return out;
-}
-
-function stdev(values, period, means){
-  const out = Array(values.length).fill(null);
-  for(let i=period-1;i<values.length;i++){
-    const mean = means[i];
-    let s=0;
-    for(let j=i-period+1;j<=i;j++) s += Math.pow(values[j]-mean,2);
-    out[i] = Math.sqrt(s/period);
-  }
-  return out;
-}
-
-function rsi(values, period=14){
-  const out = Array(values.length).fill(null);
-  if(values.length <= period) return out;
-  let gain=0, loss=0;
-  for(let i=1;i<=period;i++){
-    const d = values[i]-values[i-1];
-    if(d>=0) gain += d; else loss -= d;
-  }
-  let avgG = gain/period, avgL = loss/period;
-  out[period] = avgL === 0 ? 100 : 100 - 100/(1+avgG/avgL);
-  for(let i=period+1;i<values.length;i++){
-    const d = values[i]-values[i-1];
-    const g = d>0 ? d : 0, l = d<0 ? -d : 0;
-    avgG = (avgG*(period-1)+g)/period;
-    avgL = (avgL*(period-1)+l)/period;
-    out[i] = avgL === 0 ? 100 : 100 - 100/(1+avgG/avgL);
-  }
-  return out;
-}
-
-function heikinAshi(c){
-  const out = [];
-  for(let i=0;i<c.length;i++){
-    const close = (c[i].open+c[i].high+c[i].low+c[i].close)/4;
-    const open = i===0 ? (c[i].open+c[i].close)/2 : (out[i-1].open+out[i-1].close)/2;
-    const high = Math.max(c[i].high, open, close);
-    const low = Math.min(c[i].low, open, close);
-    out.push({open, high, low, close});
-  }
-  return out;
-}
-
-function countHaStreak(ha, i){
-  const dir = ha[i].close > ha[i].open ? "bull" : ha[i].close < ha[i].open ? "bear" : "flat";
-  if(dir==="flat") return {dir, count:0};
-  let count=0;
-  for(let j=i;j>=0;j--){
-    const d = ha[j].close > ha[j].open ? "bull" : ha[j].close < ha[j].open ? "bear" : "flat";
-    if(d!==dir) break;
-    count++;
-  }
-  return {dir, count};
-}
-
-function bbPosition(close, mid, upper, lower){
-  if(mid==null || upper==null || lower==null) return "不足";
-  const width = upper-lower;
-  if(width <= 0) return "不足";
-  if(close >= upper) return "上バンド超え";
-  if(close <= lower) return "下バンド割れ";
-  if(close > upper - width*0.15) return "上バンド付近";
-  if(close < lower + width*0.15) return "下バンド付近";
-  if(Math.abs(close-mid) < width*0.12) return "ミドル付近";
-  return close > mid ? "ミドル上" : "ミドル下";
-}
-
-function runBacktest(){
-  if(candles.length < 100){ alert("ローソク足データが不足しています。"); return; }
-  const spread = Number(document.getElementById("spreadPips").value || 0);
-  const minGap = Number(document.getElementById("minSignalGap").value || 5);
-  const emaMax = Number(document.getElementById("emaMax").value || 5);
-  const rsiHigh = Number(document.getElementById("rsiHigh").value || 70);
-  const rsiLow = Number(document.getElementById("rsiLow").value || 30);
-
-  const closes = candles.map(c=>c.close);
-  const ema9 = ema(closes, 9);
-  const ema20 = ema(closes, 20);
-  const rsi14 = rsi(closes, 14);
-  const mid = sma(closes, 20);
-  const sd = stdev(closes, 20, mid);
-  const upper = sd.map((s,i)=>s==null?null:mid[i]+2*s);
-  const lower = sd.map((s,i)=>s==null?null:mid[i]-2*s);
-  const ha = heikinAshi(candles);
-
-  signals = [];
-  results = [];
-  let lastSignalIndex = -9999;
-
-  for(let i=35; i<candles.length-31; i++){
-    if(i-lastSignalIndex < minGap) continue;
-
-    const c = candles[i], p = candles[i-1], p2 = candles[i-2];
-    const haStreak = countHaStreak(ha, i);
-    const emaDist = Math.abs(c.close - ema9[i]) * 100;
-    const bb = bbPosition(c.close, mid[i], upper[i], lower[i]);
-
-    let buyScore = 0, sellScore = 0;
-    const reasons = [];
-
-    // 方向系
-    if(c.close > ema20[i] && ema20[i] > ema20[i-3]) { buyScore += 2; reasons.push("EMA上向き買い+2"); }
-    if(c.close < ema20[i] && ema20[i] < ema20[i-3]) { sellScore += 2; reasons.push("EMA下向き売り+2"); }
-
-    if(haStreak.dir === "bull") { buyScore += Math.min(3, haStreak.count); reasons.push(`平均足陽線${haStreak.count}本`); }
-    if(haStreak.dir === "bear") { sellScore += Math.min(3, haStreak.count); reasons.push(`平均足陰線${haStreak.count}本`); }
-
-    if(c.close > p.high) { buyScore += 2; reasons.push("前高値上抜け"); }
-    if(c.close < p.low) { sellScore += 2; reasons.push("前安値下抜け"); }
-
-    if(c.close > p.close && p.close >= p2.close) buyScore += 1;
-    if(c.close < p.close && p.close <= p2.close) sellScore += 1;
-
-    // 過熱フィルター/減点
-    if(emaDist > emaMax) { buyScore -= 1; sellScore -= 1; reasons.push(`EMA距離${emaDist.toFixed(1)}pips過熱`); }
-    if(rsi14[i] != null && rsi14[i] >= rsiHigh) { buyScore -= 2; sellScore += 1; reasons.push("RSI高値圏"); }
-    if(rsi14[i] != null && rsi14[i] <= rsiLow) { sellScore -= 2; buyScore += 1; reasons.push("RSI安値圏"); }
-    if(bb === "上バンド超え" || bb === "上バンド付近") { buyScore -= 2; sellScore += 1; reasons.push("BB上限"); }
-    if(bb === "下バンド割れ" || bb === "下バンド付近") { sellScore -= 2; buyScore += 1; reasons.push("BB下限"); }
-
-    let signal = null;
-    if(buyScore >= 5 && buyScore - sellScore >= 2) signal = "buy";
-    if(sellScore >= 5 && sellScore - buyScore >= 2) signal = "sell";
-
-    if(signal){
-      const sig = {
-        index:i, time:c.time, signal, price:c.close, buyScore, sellScore,
-        rsi:rsi14[i], emaDist, bb, haStreak: `${haStreak.dir}:${haStreak.count}`, reasons: reasons.join(" / ")
-      };
-      signals.push(sig);
-      lastSignalIndex = i;
-      for(const h of horizons){
-        const future = candles[i+h];
-        if(!future) continue;
-        const diffPips = (future.close - c.close) * 100;
-        const normal = signal === "buy" ? diffPips - spread : -diffPips - spread;
-        const reverse = signal === "buy" ? -diffPips - spread : diffPips - spread;
-        results.push({...sig, horizon:h, futurePrice:future.close, normalPips:normal, reversePips:reverse});
+    async function runAnalysis() {
+      const file = document.getElementById("csvFile").files[0];
+      if (!file) {
+        alert("CSVファイルを選択してください。");
+        return;
+      }
+      setStatus("CSVを読み込み中...");
+      try {
+        const text = await file.text();
+        bars = parseCsvBars(text);
+        if (bars.length < 40) throw new Error("分析に必要なデータ数が不足しています。");
+        setStatus(`${bars.length.toLocaleString()}本を読み込みました。指標を計算中...`);
+        enrichBars(bars);
+        const analyzable = bars.filter(b => b.ready && b.future5);
+        const result = {
+          hours: aggregate(analyzable, b => `${String(b.time.getHours()).padStart(2, "0")}時`),
+          weekdays: aggregate(analyzable, b => b.weekday),
+          candles: aggregate(analyzable, b => b.recent3Bucket),
+          ema: aggregate(analyzable, b => b.emaBucket),
+          rsi: aggregate(analyzable, b => b.rsiBucket)
+        };
+        renderSummary(file.name, analyzable.length);
+        renderHourAnalysis(result.hours);
+        renderWeekdayAnalysis(result.weekdays);
+        renderBasicTable("candleAnalysis", result.candles, ["条件", "件数", "上昇率", "下落率", "平均変動"], row => [row.key, row.count, pct(row.upRate), pct(row.downRate), pips(row.avgMove)]);
+        renderBasicTable("emaAnalysis", result.ema, ["EMA距離", "件数", "次5分上昇率", "次5分下落率", "平均変動"], row => [row.key, row.count, pct(row.upRate), pct(row.downRate), pips(row.avgMove)]);
+        renderBasicTable("rsiAnalysis", result.rsi, ["RSI帯", "出現回数", "次5分上昇率", "次5分下落率", "平均変動"], row => [row.key, row.count, pct(row.upRate), pct(row.downRate), pips(row.avgMove)]);
+        renderEdgeRanking(buildEdgeRanking(analyzable));
+        setStatus("分析完了。高勝率は緑、低勝率は赤、中立は黄色で表示しています。");
+      } catch (error) {
+        console.error(error);
+        setStatus("エラー：" + error.message);
       }
     }
-  }
 
-  renderAll();
-}
-
-function stats(rows){
-  const n = rows.length;
-  if(!n) return {n:0, winN:0, winRate:0, avg:0, total:0};
-  const winN = rows.filter(r=>r>0).length;
-  const total = rows.reduce((a,b)=>a+b,0);
-  return {n, winN, winRate:Math.round(winN/n*100), avg:total/n, total};
-}
-
-function renderStatsTable(target, filterFn){
-  const rows = horizons.map(h=>{
-    const rs = results.filter(r=>r.horizon===h && (!filterFn || filterFn(r)));
-    const normal = stats(rs.map(r=>r.normalPips));
-    const reverse = stats(rs.map(r=>r.reversePips));
-    return {h, normal, reverse};
-  });
-  const html = `<table><thead><tr><th>時間</th><th>通常勝率</th><th>通常平均</th><th>通常合計</th><th>逆勝率</th><th>逆平均</th><th>逆合計</th><th>優位</th></tr></thead><tbody>`+
-    rows.map(r=>{
-      const better = r.reverse.avg > r.normal.avg ? "逆" : r.normal.avg > r.reverse.avg ? "通常" : "同等";
-      const cls = better==="逆" ? "warn" : better==="通常" ? "good" : "";
-      return `<tr><td>${r.h}分後</td><td>${r.normal.winRate}%</td><td>${r.normal.avg.toFixed(2)}</td><td>${r.normal.total.toFixed(1)}</td><td>${r.reverse.winRate}%</td><td>${r.reverse.avg.toFixed(2)}</td><td>${r.reverse.total.toFixed(1)}</td><td class="${cls}">${better}</td></tr>`;
-    }).join("")+`</tbody></table>`;
-  document.getElementById(target).innerHTML = html;
-}
-
-function renderAll(){
-  document.getElementById("barCount").textContent = candles.length;
-  document.getElementById("buyCount").textContent = signals.filter(s=>s.signal==="buy").length;
-  document.getElementById("sellCount").textContent = signals.filter(s=>s.signal==="sell").length;
-  document.getElementById("testStatus").textContent = `${signals.length}件のサインを検出しました。`;
-
-  renderStatsTable("resultTable");
-  renderStatsTable("buyTable", r=>r.signal==="buy");
-  renderStatsTable("sellTable", r=>r.signal==="sell");
-
-  const shortReverse = [1,3,5].map(h=>{
-    const rs = results.filter(r=>r.horizon===h);
-    return {h, n: stats(rs.map(r=>r.normalPips)), rv: stats(rs.map(r=>r.reversePips))};
-  });
-  const revBetter = shortReverse.filter(x=>x.rv.winRate >= 55 && x.rv.avg > x.n.avg).length;
-  const normal30 = stats(results.filter(r=>r.horizon===30).map(r=>r.normalPips));
-  const reverse30 = stats(results.filter(r=>r.horizon===30).map(r=>r.reversePips));
-  let verdict = "データ不足";
-  let cls = "";
-  if(signals.length >= 10){
-    if(revBetter >= 2 && normal30.winRate >= 55 && normal30.avg > reverse30.avg) {
-      verdict = "短期は逆方向が有利、30分後は順方向が有利の可能性";
-      cls = "warn";
-    } else if(revBetter >= 2) {
-      verdict = "短期逆張り有利の可能性：買い入口/売り入口が上限・下限検出になっているかも";
-      cls = "warn";
-    } else if(normal30.winRate >= 55 && normal30.avg > reverse30.avg) {
-      verdict = "通常方向が中期で優位の可能性：スキャルより短期デイトレ寄りかも";
-      cls = "good";
-    } else {
-      verdict = "通常/逆とも明確な優位なし：ノイズまたは条件再設計が必要";
-      cls = "bad";
+    function parseCsvBars(text) {
+      const rows = parseCsv(text).filter(row => row.some(cell => String(cell).trim() !== ""));
+      if (!rows.length) return [];
+      const headers = rows[0].map(h => String(h).trim().toLowerCase());
+      const hasHeader = headers.some(h => ["datetime", "time", "date", "日時"].includes(h)) || headers.includes("終値") || headers.includes("close");
+      const body = hasHeader ? rows.slice(1) : rows;
+      const idx = hasHeader ? {
+        time: findHeader(headers, ["日時", "datetime", "time", "date"]),
+        open: findHeader(headers, ["始値", "open"]),
+        high: findHeader(headers, ["高値", "high"]),
+        low: findHeader(headers, ["安値", "low"]),
+        close: findHeader(headers, ["終値", "close"])
+      } : { time: 0, open: 1, high: 2, low: 3, close: 4 };
+      return body.map(row => ({
+        rawTime: row[idx.time],
+        time: parseDate(row[idx.time]),
+        open: toNumber(row[idx.open]),
+        high: toNumber(row[idx.high]),
+        low: toNumber(row[idx.low]),
+        close: toNumber(row[idx.close])
+      })).filter(b => b.time && [b.open, b.high, b.low, b.close].every(Number.isFinite))
+        .sort((a, b) => a.time - b.time)
+        .map((b, i) => ({ ...b, index: i }));
     }
-  }
-  document.getElementById("verdict").innerHTML = `<strong class="${cls}">${verdict}</strong>`;
-  document.getElementById("summaryPills").innerHTML = horizons.map(h=>{
-    const rs = results.filter(r=>r.horizon===h);
-    const n = stats(rs.map(r=>r.normalPips));
-    const rv = stats(rs.map(r=>r.reversePips));
-    return `<span class="pill">${h}分 通常${n.winRate}% / 逆${rv.winRate}%</span>`;
-  }).join("");
 
-  const log = signals.slice(0,200).map(s=>{
-    const r5 = results.find(r=>r.index===s.index && r.horizon===5);
-    return `<div class="logItem">${s.time.toLocaleString()}｜${s.signal==="buy"?"買い入口":"売り入口"}｜${s.price.toFixed(3)}｜5分 通常:${r5?r5.normalPips.toFixed(1):"--"} / 逆:${r5?r5.reversePips.toFixed(1):"--"}｜BB:${s.bb}｜RSI:${s.rsi?s.rsi.toFixed(1):"--"}｜EMA距離:${s.emaDist.toFixed(1)}pips</div>`;
-  }).join("");
-  document.getElementById("log").innerHTML = log || "サインが検出されませんでした。";
-}
+    function parseCsv(text) {
+      const rows = [];
+      let row = [], cell = "", quote = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i], next = text[i + 1];
+        if (quote && ch === '"' && next === '"') { cell += '"'; i++; continue; }
+        if (ch === '"') { quote = !quote; continue; }
+        if (!quote && ch === ",") { row.push(cell); cell = ""; continue; }
+        if (!quote && (ch === "\n" || ch === "\r")) {
+          if (ch === "\r" && next === "\n") i++;
+          row.push(cell); rows.push(row); row = []; cell = ""; continue;
+        }
+        cell += ch;
+      }
+      row.push(cell); rows.push(row);
+      return rows;
+    }
 
-function downloadResultsCsv(){
-  if(!results.length){ alert("結果がありません。"); return; }
-  const header = ["time","signal","entryPrice","futureMinutes","futurePrice","normalPips","reversePips","buyScore","sellScore","rsi","emaDist","bb","haStreak","reasons"];
-  const rows = results.map(r=>[
-    r.time.toISOString(), r.signal, r.price, r.horizon, r.futurePrice, r.normalPips.toFixed(3), r.reversePips.toFixed(3),
-    r.buyScore, r.sellScore, r.rsi==null?"":r.rsi.toFixed(2), r.emaDist.toFixed(2), r.bb, r.haStreak, `"${String(r.reasons).replace(/"/g,'""')}"`
-  ].join(","));
-  const blob = new Blob([header.join(",")+"\n"+rows.join("\n")], {type:"text/csv;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = "scalplayer_research_results.csv";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-</script>
+    function enrichBars(list) {
+      let ema = list[0].close;
+      const alpha = 2 / (EMA_PERIOD + 1);
+      let avgGain = 0, avgLoss = 0;
+      list.forEach((bar, i) => {
+        if (i === 0) bar.ema20 = bar.close;
+        else {
+          ema = bar.close * alpha + ema * (1 - alpha);
+          bar.ema20 = ema;
+        }
+        if (i > 0) {
+          const diff = bar.close - list[i - 1].close;
+          const gain = Math.max(0, diff);
+          const loss = Math.max(0, -diff);
+          if (i <= RSI_PERIOD) {
+            avgGain += gain; avgLoss += loss;
+            if (i === RSI_PERIOD) {
+              avgGain /= RSI_PERIOD; avgLoss /= RSI_PERIOD;
+              bar.rsi = calcRsi(avgGain, avgLoss);
+            }
+          } else {
+            avgGain = (avgGain * (RSI_PERIOD - 1) + gain) / RSI_PERIOD;
+            avgLoss = (avgLoss * (RSI_PERIOD - 1) + loss) / RSI_PERIOD;
+            bar.rsi = calcRsi(avgGain, avgLoss);
+          }
+        }
+        bar.weekday = ["日曜", "月曜", "火曜", "水曜", "木曜", "金曜", "土曜"][bar.time.getDay()];
+        bar.emaDistance = (bar.close - bar.ema20) * PIP;
+        bar.emaBucket = bucketEma(bar.emaDistance);
+        bar.rsiBucket = bucketRsi(bar.rsi);
+        bar.recent3 = i >= 3 ? (bar.close - list[i - 3].close) * PIP : null;
+        bar.recent3Bucket = bucketRecent3(bar.recent3);
+        bar.rangePips = (bar.high - bar.low) * PIP;
+        bar.ready = i >= 20 && Number.isFinite(bar.rsi) && i + 5 < list.length;
+        if (i + 5 < list.length) {
+          const future = list[i + 5].close;
+          bar.future5 = (future - bar.close) * PIP;
+          const futureSlice = list.slice(i + 1, i + 6);
+          bar.futureHigh = (Math.max(...futureSlice.map(b => b.high)) - bar.close) * PIP;
+          bar.futureLow = (Math.min(...futureSlice.map(b => b.low)) - bar.close) * PIP;
+          bar.futureRange = Math.max(Math.abs(bar.futureHigh), Math.abs(bar.futureLow));
+        }
+      });
+    }
+
+    function aggregate(rows, keyFn) {
+      const map = new Map();
+      rows.forEach(row => {
+        const key = keyFn(row);
+        if (!key || key.includes("不足")) return;
+        if (!map.has(key)) map.set(key, { key, count: 0, up: 0, down: 0, totalMove: 0, totalUp: 0, totalDown: 0, totalRange: 0 });
+        const item = map.get(key);
+        item.count++;
+        if (row.future5 > 0) item.up++;
+        if (row.future5 < 0) item.down++;
+        item.totalMove += row.future5;
+        item.totalUp += Math.max(0, row.futureHigh);
+        item.totalDown += Math.abs(Math.min(0, row.futureLow));
+        item.totalRange += row.futureRange;
+      });
+      return [...map.values()].map(x => ({
+        ...x,
+        upRate: x.count ? x.up / x.count * 100 : 0,
+        downRate: x.count ? x.down / x.count * 100 : 0,
+        winRate: x.count ? Math.max(x.up, x.down) / x.count * 100 : 0,
+        avgMove: x.count ? x.totalMove / x.count : 0,
+        avgUp: x.count ? x.totalUp / x.count : 0,
+        avgDown: x.count ? x.totalDown / x.count : 0,
+        avgRange: x.count ? x.totalRange / x.count : 0
+      })).sort((a, b) => b.winRate - a.winRate || b.count - a.count);
+    }
+
+    function buildEdgeRanking(rows) {
+      const conditions = [
+        { label: b => `RSI${b.rsiBucket}`, key: b => b.rsiBucket },
+        { label: b => `EMA距離${b.emaBucket}`, key: b => b.emaBucket },
+        { label: b => `直近3本${b.recent3Bucket}`, key: b => b.recent3Bucket },
+        { label: b => `${String(b.time.getHours()).padStart(2, "0")}時`, key: b => `${String(b.time.getHours()).padStart(2, "0")}時` },
+        { label: b => b.weekday, key: b => b.weekday }
+      ];
+      const candidates = [];
+      conditions.forEach(def => {
+        aggregate(rows, def.label).forEach(row => candidates.push(edgeRow(row.key, row)));
+      });
+      for (let i = 0; i < conditions.length - 1; i++) {
+        for (let j = i + 1; j < conditions.length; j++) {
+          const grouped = aggregate(rows, b => `${conditions[i].label(b)} + ${conditions[j].label(b)}`);
+          grouped.forEach(row => candidates.push(edgeRow(row.key, row)));
+        }
+      }
+      return candidates
+        .filter(r => r.count >= 30)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+    }
+
+    function edgeRow(condition, row) {
+      const direction = row.upRate >= row.downRate ? "上昇優位" : "下落優位";
+      const winRate = Math.max(row.upRate, row.downRate);
+      const expectancy = direction === "上昇優位" ? row.avgMove : -row.avgMove;
+      const score = expectancy * 40 + (winRate - 50) * 2 + Math.log(Math.max(row.count, 1)) * 8;
+      return { condition, direction, count: row.count, winRate, expectancy, avgRange: row.avgRange, score };
+    }
+
+    function renderSummary(fileName, targetCount) {
+      const first = bars[0].time;
+      const last = bars[bars.length - 1].time;
+      document.getElementById("summary").innerHTML = `
+        <div class="stat"><span>総データ数</span><strong>${bars.length.toLocaleString()}</strong></div>
+        <div class="stat"><span>期間</span><strong>${formatDate(first)}<br>${formatDate(last)}</strong></div>
+        <div class="stat"><span>分析対象</span><strong>${targetCount.toLocaleString()}</strong></div>
+        <div class="stat"><span>読込ファイル</span><strong>${escapeHtml(fileName)}</strong></div>
+      `;
+    }
+
+    function renderHourAnalysis(rows) {
+      const ordered = [...rows].sort((a, b) => Number(a.key.slice(0, 2)) - Number(b.key.slice(0, 2)));
+      renderBasicTable("hourAnalysis", ordered, ["時間", "件数", "勝率", "平均上昇pips", "平均下落pips", "平均値幅"], row => [
+        row.key, row.count, pct(row.winRate), pips(row.avgUp), pips(-row.avgDown), pips(row.avgRange)
+      ]);
+      renderBasicTable("hourTop5", rows.slice(0, 5), ["順位", "時間", "勝率", "平均値幅", "件数"], (row, i) => [
+        i + 1, row.key, pct(row.winRate), pips(row.avgRange), row.count
+      ]);
+    }
+
+    function renderWeekdayAnalysis(rows) {
+      const order = ["月曜", "火曜", "水曜", "木曜", "金曜"];
+      const ordered = rows.filter(r => order.includes(r.key)).sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+      renderBasicTable("weekdayAnalysis", ordered, ["曜日", "勝率", "平均変動幅", "上昇率", "下落率", "件数"], row => [
+        row.key, pct(row.winRate), pips(row.avgRange), pct(row.upRate), pct(row.downRate), row.count
+      ]);
+    }
+
+    function renderEdgeRanking(rows) {
+      const html = tableHtml(rows, ["順位", "条件", "方向", "件数", "勝率", "期待値", "平均値幅"], (row, i) => [
+        i + 1, row.condition, row.direction, row.count, pct(row.winRate), pips(row.expectancy), pips(row.avgRange)
+      ], true);
+      document.getElementById("edgeRanking").innerHTML = html;
+    }
+
+    function renderBasicTable(id, rows, headers, mapper) {
+      document.getElementById(id).innerHTML = tableHtml(rows, headers, mapper, false);
+    }
+
+    function tableHtml(rows, headers, mapper, rankClass) {
+      if (!rows.length) return "該当データがありません。";
+      return `<table class="${rankClass ? "rankTable" : ""}"><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${rows.map((row, i) => `<tr>${mapper(row, i).map((cell, idx) => `<td class="${idx > 1 && String(cell).includes("%") ? heatClass(parseFloat(cell)) : ""}">${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    }
+
+    function heatClass(rate) {
+      if (!Number.isFinite(rate)) return "";
+      if (rate >= 58) return "heat-high";
+      if (rate <= 45) return "heat-low";
+      return "heat-mid";
+    }
+
+    function bucketRecent3(v) {
+      if (!Number.isFinite(v)) return "不足";
+      if (v <= -10) return "-10pips以下";
+      if (v <= -5) return "-5pips以下";
+      if (v < 5) return "±0";
+      if (v < 10) return "+5pips以上";
+      return "+10pips以上";
+    }
+
+    function bucketEma(v) {
+      if (!Number.isFinite(v)) return "不足";
+      if (v <= -20) return "-20pips以下";
+      if (v <= -10) return "-10pips以下";
+      if (v < 10) return "±0";
+      if (v < 20) return "+10pips以上";
+      return "+20pips以上";
+    }
+
+    function bucketRsi(v) {
+      if (!Number.isFinite(v)) return "不足";
+      if (v < 20) return "0〜20";
+      if (v < 30) return "20〜30";
+      if (v < 40) return "30〜40";
+      if (v < 50) return "40〜50";
+      if (v < 60) return "50〜60";
+      if (v < 70) return "60〜70";
+      if (v < 80) return "70〜80";
+      return "80〜100";
+    }
+
+    function calcRsi(gain, loss) {
+      if (loss === 0) return 100;
+      const rs = gain / loss;
+      return 100 - 100 / (1 + rs);
+    }
+
+    function findHeader(headers, names) {
+      for (const name of names) {
+        const idx = headers.indexOf(String(name).toLowerCase());
+        if (idx >= 0) return idx;
+      }
+      return -1;
+    }
+
+    function parseDate(value) {
+      const raw = String(value || "").trim().replace(/\./g, "-").replace("T", " ");
+      const m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+      if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4]), Number(m[5]), Number(m[6] || 0));
+      const d = new Date(raw);
+      return Number.isFinite(d.getTime()) ? d : null;
+    }
+
+    function toNumber(value) {
+      const n = Number(String(value ?? "").replace(/,/g, "").trim());
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    function setStatus(text) { document.getElementById("status").textContent = text; }
+    function pct(v) { return `${Number(v).toFixed(1)}%`; }
+    function pips(v) { return `${Number(v) >= 0 ? "+" : ""}${Number(v).toFixed(1)}pips`; }
+    function formatDate(d) { return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`; }
+    function escapeHtml(value) { return String(value ?? "").replace(/[&<>"]/g, s => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[s])); }
+  </script>
 </body>
 </html>
