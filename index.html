@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v5.3</title>
+  <title>ScalpLayer Research v5.4</title>
   <style>
     :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#263852;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b;--yellow:#ffd166}
     *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07111f,#0b1423 44%,#07111f);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
@@ -21,15 +21,15 @@
 <body>
 <main>
   <section class="hero">
-    <h1>ScalpLayer Research v5.3</h1>
-    <p class="sub">安値更新後の最適エントリータイミングを比較します。0本後、1本後、2本後、3本後、5本後を最優先で検証します。</p>
+    <h1>ScalpLayer Research v5.4</h1>
+    <p class="sub">v5.3の最優秀エントリータイミングを固定し、利確・損切り・トレーリング・時間決済のどれが最も実戦向きかを検証します。</p>
   </section>
 
   <section class="card">
     <h2>1. CSV読み込み</h2>
     <input id="csvFile" type="file" accept=".csv,text/csv">
     <button id="loadBtn" type="button">CSVを読み込む</button>
-    <button id="runBtn" type="button" disabled>v5.3分析を実行</button>
+    <button id="runBtn" type="button" disabled>v5.4分析を実行</button>
     <p id="status" class="small">USDJPY M1 CSVを選択してください。</p>
     <div class="kpi">
       <div class="pill"><b>読み込み本数</b><span id="loadedRows">--</span></div>
@@ -41,27 +41,33 @@
 
   <section class="card">
     <h2>2. 分析条件と進捗</h2>
-    <p class="note">固定条件: <b>BUY / RSI &lt; 25 / 直近3本 &lt;= -10pips / NY後半前半 / 安値更新あり</b><br>決済: <b>+10pips到達後、-5pips戻しで決済</b>。今回の研究は「条件を変える」のではなく「何本待つか」を比較します。</p>
+    <p class="note">エントリー条件: <b>RSI &lt; 25 / 直近3本 &lt;= -10pips / NY後半前半 / 安値更新あり</b><br>まずv5.3の9種類のタイミングを同じ基準で再比較し、最上位タイミングを固定。その後、利確方法だけを比較します。</p>
     <progress id="progressBar" value="0" max="100"></progress>
     <p id="progressText" class="small">待機中</p>
+    <div class="kpi">
+      <div class="pill"><b>固定タイミング</b><span id="fixedTiming">--</span></div>
+      <div class="pill"><b>固定エントリー件数</b><span id="fixedEntryCount">--</span></div>
+      <div class="pill"><b>ATR計算件数</b><span id="atrCount">--</span></div>
+      <div class="pill"><b>Base検出件数</b><span id="baseCount">--</span></div>
+    </div>
   </section>
 
   <section class="card">
     <h2>3. 総合ランキング</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>順位</th><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th><th>実戦評価</th></tr></thead>
+        <thead><tr><th>順位</th><th>利確方法</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th><th>実戦評価</th></tr></thead>
         <tbody id="rankingBody"><tr><td colspan="10" class="small">分析実行後に表示します。</td></tr></tbody>
       </table>
     </div>
   </section>
 
   <section class="card">
-    <h2>4. エントリータイミング比較</h2>
+    <h2>4. 利確方法比較</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th></tr></thead>
-        <tbody id="timingBody"><tr><td colspan="8" class="small">0/1/2/3/5本後と戻り確認ルールを比較します。</td></tr></tbody>
+        <thead><tr><th>利確方法</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th></tr></thead>
+        <tbody id="exitBody"><tr><td colspan="8" class="small">固定TP/SL、トレーリング、ATR利確、時間決済を比較します。</td></tr></tbody>
       </table>
     </div>
   </section>
@@ -70,7 +76,7 @@
     <h2>5. Walk Forward 70% / 30%</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>条件</th><th>前半PF</th><th>後半PF</th><th>前半期待値</th><th>後半期待値</th><th>劣化率</th><th>判定</th></tr></thead>
+        <thead><tr><th>利確方法</th><th>前半PF</th><th>後半PF</th><th>前半期待値</th><th>後半期待値</th><th>劣化率</th><th>判定</th></tr></thead>
         <tbody id="walkBody"><tr><td colspan="7" class="small">分析実行後に表示します。</td></tr></tbody>
       </table>
     </div>
@@ -78,23 +84,23 @@
 
   <section class="grid">
     <div class="card">
-      <h2>6. ScalpLayer実装案</h2>
-      <div id="planBox" class="small">分析結果から安全型・標準型・攻撃型を生成します。</div>
+      <h2>6. ScalpLayer推奨設定</h2>
+      <div id="planBox" class="small">分析結果から保守型・標準型・攻撃型を提案します。</div>
     </div>
     <div class="card">
       <h2>7. JSON出力</h2>
-      <button id="downloadBtn" type="button" disabled>research_v5_3_results.json をダウンロード</button>
-      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv5.3の分析結果を確認できます。</p>
+      <button id="downloadBtn" type="button" disabled>research_v5_4_results.json をダウンロード</button>
+      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv5.4の分析結果を確認できます。</p>
     </div>
   </section>
 
   <section class="card">
     <h2>8. Debug Console</h2>
     <div class="kpi">
-      <div class="pill"><b>Base検出件数</b><span id="baseCount">--</span></div>
       <div class="pill"><b>RSI計算件数</b><span id="rsiCount">--</span></div>
       <div class="pill"><b>エラー件数</b><span id="errorCount">--</span></div>
       <div class="pill"><b>最終実行時間</b><span id="lastRun">--</span></div>
+      <div class="pill"><b>生成トレード数</b><span id="tradeCount">--</span></div>
     </div>
     <pre id="debugLog">Debug Consoleはここに表示されます。</pre>
   </section>
@@ -118,7 +124,7 @@ document.getElementById("runBtn").addEventListener("click", runResearch);
 document.getElementById("downloadBtn").addEventListener("click", downloadJson);
 
 function createDebugState() {
-  return { loadedRows: 0, validBars: 0, rsiCount: 0, baseCount: 0, generatedEntryCount: 0, errorCount: 0, lastRun: "--", firstBaseTime: "--", errors: [] };
+  return { loadedRows: 0, validBars: 0, rsiCount: 0, atrCount: 0, baseCount: 0, fixedEntryCount: 0, tradeCount: 0, errorCount: 0, lastRun: "--", errors: [] };
 }
 
 async function loadCsvOnly() {
@@ -146,7 +152,7 @@ async function loadCsvOnly() {
     updateLoadSummary();
     updateDebugConsole();
     setProgress("CSV読み込み完了", 100, 100);
-    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v5.3分析を実行できます。`);
+    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v5.4分析を実行できます。`);
     document.getElementById("runBtn").disabled = !parsed.bars.length;
   } catch (error) {
     logError("loadCsvOnly", "--", error);
@@ -166,18 +172,24 @@ async function runResearch() {
   document.getElementById("runBtn").disabled = true;
   document.getElementById("downloadBtn").disabled = true;
   clearTables();
-  setStatus("v5.3分析を開始しました。");
+  setStatus("v5.4分析を開始しました。");
   try {
     await enrichBarsChunked(bars);
     const baseEvents = await buildBaseEventsChunked(bars);
-    const strategyResults = await evaluateTimingStrategies(baseEvents, bars);
-    const ranking = strategyResults.slice().sort(rankSort);
-    const walkForwardResults = buildWalkForward(strategyResults, bars.length);
-    const implementationPlan = buildImplementationPlan(ranking);
+    const timingRows = await evaluateV53Timing(baseEvents, bars);
+    const fixedTiming = timingRows.slice().sort(rankSort)[0] || null;
+    const fixedTrades = fixedTiming ? fixedTiming.trades : [];
+    debugState.fixedEntryCount = fixedTrades.length;
+    document.getElementById("fixedTiming").textContent = fixedTiming ? fixedTiming.condition : "--";
+    document.getElementById("fixedEntryCount").textContent = fixedTrades.length.toLocaleString();
+    const exitResults = await evaluateExitRules(fixedTrades, bars);
+    const ranking = exitResults.slice().sort(exitRankSort);
+    const walkForwardResults = buildWalkForward(exitResults, bars.length);
+    const recommendedSettings = buildRecommendedSettings(ranking);
     const finalJudgement = buildFinalJudgement(ranking, walkForwardResults);
     researchResults = {
       meta: {
-        version: "research-v5.3",
+        version: "research-v5.4",
         sourceFileName: loadedState.fileName,
         generatedAt: new Date().toISOString(),
         loadedRows: loadedState.loadedRows,
@@ -185,28 +197,25 @@ async function runResearch() {
         startTime: loadedState.startTime,
         endTime: loadedState.endTime
       },
-      fixedCondition: {
-        direction: "BUY",
-        rsi: "<25",
-        recent3Pips: "<=-10",
-        sessionPart: "NY後半前半",
-        lowUpdate: "あり",
-        exitRule: "+10到達後 -5戻し"
+      fixedEntryCondition: {
+        base: "BUY / RSI < 25 / recent3Pips <= -10 / NY後半前半 / 安値更新あり",
+        selectedTiming: fixedTiming ? fixedTiming.condition : "",
+        selectedTimingStats: fixedTiming ? stripTrades(fixedTiming) : null
       },
-      timingComparison: strategyResults,
-      ranking,
+      exitComparison: exitResults.map(stripTrades),
+      ranking: ranking.map(stripTrades),
       walkForwardResults,
-      implementationPlan,
+      recommendedSettings,
       finalJudgement,
       debug: debugState
     };
-    renderTiming(strategyResults);
+    renderExit(exitResults);
     renderRanking(ranking);
     renderWalkForward(walkForwardResults);
-    renderPlan(implementationPlan, finalJudgement);
+    renderPlan(recommendedSettings, finalJudgement);
     document.getElementById("downloadBtn").disabled = false;
     setProgress("分析完了", 100, 100);
-    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v5_3_results.json を出力できます。");
+    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v5_4_results.json を出力できます。");
   } catch (error) {
     logError("runResearch", "--", error);
     setStatus("分析中にエラーが発生しました。Debug Consoleを確認してください。");
@@ -217,7 +226,7 @@ async function runResearch() {
 }
 
 async function enrichBarsChunked(bars) {
-  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0;
+  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0, atr = null, trSum = 0;
   for (let start = 1; start < bars.length; start += CHUNK_SIZE) {
     const end = Math.min(bars.length, start + CHUNK_SIZE);
     for (let i = start; i < end; i++) {
@@ -235,6 +244,15 @@ async function enrichBarsChunked(bars) {
           bar.rsi = calcRsi(avgGain, avgLoss);
           debugState.rsiCount++;
         }
+        const tr = Math.max(bar.high - bar.low, Math.abs(bar.high - prev.close), Math.abs(bar.low - prev.close));
+        if (i <= 14) {
+          trSum += tr;
+          if (i === 14) { atr = trSum / 14; bar.atrPips = atr * PIP; debugState.atrCount++; }
+        } else if (atr != null) {
+          atr = ((atr * 13) + tr) / 14;
+          bar.atrPips = atr * PIP;
+          debugState.atrCount++;
+        }
         bar.session = getSessionJst(bar.time);
         bar.nyLatePart = getNyLatePart(bar.time);
         bar.recent3 = calcRecentPips(bars, i, 3);
@@ -243,8 +261,7 @@ async function enrichBarsChunked(bars) {
         bar.lowBreak10 = isLowBreak(bars, i, 10);
         bar.lowUpdate = bar.lowBreak3 || bar.lowBreak5 || bar.lowBreak10;
         bar.isBull = bar.close > bar.open;
-        bar.isBear = bar.close < bar.open;
-        bar.closeBreakPrevHigh = validBar(prev) && bar.close > prev.high;
+        bar.closeBreakPrevHigh = bar.close > prev.high;
       } catch (error) {
         logError("enrichBarsChunked", i, error);
       }
@@ -265,10 +282,7 @@ async function buildBaseEventsChunked(bars) {
       try {
         const bar = bars[i];
         if (!validBar(bar) || !Number.isFinite(bar.rsi) || !Number.isFinite(bar.recent3)) continue;
-        const ok = bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半" && bar.lowUpdate;
-        if (!ok) continue;
-        events.push({ index: i, time: bar.time, price: bar.close });
-        if (debugState.firstBaseTime === "--") debugState.firstBaseTime = fmtDate(bar.time);
+        if (bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半" && bar.lowUpdate) events.push({ index: i, time: bar.time });
       } catch (error) {
         logError("buildBaseEventsChunked", i, error);
       }
@@ -281,50 +295,92 @@ async function buildBaseEventsChunked(bars) {
   return events;
 }
 
-async function evaluateTimingStrategies(baseEvents, bars) {
-  const strategyDefs = [
-    { key: "delay0", name: "安値更新直後 0本後エントリー", type: "delay", delay: 0 },
-    { key: "delay1", name: "安値更新後 1本後エントリー", type: "delay", delay: 1 },
-    { key: "delay2", name: "安値更新後 2本後エントリー", type: "delay", delay: 2 },
-    { key: "delay3", name: "安値更新後 3本後エントリー", type: "delay", delay: 3 },
-    { key: "delay5", name: "安値更新後 5本後エントリー", type: "delay", delay: 5 },
-    { key: "firstBull", name: "戻り確認: 陽線出現でエントリー", type: "firstBull" },
-    { key: "twoBull", name: "戻り確認: 2連続陽線でエントリー", type: "twoBull" },
-    { key: "closeBreakHigh", name: "戻り確認: 終値が前足高値を上抜け", type: "closeBreakHigh" },
-    { key: "rsiRecover", name: "RSI回復確認: RSI > 25でエントリー", type: "rsiRecover" }
+async function evaluateV53Timing(baseEvents, bars) {
+  const defs = [
+    { key: "delay0", condition: "安値更新直後 0本後エントリー", type: "delay", delay: 0 },
+    { key: "delay1", condition: "安値更新後 1本後エントリー", type: "delay", delay: 1 },
+    { key: "delay2", condition: "安値更新後 2本後エントリー", type: "delay", delay: 2 },
+    { key: "delay3", condition: "安値更新後 3本後エントリー", type: "delay", delay: 3 },
+    { key: "delay5", condition: "安値更新後 5本後エントリー", type: "delay", delay: 5 },
+    { key: "firstBull", condition: "戻り確認: 陽線出現でエントリー", type: "firstBull" },
+    { key: "twoBull", condition: "戻り確認: 2連続陽線でエントリー", type: "twoBull" },
+    { key: "closeBreakHigh", condition: "戻り確認: 終値が前足高値を上抜け", type: "closeBreakHigh" },
+    { key: "rsiRecover", condition: "RSI回復確認: RSI > 25でエントリー", type: "rsiRecover" }
   ];
-  const buckets = Object.fromEntries(strategyDefs.map(def => [def.key, { def, trades: [] }]));
+  const buckets = Object.fromEntries(defs.map(def => [def.key, { def, trades: [] }]));
   for (let start = 0; start < baseEvents.length; start += CHUNK_SIZE) {
     const end = Math.min(baseEvents.length, start + CHUNK_SIZE);
     for (let n = start; n < end; n++) {
       const event = baseEvents[n];
       try {
-        for (const def of strategyDefs) {
+        for (const def of defs) {
           const entryIndex = resolveEntryIndex(def, event.index, bars);
           if (entryIndex == null) continue;
-          const result = simulatePullbackExit(bars, entryIndex, "BUY");
+          const result = simulateTrailingExit(bars, entryIndex, 10, 5);
           if (!result) continue;
-          buckets[def.key].trades.push({ baseIndex: event.index, entryIndex, entryTime: bars[entryIndex].time, entryPrice: bars[entryIndex].close, pips: result.pips, exitMinutes: result.exitMinutes, peakPips: result.peakPips });
+          buckets[def.key].trades.push({ baseIndex: event.index, entryIndex, entryTime: bars[entryIndex].time, entryPrice: bars[entryIndex].close, pips: result.pips });
         }
       } catch (error) {
-        logError("evaluateTimingStrategies", event.index, error);
+        logError("evaluateV53Timing", event.index, error);
       }
     }
-    debugState.generatedEntryCount = Object.values(buckets).reduce((sum, bucket) => sum + bucket.trades.length, 0);
-    setProgress(`タイミング比較中 ${end.toLocaleString()} / ${baseEvents.length.toLocaleString()}`, end, baseEvents.length || 1);
-    updateDebugConsole();
+    setProgress(`v5.3最優秀タイミング選定中 ${end.toLocaleString()} / ${baseEvents.length.toLocaleString()}`, end, baseEvents.length || 1);
     await yieldToBrowser();
   }
-  return strategyDefs.map(def => {
-    const trades = buckets[def.key].trades;
-    return {
-      key: def.key,
-      condition: def.name,
-      count: trades.length,
-      ...calcMetrics(trades.map(t => t.pips)),
-      trades
-    };
-  });
+  return defs.map(def => makeResultRow(def.key, def.condition, buckets[def.key].trades));
+}
+
+async function evaluateExitRules(fixedTrades, bars) {
+  const defs = [
+    { key: "tp5sl10", name: "固定利確 +5 / 固定損切 -10", type: "tpSl", tp: 5, sl: 10 },
+    { key: "tp10sl10", name: "固定利確 +10 / 固定損切 -10", type: "tpSl", tp: 10, sl: 10 },
+    { key: "tp15sl10", name: "固定利確 +15 / 固定損切 -10", type: "tpSl", tp: 15, sl: 10 },
+    { key: "tp20sl10", name: "固定利確 +20 / 固定損切 -10", type: "tpSl", tp: 20, sl: 10 },
+    { key: "tp30sl10", name: "固定利確 +30 / 固定損切 -10", type: "tpSl", tp: 30, sl: 10 },
+    { key: "trail5_3", name: "トレーリング +5到達後 -3戻し", type: "trail", trigger: 5, pullback: 3 },
+    { key: "trail10_5", name: "トレーリング +10到達後 -5戻し", type: "trail", trigger: 10, pullback: 5 },
+    { key: "trail15_5", name: "トレーリング +15到達後 -5戻し", type: "trail", trigger: 15, pullback: 5 },
+    { key: "trail20_10", name: "トレーリング +20到達後 -10戻し", type: "trail", trigger: 20, pullback: 10 },
+    { key: "atr05", name: "ATR利確 ATR×0.5 / SL -10", type: "atr", mult: 0.5, sl: 10 },
+    { key: "atr10", name: "ATR利確 ATR×1.0 / SL -10", type: "atr", mult: 1.0, sl: 10 },
+    { key: "atr15", name: "ATR利確 ATR×1.5 / SL -10", type: "atr", mult: 1.5, sl: 10 },
+    { key: "time10", name: "時間決済 10分後", type: "time", minutes: 10 },
+    { key: "time30", name: "時間決済 30分後", type: "time", minutes: 30 },
+    { key: "time60", name: "時間決済 60分後", type: "time", minutes: 60 }
+  ];
+  const results = [];
+  for (const def of defs) {
+    const trades = [];
+    for (let start = 0; start < fixedTrades.length; start += CHUNK_SIZE) {
+      const end = Math.min(fixedTrades.length, start + CHUNK_SIZE);
+      for (let i = start; i < end; i++) {
+        try {
+          const entryIndex = fixedTrades[i].entryIndex;
+          const result = simulateExitByRule(def, bars, entryIndex);
+          if (result) trades.push({ entryIndex, entryTime: bars[entryIndex].time, pips: result.pips, exitMinutes: result.exitMinutes });
+        } catch (error) {
+          logError("evaluateExitRules", fixedTrades[i] ? fixedTrades[i].entryIndex : "--", error);
+        }
+      }
+      debugState.tradeCount = results.reduce((sum, row) => sum + row.count, 0) + trades.length;
+      setProgress(`利確方法比較中 ${def.name} ${end.toLocaleString()} / ${fixedTrades.length.toLocaleString()}`, end, fixedTrades.length || 1);
+      updateDebugConsole();
+      await yieldToBrowser();
+    }
+    results.push(makeResultRow(def.key, def.name, trades));
+  }
+  return results;
+}
+
+function simulateExitByRule(def, bars, entryIndex) {
+  if (def.type === "tpSl") return simulateTpSlExit(bars, entryIndex, def.tp, def.sl);
+  if (def.type === "trail") return simulateTrailingExit(bars, entryIndex, def.trigger, def.pullback);
+  if (def.type === "atr") {
+    const atr = Number.isFinite(bars[entryIndex].atrPips) ? bars[entryIndex].atrPips : 0;
+    return simulateTpSlExit(bars, entryIndex, atr * def.mult, def.sl);
+  }
+  if (def.type === "time") return simulateTimeExit(bars, entryIndex, def.minutes);
+  return null;
 }
 
 function resolveEntryIndex(def, baseIndex, bars) {
@@ -346,44 +402,48 @@ function safeEntryIndex(index, bars) {
   return validBar(bars[index]) ? index : null;
 }
 
-function simulatePullbackExit(bars, index, direction) {
-  const entryBar = bars[index];
-  if (!validBar(entryBar) || index + 1 >= bars.length) return null;
-  const entry = entryBar.close;
-  let peak = -Infinity, exitPips = null, exitMinutes = 0;
-  for (let m = 1; m <= MAX_HOLD; m++) {
-    const bar = bars[index + m];
-    if (!validBar(bar)) return null;
-    const favorable = direction === "BUY" ? (bar.high - entry) * PIP : (entry - bar.low) * PIP;
-    const closePips = direction === "BUY" ? (bar.close - entry) * PIP : (entry - bar.close) * PIP;
-    peak = Math.max(peak, favorable);
-    if (peak >= 10 && favorable <= peak - 5) {
-      exitPips = closePips;
-      exitMinutes = m;
-      break;
-    }
-    if (m === MAX_HOLD) {
-      exitPips = closePips;
-      exitMinutes = m;
-    }
-  }
-  if (!Number.isFinite(exitPips)) return null;
-  return { pips: exitPips, exitMinutes, peakPips: peak };
+function simulateTimeExit(bars, entryIndex, minutes) {
+  const entry = bars[entryIndex];
+  const exit = bars[entryIndex + minutes];
+  if (!validBar(entry) || !validBar(exit)) return null;
+  return { pips: (exit.close - entry.close) * PIP, exitMinutes: minutes };
 }
 
-function buildWalkForward(strategyResults, totalBars) {
-  const splitIndex = Math.floor(totalBars * 0.7);
-  return strategyResults.map(row => {
-    const first = row.trades.filter(t => t.entryIndex < splitIndex).map(t => t.pips);
-    const second = row.trades.filter(t => t.entryIndex >= splitIndex).map(t => t.pips);
-    const a = calcMetrics(first), b = calcMetrics(second);
-    const degradation = a.expectancy ? ((b.expectancy - a.expectancy) / Math.abs(a.expectancy)) * 100 : 0;
-    let judgement = "追加検証";
-    if (second.length < 30) judgement = "サンプル不足";
-    else if (b.profitFactor >= 1.3 && b.expectancy > 0) judgement = "有望";
-    else if (b.profitFactor < 1 || b.expectancy <= 0) judgement = "過剰最適化疑い";
-    return { condition: row.condition, firstCount: first.length, secondCount: second.length, firstPF: a.profitFactor, secondPF: b.profitFactor, firstExpectancy: a.expectancy, secondExpectancy: b.expectancy, degradation, judgement };
-  });
+function simulateTpSlExit(bars, entryIndex, tp, sl) {
+  const entry = bars[entryIndex];
+  if (!validBar(entry) || !Number.isFinite(tp) || tp <= 0) return null;
+  const entryPrice = entry.close;
+  for (let m = 1; m <= MAX_HOLD; m++) {
+    const bar = bars[entryIndex + m];
+    if (!validBar(bar)) return null;
+    const highPips = (bar.high - entryPrice) * PIP;
+    const lowPips = (bar.low - entryPrice) * PIP;
+    if (lowPips <= -sl) return { pips: -sl, exitMinutes: m };
+    if (highPips >= tp) return { pips: tp, exitMinutes: m };
+  }
+  return simulateTimeExit(bars, entryIndex, MAX_HOLD);
+}
+
+function simulateTrailingExit(bars, entryIndex, trigger, pullback) {
+  const entry = bars[entryIndex];
+  if (!validBar(entry)) return null;
+  const entryPrice = entry.close;
+  let peak = -Infinity, activated = false;
+  for (let m = 1; m <= MAX_HOLD; m++) {
+    const bar = bars[entryIndex + m];
+    if (!validBar(bar)) return null;
+    const favorable = (bar.high - entryPrice) * PIP;
+    const closePips = (bar.close - entryPrice) * PIP;
+    peak = Math.max(peak, favorable);
+    if (peak >= trigger) activated = true;
+    if (activated && favorable <= peak - pullback) return { pips: closePips, exitMinutes: m };
+    if (m === MAX_HOLD) return { pips: closePips, exitMinutes: m };
+  }
+  return null;
+}
+
+function makeResultRow(key, condition, trades) {
+  return { key, condition, count: trades.length, ...calcMetrics(trades.map(t => t.pips)), avgHoldMinutes: average(trades.map(t => t.exitMinutes).filter(Number.isFinite)), trades };
 }
 
 function calcMetrics(pipsList) {
@@ -401,39 +461,64 @@ function calcMetrics(pipsList) {
   return { winRate: wins / count * 100, profitFactor: grossLoss ? grossProfit / grossLoss : (grossProfit ? 999 : 0), expectancy: total / count, totalPips: total, maxDrawdown: maxDd, maxLosingStreak: maxLosing };
 }
 
+function buildWalkForward(rows, totalBars) {
+  const splitIndex = Math.floor(totalBars * 0.7);
+  return rows.map(row => {
+    const first = row.trades.filter(t => t.entryIndex < splitIndex).map(t => t.pips);
+    const second = row.trades.filter(t => t.entryIndex >= splitIndex).map(t => t.pips);
+    const a = calcMetrics(first), b = calcMetrics(second);
+    const degradation = a.expectancy ? ((b.expectancy - a.expectancy) / Math.abs(a.expectancy)) * 100 : 0;
+    let judgement = "追加検証";
+    if (second.length < 30) judgement = "サンプル不足";
+    else if (b.profitFactor >= 1.5 && b.expectancy > 0) judgement = "有望";
+    else if (b.profitFactor < 1 || b.expectancy <= 0) judgement = "過剰最適化疑い";
+    return { condition: row.condition, firstCount: first.length, secondCount: second.length, firstPF: a.profitFactor, secondPF: b.profitFactor, firstExpectancy: a.expectancy, secondExpectancy: b.expectancy, degradation, judgement };
+  });
+}
+
+function buildRecommendedSettings(ranking) {
+  const positive = ranking.filter(r => r.count > 0 && r.expectancy > 0);
+  const conservative = positive.find(r => r.maxDrawdown <= 20 && r.maxLosingStreak <= 2) || positive[0] || null;
+  const standard = positive.find(r => r.profitFactor >= 1.5 && r.count >= 30) || positive[0] || null;
+  const aggressive = positive[0] || null;
+  return {
+    conservative: makeSetting("保守型", conservative, "DDと最大連敗を優先。実運用では最初に検証する候補。"),
+    standard: makeSetting("標準型", standard, "PF、期待値、総利益のバランス重視。"),
+    aggressive: makeSetting("攻撃型", aggressive, "期待値と総利益を優先。ロットを抑えたデモ検証向き。")
+  };
+}
+
+function makeSetting(type, row, note) {
+  if (!row) return { type, exitRule: "候補なし", note };
+  return { type, exitRule: row.condition, count: row.count, pf: row.profitFactor, expectancy: row.expectancy, totalPips: row.totalPips, maxDrawdown: row.maxDrawdown, note };
+}
+
+function buildFinalJudgement(ranking, walkRows) {
+  const best = ranking[0] || null;
+  if (!best || !best.count) return { grade: "C", judgement: "候補不足", reason: "固定エントリー条件に一致するサンプルが不足しています。" };
+  const wf = walkRows.find(w => w.condition === best.condition);
+  if (best.profitFactor >= 2 && best.expectancy > 0 && best.maxDrawdown <= 30 && wf && ["有望", "追加検証", "サンプル不足"].includes(wf.judgement)) return { grade: "S", judgement: "実装候補", reason: `${best.condition} がPF ${fmtNum(best.profitFactor, 2)}、期待値 ${fmtNum(best.expectancy, 2)}pipsで最上位です。` };
+  if (best.profitFactor >= 1.3 && best.expectancy > 0) return { grade: "A", judgement: "追加検証候補", reason: "期待値はプラスですが、DDまたはWalk Forwardを追加確認してください。" };
+  if (best.expectancy > 0) return { grade: "B", judgement: "弱い候補", reason: "期待値はプラスですが、PFが十分ではありません。" };
+  return { grade: "C", judgement: "採用見送り", reason: "最上位候補でも期待値が弱い、またはマイナスです。" };
+}
+
 function rankSort(a, b) {
   if ((b.expectancy > 0) !== (a.expectancy > 0)) return b.expectancy - a.expectancy;
   if (Math.abs(b.profitFactor - a.profitFactor) > 0.01) return b.profitFactor - a.profitFactor;
   return b.totalPips - a.totalPips;
 }
 
-function buildImplementationPlan(ranking) {
-  const valid = ranking.filter(r => r.count > 0);
-  const safe = valid.find(r => r.maxDrawdown <= 20 && r.expectancy > 0) || valid[0] || null;
-  const standard = valid.find(r => r.count >= 50 && r.profitFactor >= 1.3 && r.expectancy > 0) || valid[0] || null;
-  const attack = valid[0] || null;
-  return {
-    safe: makePlan("安全型", safe, "DDと最大連敗を優先。無理に待たず、安値更新後の確認が入った候補を優先します。"),
-    standard: makePlan("標準型", standard, "件数、PF、期待値のバランスを重視。v6系本体に載せる場合の第一候補です。"),
-    attack: makePlan("攻撃型", attack, "期待値と総利益を優先。デモ検証でブレを確認してから採用します。")
-  };
+function exitRankSort(a, b) {
+  if (Math.abs(b.expectancy - a.expectancy) > 0.01) return b.expectancy - a.expectancy;
+  if (Math.abs(b.profitFactor - a.profitFactor) > 0.01) return b.profitFactor - a.profitFactor;
+  if (Math.abs(a.maxDrawdown - b.maxDrawdown) > 0.01) return a.maxDrawdown - b.maxDrawdown;
+  return b.totalPips - a.totalPips;
 }
 
-function makePlan(type, row, note) {
-  if (!row) return { type, entryTiming: "候補なし", exitRule: "+10到達後 -5戻し", note };
-  return { type, entryTiming: row.condition, exitRule: "+10到達後 -5戻し", expectancy: row.expectancy, pf: row.profitFactor, count: row.count, note };
-}
-
-function buildFinalJudgement(ranking, walkForward) {
-  const best = ranking[0] || null;
-  if (!best || !best.count) return { grade: "C", judgement: "候補不足", reason: "固定条件に一致するサンプルが不足しています。" };
-  const wf = walkForward.find(w => w.condition === best.condition);
-  if (best.count >= 50 && best.profitFactor >= 2 && best.expectancy > 0 && wf && ["有望", "追加検証"].includes(wf.judgement)) {
-    return { grade: "S", judgement: "実装候補", reason: `${best.condition} がPF ${fmtNum(best.profitFactor, 2)}、期待値 ${fmtNum(best.expectancy, 2)}pipsで最上位です。` };
-  }
-  if (best.profitFactor >= 1.3 && best.expectancy > 0) return { grade: "A", judgement: "追加検証候補", reason: "期待値はプラスですが、件数またはWalk Forwardの確認が必要です。" };
-  if (best.expectancy > 0) return { grade: "B", judgement: "弱い候補", reason: "期待値はプラスですが、PFが十分ではありません。" };
-  return { grade: "C", judgement: "採用見送り", reason: "最上位候補でも期待値が弱い、またはマイナスです。" };
+function stripTrades(row) {
+  const { trades, ...rest } = row;
+  return rest;
 }
 
 function parseCsvBars(text) {
@@ -442,13 +527,7 @@ function parseCsvBars(text) {
   const headers = rows[0].map(normalizeHeader);
   const hasHeader = headers.some(h => ["datetime", "time", "date", "日時"].includes(h)) || headers.includes("close") || headers.includes("終値");
   const body = hasHeader ? rows.slice(1) : rows;
-  const idx = hasHeader ? {
-    time: findHeader(headers, ["日時", "datetime", "time", "date"]),
-    open: findHeader(headers, ["始値", "open"]),
-    high: findHeader(headers, ["高値", "high"]),
-    low: findHeader(headers, ["安値", "low"]),
-    close: findHeader(headers, ["終値", "close"])
-  } : { time: 0, open: 1, high: 2, low: 3, close: 4 };
+  const idx = hasHeader ? { time: findHeader(headers, ["日時", "datetime", "time", "date"]), open: findHeader(headers, ["始値", "open"]), high: findHeader(headers, ["高値", "high"]), low: findHeader(headers, ["安値", "low"]), close: findHeader(headers, ["終値", "close"]) } : { time: 0, open: 1, high: 2, low: 3, close: 4 };
   let missingRows = 0;
   const bars = [];
   for (let sourceIndex = 0; sourceIndex < body.length; sourceIndex++) {
@@ -470,10 +549,7 @@ function parseCsv(text) {
     if (quote && ch === '"' && next === '"') { cell += '"'; i++; continue; }
     if (ch === '"') { quote = !quote; continue; }
     if (!quote && ch === ",") { row.push(cell); cell = ""; continue; }
-    if (!quote && (ch === "\n" || ch === "\r")) {
-      if (ch === "\r" && next === "\n") i++;
-      row.push(cell); rows.push(row); row = []; cell = ""; continue;
-    }
+    if (!quote && (ch === "\n" || ch === "\r")) { if (ch === "\r" && next === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; continue; }
     cell += ch;
   }
   row.push(cell); rows.push(row);
@@ -500,38 +576,13 @@ function parseDate(value) {
 function validBar(bar) { return !!bar && bar.time instanceof Date && !Number.isNaN(bar.time.getTime()) && [bar.open, bar.high, bar.low, bar.close].every(Number.isFinite); }
 function calcRsi(avgGain, avgLoss) { if (avgLoss === 0) return 100; const rs = avgGain / avgLoss; return 100 - (100 / (1 + rs)); }
 function calcRecentPips(bars, index, length) { if (index < length) return NaN; const now = bars[index], prev = bars[index - length]; if (!validBar(now) || !validBar(prev)) return NaN; return (now.close - prev.close) * PIP; }
+function isLowBreak(bars, index, length) { const bar = bars[index]; if (!validBar(bar) || index < length) return false; let prevLow = Infinity; for (let i = index - length; i < index; i++) { if (!validBar(bars[i])) return false; prevLow = Math.min(prevLow, bars[i].low); } return Number.isFinite(prevLow) && bar.low < prevLow; }
+function getSessionJst(date) { const h = date.getHours(); if (h >= 6 && h <= 14) return "東京"; if (h >= 15 && h <= 17) return "ロンドン前半"; if (h >= 18 && h <= 20) return "ロンドン後半"; if (h >= 21 && h <= 23) return "NY前半"; if (h >= 0 && h <= 2) return "NY後半"; return "深夜"; }
+function getNyLatePart(date) { const h = date.getHours(); if (h === 0) return "NY後半前半"; if (h === 1) return "NY後半中盤"; if (h === 2) return "NY後半終盤"; return ""; }
+function average(values) { return values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0; }
 
-function isLowBreak(bars, index, length) {
-  const bar = bars[index];
-  if (!validBar(bar) || index < length) return false;
-  let prevLow = Infinity;
-  for (let i = index - length; i < index; i++) {
-    if (!validBar(bars[i])) return false;
-    prevLow = Math.min(prevLow, bars[i].low);
-  }
-  return Number.isFinite(prevLow) && bar.low < prevLow;
-}
-
-function getSessionJst(date) {
-  const h = date.getHours();
-  if (h >= 6 && h <= 14) return "東京";
-  if (h >= 15 && h <= 17) return "ロンドン前半";
-  if (h >= 18 && h <= 20) return "ロンドン後半";
-  if (h >= 21 && h <= 23) return "NY前半";
-  if (h >= 0 && h <= 2) return "NY後半";
-  return "深夜";
-}
-
-function getNyLatePart(date) {
-  const h = date.getHours();
-  if (h === 0) return "NY後半前半";
-  if (h === 1) return "NY後半中盤";
-  if (h === 2) return "NY後半終盤";
-  return "";
-}
-
-function renderTiming(rows) {
-  const body = document.getElementById("timingBody");
+function renderExit(rows) {
+  const body = document.getElementById("exitBody");
   body.innerHTML = rows.map(row => `<tr><td>${escapeHtml(row.condition)}</td><td>${row.count.toLocaleString()}</td><td class="${classFor(row.winRate,55,45)}">${fmtNum(row.winRate,1)}%</td><td class="${classFor(row.profitFactor,1.3,1)}">${fmtNum(row.profitFactor,2)}</td><td class="${classFor(row.expectancy,0,0)}">${fmtNum(row.expectancy,2)}</td><td class="${classFor(row.totalPips,0,0)}">${fmtNum(row.totalPips,1)}</td><td>${fmtNum(row.maxDrawdown,1)}</td><td>${row.maxLosingStreak}</td></tr>`).join("");
 }
 
@@ -550,61 +601,17 @@ function renderPlan(plan, finalJudgement) {
     <p><b>実戦評価:</b> ${escapeHtml(finalJudgement.grade)} / ${escapeHtml(finalJudgement.judgement)}</p>
     <p>${escapeHtml(finalJudgement.reason)}</p>
     <ul>
-      <li><b>安全型:</b> ${escapeHtml(plan.safe.entryTiming)} / ${escapeHtml(plan.safe.exitRule)}</li>
-      <li><b>標準型:</b> ${escapeHtml(plan.standard.entryTiming)} / ${escapeHtml(plan.standard.exitRule)}</li>
-      <li><b>攻撃型:</b> ${escapeHtml(plan.attack.entryTiming)} / ${escapeHtml(plan.attack.exitRule)}</li>
+      <li><b>保守型:</b> ${escapeHtml(plan.conservative.exitRule)}</li>
+      <li><b>標準型:</b> ${escapeHtml(plan.standard.exitRule)}</li>
+      <li><b>攻撃型:</b> ${escapeHtml(plan.aggressive.exitRule)}</li>
     </ul>`;
 }
 
-function gradeRow(row) {
-  if (row.count >= 50 && row.profitFactor >= 2 && row.expectancy > 0) return "S";
-  if (row.count >= 30 && row.profitFactor >= 1.3 && row.expectancy > 0) return "A";
-  if (row.expectancy > 0) return "B";
-  return "C";
-}
-
-function clearTables() {
-  document.getElementById("rankingBody").innerHTML = '<tr><td colspan="10" class="small">分析中...</td></tr>';
-  document.getElementById("timingBody").innerHTML = '<tr><td colspan="8" class="small">分析中...</td></tr>';
-  document.getElementById("walkBody").innerHTML = '<tr><td colspan="7" class="small">分析中...</td></tr>';
-  document.getElementById("planBox").textContent = "分析中...";
-}
-
-function updateLoadSummary() {
-  document.getElementById("loadedRows").textContent = loadedState.loadedRows.toLocaleString();
-  document.getElementById("validBars").textContent = loadedState.bars.length.toLocaleString();
-  document.getElementById("startTime").textContent = loadedState.startTime;
-  document.getElementById("endTime").textContent = loadedState.endTime;
-}
-
-function updateDebugConsole() {
-  document.getElementById("baseCount").textContent = debugState.baseCount ? debugState.baseCount.toLocaleString() : "--";
-  document.getElementById("rsiCount").textContent = debugState.rsiCount ? debugState.rsiCount.toLocaleString() : "--";
-  document.getElementById("errorCount").textContent = String(debugState.errorCount || 0);
-  document.getElementById("lastRun").textContent = debugState.lastRun || "--";
-  const lines = [
-    `読み込み本数: ${debugState.loadedRows.toLocaleString()}`,
-    `有効バー数: ${debugState.validBars.toLocaleString()}`,
-    `Base検出件数: ${debugState.baseCount.toLocaleString()}`,
-    `生成エントリー件数: ${debugState.generatedEntryCount.toLocaleString()}`,
-    `RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,
-    `エラー件数: ${debugState.errorCount.toLocaleString()}`,
-    `最初にBase一致した日時: ${debugState.firstBaseTime || "--"}`,
-    `最終実行時間: ${debugState.lastRun || "--"}`,
-    "",
-    "Errors:",
-    ...(debugState.errors.length ? debugState.errors.slice(-80).map(e => `${e.functionName} index=${e.index} ${e.message}`) : ["なし"])
-  ];
-  document.getElementById("debugLog").textContent = lines.join("\n");
-}
-
-function logError(functionName, index, error) {
-  debugState.errorCount++;
-  debugState.errors.push({ functionName, index, message: error && error.message ? error.message : String(error) });
-  if (debugState.errors.length > 200) debugState.errors.shift();
-  console.error(functionName, index, error);
-}
-
+function gradeRow(row) { if (row.count >= 50 && row.profitFactor >= 2 && row.expectancy > 0 && row.maxDrawdown <= 30) return "S"; if (row.count >= 30 && row.profitFactor >= 1.3 && row.expectancy > 0) return "A"; if (row.expectancy > 0) return "B"; return "C"; }
+function clearTables() { document.getElementById("rankingBody").innerHTML = '<tr><td colspan="10" class="small">分析中...</td></tr>'; document.getElementById("exitBody").innerHTML = '<tr><td colspan="8" class="small">分析中...</td></tr>'; document.getElementById("walkBody").innerHTML = '<tr><td colspan="7" class="small">分析中...</td></tr>'; document.getElementById("planBox").textContent = "分析中..."; }
+function updateLoadSummary() { document.getElementById("loadedRows").textContent = loadedState.loadedRows.toLocaleString(); document.getElementById("validBars").textContent = loadedState.bars.length.toLocaleString(); document.getElementById("startTime").textContent = loadedState.startTime; document.getElementById("endTime").textContent = loadedState.endTime; }
+function updateDebugConsole() { document.getElementById("baseCount").textContent = debugState.baseCount ? debugState.baseCount.toLocaleString() : "--"; document.getElementById("fixedEntryCount").textContent = debugState.fixedEntryCount ? debugState.fixedEntryCount.toLocaleString() : "--"; document.getElementById("atrCount").textContent = debugState.atrCount ? debugState.atrCount.toLocaleString() : "--"; document.getElementById("rsiCount").textContent = debugState.rsiCount ? debugState.rsiCount.toLocaleString() : "--"; document.getElementById("errorCount").textContent = String(debugState.errorCount || 0); document.getElementById("lastRun").textContent = debugState.lastRun || "--"; document.getElementById("tradeCount").textContent = debugState.tradeCount ? debugState.tradeCount.toLocaleString() : "--"; document.getElementById("debugLog").textContent = [`読み込み本数: ${debugState.loadedRows.toLocaleString()}`,`有効バー数: ${debugState.validBars.toLocaleString()}`,`Base検出件数: ${debugState.baseCount.toLocaleString()}`,`固定エントリー件数: ${debugState.fixedEntryCount.toLocaleString()}`,`生成トレード数: ${debugState.tradeCount.toLocaleString()}`,`RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,`ATR計算件数: ${debugState.atrCount.toLocaleString()}`,`エラー件数: ${debugState.errorCount.toLocaleString()}`,`最終実行時間: ${debugState.lastRun || "--"}`,"","Errors:",...(debugState.errors.length ? debugState.errors.slice(-80).map(e => `${e.functionName} index=${e.index} ${e.message}`) : ["なし"])].join("\n"); }
+function logError(functionName, index, error) { debugState.errorCount++; debugState.errors.push({ functionName, index, message: error && error.message ? error.message : String(error) }); if (debugState.errors.length > 200) debugState.errors.shift(); console.error(functionName, index, error); }
 function setStatus(text) { document.getElementById("status").textContent = text; }
 function setProgress(label, done, total) { const pct = total ? Math.min(100, Math.max(0, done / total * 100)) : 0; document.getElementById("progressBar").value = pct; document.getElementById("progressText").textContent = `${label} / 進捗 ${pct.toFixed(1)}%`; }
 function yieldToBrowser() { return new Promise(resolve => setTimeout(resolve, 0)); }
@@ -619,7 +626,7 @@ function downloadJson() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "research_v5_3_results.json";
+  a.download = "research_v5_4_results.json";
   document.body.appendChild(a);
   a.click();
   a.remove();
