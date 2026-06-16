@@ -42,7 +42,7 @@
     const EXIT_METHODS=[{name:"15分後",type:"time",minutes:15},{name:"30分後",type:"time",minutes:30},{name:"45分後",type:"time",minutes:45},{name:"60分後",type:"time",minutes:60},{name:"TP5 SL5",type:"fixed",tp:5,sl:5},{name:"TP8 SL5",type:"fixed",tp:8,sl:5},{name:"TP10 SL5",type:"fixed",tp:10,sl:5},{name:"TP12 SL6",type:"fixed",tp:12,sl:6}];
     const SPREADS=[0,1,2];
     let researchResults=null;
-    let debug={loadedRows:0,analyzedBars:0,coreRuleBCount:0,rsiCount:0,bbCount:0,errorCount:0,lastRun:"--",errors:[]};
+    let debug={loadedRows:0,analyzedBars:0,coreRuleBCount:0,rsiCount:0,bbCount:0,errorCount:0,lastRun:"--",errors:[],buildStartIndex:"--",buildEndIndex:"--",buildSuccessCount:0,buildSkipCount:0,firstSuccessTime:"--",firstCoreRuleBTime:"--"};
 
     async function runResearch(){
       resetDebug();
@@ -91,15 +91,41 @@
       }
     }
 
-    function isCoreRuleB(e){return e&&e.bar&&Number.isFinite(e.bar.rsi)&&e.bar.rsi<30&&e.bar.session==="NY後半"&&e.bar.candleType==="陰線"}
+    function isCoreRuleB(e){
+      const bar=e&&e.bar;
+      if(!bar||!Number.isFinite(bar.close)||!Number.isFinite(bar.open)||!Number.isFinite(bar.rsi)||!bar.bbPosition||!bar.session||!bar.candleType)return false;
+      return bar.rsi<30&&bar.session==="NY後半"&&bar.close<bar.open;
+    }
 
     function buildEntries(bars){
       const out=[];
-      for(let i=30;i<bars.length-60;i++){
-        const bar=bars[i];
-        if(!hasClose(bar)||!Number.isFinite(bar.rsi)||bar.bbPosition==="BB不足")continue;
-        out.push({index:i,bar,price:bar.close,rsiBand:rsiBand(bar.rsi),candleSize:candleSize(bar),bbBand:bbBand(bar),recent3Band:moveBand(bar.recent3),recent5Band:moveBand(bar.recent5),recent10Band:moveBand(bar.recent10),nyLatePart:nyLatePart(bar.time),features:[]});
+      debug.buildStartIndex=MIN_REQUIRED_BARS;
+      debug.buildEndIndex=Math.max(MIN_REQUIRED_BARS,bars.length-61);
+      debug.buildSuccessCount=0;
+      debug.buildSkipCount=0;
+      debug.firstSuccessTime="--";
+      debug.firstCoreRuleBTime="--";
+      for(let i=MIN_REQUIRED_BARS;i<bars.length-60;i++){
+        try{
+          if(i+60>=bars.length){debug.buildSkipCount++;continue}
+          const bar=bars[i],prev=bars[i-1],next=bars[i+1];
+          if(!bar||!Number.isFinite(bar.close)||!Number.isFinite(bar.open)){debug.buildSkipCount++;continue}
+          if(!prev||!Number.isFinite(prev.close)){debug.buildSkipCount++;continue}
+          if(!next||!Number.isFinite(next.close)){debug.buildSkipCount++;continue}
+          if(!Number.isFinite(bar.rsi)||!bar.bbPosition||bar.bbPosition==="BB不足"||!bar.session||!bar.candleType){debug.buildSkipCount++;continue}
+          if(!Number.isFinite(bar.recent3)||!Number.isFinite(bar.recent5)||!Number.isFinite(bar.recent10)){debug.buildSkipCount++;continue}
+          const entry={index:i,bar,price:bar.close,rsiBand:rsiBand(bar.rsi),candleSize:candleSizeFromBar(bar),bbBand:bbBandFromBar(bar),recent3Band:moveBand(bar.recent3),recent5Band:moveBand(bar.recent5),recent10Band:moveBand(bar.recent10),nyLatePart:nyLatePart(bar.time),features:[]};
+          out.push(entry);
+          debug.buildSuccessCount++;
+          if(debug.firstSuccessTime==="--")debug.firstSuccessTime=formatDateTime(bar.time);
+          if(debug.firstCoreRuleBTime==="--"&&isCoreRuleB(entry))debug.firstCoreRuleBTime=formatDateTime(bar.time);
+        }catch(e){
+          logError("buildEntries",e,{index:i});
+          debug.buildSkipCount++;
+          continue;
+        }
       }
+      updateDebug();
       return out;
     }
 
@@ -218,7 +244,7 @@
       }
     }
 
-    function rsiBand(v){if(v<20)return"RSI<20";if(v<25)return"RSI20〜25";if(v<30)return"RSI25〜30";if(v<35)return"RSI30〜35";return"RSI35以上"}function candleSize(e){const p=Math.abs((e.bar.close-e.bar.open)*PIP);if(p<1)return"小陰線";if(p<3)return"中陰線";return"大陰線"}function bbBand(e){const b=e.bar;if(b.close<b.bbLower)return"下バンド外";const near=(b.bbUpper-b.bbLower)*.12;if(b.close-b.bbLower<=near)return"下バンド付近";if(Math.abs(b.close-b.bbMid)<=near)return"中央付近";if(b.close<b.bbMid)return"中央より下";return"中央より上"}function moveBand(v){if(v<=-12)return"-12以下";if(v<=-8)return"-12〜-8";if(v<=-4)return"-8〜-4";if(v<0)return"-4〜0";return"0以上"}function nyLatePart(d){const h=d.getHours(),m=d.getMinutes(),t=h*60+m;if(t<60)return"NY後半前半";if(t<120)return"NY後半中盤";return"NY後半終盤"}
+    function rsiBand(v){if(v<20)return"RSI<20";if(v<25)return"RSI20〜25";if(v<30)return"RSI25〜30";if(v<35)return"RSI30〜35";return"RSI35以上"}function candleSize(e){return candleSizeFromBar(e&&e.bar)}function candleSizeFromBar(b){if(!b||!Number.isFinite(b.close)||!Number.isFinite(b.open))return"不明";const p=Math.abs((b.close-b.open)*PIP);if(p<1)return"小陰線";if(p<3)return"中陰線";return"大陰線"}function bbBand(e){return bbBandFromBar(e&&e.bar)}function bbBandFromBar(b){if(!b||!Number.isFinite(b.close)||!Number.isFinite(b.bbLower)||!Number.isFinite(b.bbUpper)||!Number.isFinite(b.bbMid))return"BB不足";if(b.close<b.bbLower)return"下バンド外";const near=(b.bbUpper-b.bbLower)*.12;if(b.close-b.bbLower<=near)return"下バンド付近";if(Math.abs(b.close-b.bbMid)<=near)return"中央付近";if(b.close<b.bbMid)return"中央より下";return"中央より上"}function moveBand(v){if(v<=-12)return"-12以下";if(v<=-8)return"-12〜-8";if(v<=-4)return"-8〜-4";if(v<0)return"-4〜0";return"0以上"}function nyLatePart(d){const h=d.getHours(),m=d.getMinutes(),t=h*60+m;if(t<60)return"NY後半前半";if(t<120)return"NY後半中盤";return"NY後半終盤"}
     function classifyBb(bar){if(!bar||!Number.isFinite(bar.bbUpper)||!Number.isFinite(bar.bbLower)||!hasClose(bar))return"BB不足";const range=bar.bbUpper-bar.bbLower,near=range*.12;if(bar.close>bar.bbUpper)return"上バンド超え";if(bar.bbUpper-bar.close<=near)return"上バンド付近";if(bar.close<bar.bbLower)return"下バンド割れ";if(bar.close-bar.bbLower<=near)return"下バンド付近";if(Math.abs(bar.close-bar.bbMid)<=near)return"ミドル付近";return bar.close>bar.bbMid?"ミドル上":"ミドル下"}function getSession(date){const h=date.getHours();if(h>=6&&h<=14)return"東京";if(h>=15&&h<=17)return"ロンドン前半";if(h>=18&&h<=20)return"ロンドン後半";if(h>=21&&h<=23)return"NY前半";if(h>=0&&h<=2)return"NY後半";return"深夜"}function recentPips(bars,i,n){if(!hasClose(bars[i])||!hasClose(bars[i-n]))return 0;return round((bars[i].close-bars[i-n].close)*PIP,2)}function calcRsi(gain,loss){if(loss===0)return 100;const rs=gain/loss;return round(100-100/(1+rs),1)}
 
     function renderAll(d){const m=d.meta;document.getElementById("summary").innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${m.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>期間</span><strong>${escapeHtml(m.startTime)}<br>${escapeHtml(m.endTime)}</strong></div><div class="stat"><span>欠損行数</span><strong>${m.missingRows.toLocaleString()}</strong></div><div class="stat"><span>Core Rule B件数</span><strong>${m.coreRuleBCount.toLocaleString()}</strong></div>`;document.getElementById("finalJudgement").innerHTML=`<strong>${d.finalJudgement.rank}：${escapeHtml(d.finalJudgement.label)}</strong><br><span class="small">${escapeHtml(d.finalJudgement.reason)}</span>`;renderResult("baseResult",[d.coreRuleBBaseResult]);renderResult("rsiBreakdown",d.rsiBreakdown);renderResult("candleBreakdown",d.candleSizeBreakdown);renderResult("bbBreakdown",d.bbPositionBreakdown);renderResult("recentBreakdown",d.recentMoveBreakdown);renderResult("nyLateBreakdown",d.nyLateBreakdown);renderDerived(d.derivedRuleRanking);renderWalkForward(d.walkForwardResults);renderFinalCandidates(d.finalCandidates);updateDebug()}
@@ -228,8 +254,8 @@
 
     function safeStep(place,fn,fallback,meta={}){try{return fn()}catch(e){logError(place,e,meta);return fallback}}
     function logError(place,e,meta={}){debug.errorCount++;const row={place,message:e&&e.message?e.message:String(e),index:meta.index??"--",time:new Date().toLocaleTimeString()};debug.errors.push(row);console.error("Research v4 error",row,e);updateDebug()}
-    function resetDebug(){debug={loadedRows:0,analyzedBars:0,coreRuleBCount:0,rsiCount:0,bbCount:0,errorCount:0,lastRun:"--",errors:[]};updateDebug()}
-    function updateDebug(){const s=document.getElementById("debugStats");if(s)s.innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${debug.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>分析対象本数</span><strong>${debug.analyzedBars.toLocaleString()}</strong></div><div class="stat"><span>Core Rule B検出件数</span><strong>${debug.coreRuleBCount.toLocaleString()}</strong></div><div class="stat"><span>RSI / BB / エラー</span><strong>${debug.rsiCount} / ${debug.bbCount} / ${debug.errorCount}</strong></div>`;const l=document.getElementById("debugLog");if(l)l.textContent=`最小必要バー数: ${MIN_REQUIRED_BARS}\n最終実行時間: ${debug.lastRun}\n`+(debug.errors.length?debug.errors.map(e=>`エラー発生箇所: ${e.place}\nエラー内容: ${e.message}\n対象index: ${e.index}\n時刻: ${e.time}\n---`).join("\n"):"エラーなし")}
+    function resetDebug(){debug={loadedRows:0,analyzedBars:0,coreRuleBCount:0,rsiCount:0,bbCount:0,errorCount:0,lastRun:"--",errors:[],buildStartIndex:"--",buildEndIndex:"--",buildSuccessCount:0,buildSkipCount:0,firstSuccessTime:"--",firstCoreRuleBTime:"--"};updateDebug()}
+    function updateDebug(){const s=document.getElementById("debugStats");if(s)s.innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${debug.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>分析対象本数</span><strong>${debug.analyzedBars.toLocaleString()}</strong></div><div class="stat"><span>Core Rule B検出件数</span><strong>${debug.coreRuleBCount.toLocaleString()}</strong></div><div class="stat"><span>RSI / BB / エラー</span><strong>${debug.rsiCount} / ${debug.bbCount} / ${debug.errorCount}</strong></div><div class="stat"><span>buildEntries範囲</span><strong>${debug.buildStartIndex} - ${debug.buildEndIndex}</strong></div><div class="stat"><span>build成功 / スキップ</span><strong>${debug.buildSuccessCount.toLocaleString()} / ${debug.buildSkipCount.toLocaleString()}</strong></div><div class="stat"><span>最初に成功したbar</span><strong>${escapeHtml(debug.firstSuccessTime)}</strong></div><div class="stat"><span>最初のCore Rule B</span><strong>${escapeHtml(debug.firstCoreRuleBTime)}</strong></div>`;const l=document.getElementById("debugLog");if(l)l.textContent=`最小必要バー数: ${MIN_REQUIRED_BARS}\n最終実行時間: ${debug.lastRun}\nbuildEntries開始index: ${debug.buildStartIndex}\nbuildEntries終了index: ${debug.buildEndIndex}\nbuildEntries処理成功件数: ${debug.buildSuccessCount}\nbuildEntriesスキップ件数: ${debug.buildSkipCount}\n最初に成功したbarの日時: ${debug.firstSuccessTime}\n最初にCore Rule Bに一致した日時: ${debug.firstCoreRuleBTime}\n`+(debug.errors.length?debug.errors.slice(-100).map(e=>`エラー発生箇所: ${e.place}\nエラー内容: ${e.message}\n対象index: ${e.index}\n時刻: ${e.time}\n---`).join("\n"):"エラーなし")}
     function hasClose(b){return !!b&&Number.isFinite(Number(b.close))}
     function parseCsv(text){const rows=[];let row=[],cell="",quote=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(quote&&ch==='"'&&next==='"'){cell+='"';i++;continue}if(ch==='"'){quote=!quote;continue}if(!quote&&ch===","){row.push(cell);cell="";continue}if(!quote&&(ch==="\n"||ch==="\r")){if(ch==="\r"&&next==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";continue}cell+=ch}row.push(cell);rows.push(row);return rows}
     function emptyMetric(){return{count:0,winRate:0,pf:0,expectancy:0,totalPips:0,maxLosingStreak:0,maxDrawdown:0,exitMethod:"--",spread:"--"}}function emptyResult(name){return{conditionName:name,count:0,winRate:0,pf:0,expectancy:0,totalPips:0,maxLosingStreak:0,maxDrawdown:0,recommendedExit:"--",adoption:"D：不採用",exitRows:[]}}function normalizeHeader(v){return String(v||"").trim().toLowerCase().replace(/\s+/g,"_")}function findHeader(headers,names){for(const name of names){const i=headers.indexOf(String(name).toLowerCase());if(i>=0)return i}return-1}function parseDate(value){const raw=String(value||"").trim().replace(/\./g,"-").replace("T"," ");const m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);if(m)return new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),Number(m[6]||0));const d=new Date(raw);return Number.isFinite(d.getTime())?d:null}function toNumber(v){const n=Number(String(v??"").replace(/,/g,"").trim());return Number.isFinite(n)?n:NaN}function average(a){return a.length?sum(a)/a.length:0}function sum(a){return a.reduce((x,y)=>x+Number(y||0),0)}function round(v,d=2){return Number(Number(v||0).toFixed(d))}function fmt(v){return Number.isFinite(Number(v))?Number(v).toLocaleString(undefined,{maximumFractionDigits:2}):"--"}function pct(v){return`${fmt(v)}%`}function pips(v){return`${Number(v)>=0?"+":""}${fmt(v)}pips`}function signed(v){return`${Number(v)>=0?"+":""}${fmt(v)}`}function formatDateTime(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`}function pad(v){return String(v).padStart(2,"0")}function setStatus(t){document.getElementById("status").textContent=t}function breathe(){return new Promise(r=>setTimeout(r,0))}function escapeHtml(v){return String(v??"").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]))}
