@@ -1,133 +1,592 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="scalplayer-version" content="research-v5.2">
-  <title>ScalpLayer Research v5.2</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScalpLayer Research v5.2.1</title>
   <style>
-    :root{--bg:#05070d;--panel:#10131c;--line:rgba(212,175,55,.28);--gold:#d4af37;--gold2:#f7dc75;--text:#f8fafc;--muted:#b8c0cc}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:20px;color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(212,175,55,.18),transparent 28%),linear-gradient(180deg,#141925,var(--bg) 46%);line-height:1.65}
-    .container{max-width:1240px;margin:0 auto}.hero{text-align:center;padding:12px 0 24px}h1{margin:0;font-size:32px}h2{margin:0 0 14px;color:var(--gold2);font-size:21px}.sub,.small{color:var(--muted);font-size:13px}
-    .card{background:rgba(16,19,28,.96);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 18px 38px rgba(0,0,0,.32);overflow:hidden}.notice{background:rgba(212,175,55,.09);color:#f8e7a2}.judgement{border-color:rgba(34,197,94,.34);background:rgba(34,197,94,.10)}
-    label{display:block;margin:8px 0 6px;color:var(--muted);font-weight:800}input,button{width:100%;min-height:48px;border-radius:10px;border:1px solid rgba(212,175,55,.38);background:#070a11;color:var(--text);padding:12px 14px;font-size:15px;margin-bottom:10px}button{border:0;background:linear-gradient(135deg,var(--gold),#9f7d1d);color:#111827;font-weight:950;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
-    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{background:rgba(5,7,13,.68);border:1px solid rgba(212,175,55,.22);border-radius:12px;padding:14px}.stat span{display:block;color:var(--muted);font-size:13px}.stat strong{display:block;font-size:22px;margin-top:4px;overflow-wrap:anywhere}
-    .tableWrap{overflow-x:auto;margin-top:10px}table{width:100%;border-collapse:collapse;min-width:1020px}th,td{border-bottom:1px solid rgba(148,163,184,.16);padding:9px 8px;text-align:left;font-size:13px;vertical-align:top}th{color:#fff;background:rgba(5,7,13,.92);position:sticky;top:0}
-    .debug{white-space:pre-wrap;background:#05070d;border:1px solid rgba(212,175,55,.2);border-radius:12px;padding:12px;color:#cbd5e1;max-height:240px;overflow:auto}
-    @media(max-width:760px){body{padding:12px}h1{font-size:25px}.card{padding:16px;border-radius:12px}.grid{grid-template-columns:1fr}table{min-width:940px}}
+    :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#24344d;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b;--yellow:#ffd166}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#07111f,#0b1423 42%,#07111f);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
+    main{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}
+    .hero{padding:26px 0 12px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);letter-spacing:0;color:var(--gold)}.sub{margin:0;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:rgba(16,27,44,.92);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0;box-shadow:0 18px 44px rgba(0,0,0,.24)}
+    h2{margin:0 0 12px;font-size:19px;color:#fff}.small{font-size:13px;color:var(--muted)}.note{border-left:4px solid var(--gold);padding:10px 12px;background:rgba(215,183,90,.08);border-radius:6px;color:#f8edc4}
+    input[type=file]{width:100%;padding:12px;border:1px dashed #4a5d7a;border-radius:8px;background:#0b1524;color:var(--text);margin:8px 0 12px}
+    button{appearance:none;border:0;border-radius:8px;background:var(--gold);color:#101010;font-weight:800;padding:11px 16px;cursor:pointer;margin:4px 8px 4px 0}button:disabled{opacity:.45;cursor:not-allowed}
+    progress{width:100%;height:16px;accent-color:var(--gold)} table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top} th:first-child,td:first-child{text-align:left} th{color:#f8edc4;background:#0b1524;position:sticky;top:0}
+    .table-wrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:8px}.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pill{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px}.pill b{display:block;color:var(--gold);font-size:13px}.pill span{font-size:18px}
+    .good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)} pre{white-space:pre-wrap;word-break:break-word;background:#050b14;border:1px solid var(--line);border-radius:8px;padding:12px;max-height:360px;overflow:auto;font-size:12px}
+    @media(max-width:760px){main{width:min(100% - 18px,1180px);padding-top:18px}.grid,.kpi{grid-template-columns:1fr}.card{padding:14px;margin:12px 0}table{font-size:12px}th,td{padding:8px 6px}button{width:100%;margin-right:0}}
   </style>
 </head>
 <body>
-  <main class="container">
-    <section class="hero"><h1>ScalpLayer Research v5.2</h1><p class="sub">安値更新後の反発が本当の優位性か検証します。</p></section>
-    <section class="card notice">固定条件: BUY / RSI&lt;25 / 直近3本&lt;=-10 / NY後半前半 / 決済 +10到達後-5戻し。今回はRSIではなく安値更新の質だけを分解します。</section>
-    <section class="card"><h2>1. CSV読み込み</h2><label for="csvFile">USDJPY M1 CSV</label><input id="csvFile" type="file" accept=".csv,text/csv"><button id="runBtn" onclick="runResearch()">Research v5.2 分析実行</button><div id="status" class="small">CSVを選択してください。</div></section>
-    <section class="card"><h2>2. データ概要</h2><div id="summary" class="grid"></div></section>
-    <section class="card judgement"><h2>Final Judgement</h2><div id="finalJudgement">未判定</div></section>
-    <section class="card"><h2>3. Baseline</h2><div id="baseline" class="tableWrap small">--</div></section>
-    <section class="card"><h2>4. 安値更新期間</h2><div id="lookbackStats" class="tableWrap small">--</div></section>
-    <section class="card"><h2>5. 当日安値</h2><div id="todayLowStats" class="tableWrap small">--</div></section>
-    <section class="card"><h2>6. 前日安値</h2><div id="prevDayLowStats" class="tableWrap small">--</div></section>
-    <section class="card"><h2>7. 時間帯安値</h2><div id="sessionLowStats" class="tableWrap small">--</div></section>
-    <section class="card"><h2>8. 更新幅</h2><div id="breakWidthStats" class="tableWrap small">--</div></section>
-    <section class="card"><h2>9. 更新後タイミング</h2><div id="afterBreakStats" class="tableWrap small">--</div></section>
-    <section class="card"><h2>10. ランキング</h2><div id="ranking" class="tableWrap small">--</div></section>
-    <section class="card"><h2>11. Walk Forward</h2><div id="walkForward" class="tableWrap small">--</div></section>
-    <section class="card"><h2>12. Debug Console</h2><div id="debugStats" class="grid"></div><div id="debugLog" class="debug">待機中</div></section>
-    <section class="card"><h2>13. research_v5_2_results.json 出力</h2><button id="downloadBtn" onclick="downloadJson()" disabled>research_v5_2_results.json をダウンロード</button></section>
-  </main>
+<main>
+  <section class="hero">
+    <h1>ScalpLayer Research v5.2.1</h1>
+    <p class="sub">軽量版：CSV読み込みと分析を分離し、安値更新条件の基本比較だけをチャンク処理で検証します。</p>
+  </section>
 
-  <script>
-    const PIP=100, RSI_PERIOD=14, MIN_REQUIRED_BARS=80, MAX_HOLD=180, SPREAD=2;
-    let researchResults=null;
-    let debug={loadedRows:0,validBars:0,analyzedBars:0,baselineCount:0,errorCount:0,lastRun:"--",errors:[]};
+  <section class="card">
+    <h2>1. CSV読み込み</h2>
+    <input id="csvFile" type="file" accept=".csv,text/csv">
+    <button id="loadBtn" type="button">CSVを読み込む</button>
+    <button id="runBtn" type="button" disabled>v5.2分析を実行</button>
+    <p id="status" class="small">CSVを選択してください。読み込み後、分析ボタンが有効になります。</p>
+    <div class="kpi">
+      <div class="pill"><b>読み込み本数</b><span id="loadedRows">--</span></div>
+      <div class="pill"><b>有効バー数</b><span id="validBars">--</span></div>
+      <div class="pill"><b>開始日時</b><span id="startTime">--</span></div>
+      <div class="pill"><b>終了日時</b><span id="endTime">--</span></div>
+    </div>
+  </section>
 
-    async function runResearch(){
-      resetDebug();
-      const file=document.getElementById("csvFile").files[0];
-      if(!file){alert("USDJPY M1 CSVを選択してください。");return}
-      document.getElementById("runBtn").disabled=true;document.getElementById("downloadBtn").disabled=true;
-      try{
-        setStatus("CSVを読み込み中...");
-        const text=await file.text(); await breathe();
-        const parsed=safeStep("parseCsvBars",()=>parseCsvBars(text),{bars:[],loadedRows:0,missingRows:0});
-        debug.loadedRows=parsed.loadedRows; debug.validBars=parsed.bars.length; updateDebug();
-        if(parsed.bars.length<MIN_REQUIRED_BARS+MAX_HOLD)throw new Error(`有効バー数が不足しています。有効バー数=${parsed.bars.length} / 最小必要=${MIN_REQUIRED_BARS+MAX_HOLD}`);
-        enrichBars(parsed.bars);
-        const allEntries=buildEntries(parsed.bars);
-        const baselineRule={name:"Baseline RSI<25 / 直近3<=-10 / NY後半前半",filter:e=>isBase(e)};
-        const baseline=evaluateRule(baselineRule,allEntries,parsed.bars);
-        debug.analyzedBars=allEntries.length; debug.baselineCount=baseline.count; updateDebug();
-        setStatus("安値更新条件を検証中...");
-        await breathe();
-        const lookbackStats=[
-          makeRule("直近3本安値更新",e=>isBase(e)&&e.bar.lowBreak3),
-          makeRule("直近5本安値更新",e=>isBase(e)&&e.bar.lowBreak5),
-          makeRule("直近10本安値更新",e=>isBase(e)&&e.bar.lowBreak10)
-        ].map(r=>evaluateRule(r,allEntries,parsed.bars,baseline));
-        const todayLowStats=[
-          makeRule("当日安値更新",e=>isBase(e)&&e.bar.todayLowBreak),
-          makeRule("当日安値まで5pips以内",e=>isBase(e)&&e.bar.todayLowDistance<=5)
-        ].map(r=>evaluateRule(r,allEntries,parsed.bars,baseline));
-        const prevDayLowStats=[
-          makeRule("前日安値更新",e=>isBase(e)&&e.bar.prevDayLowBreak),
-          makeRule("前日安値まで5pips以内",e=>isBase(e)&&e.bar.prevDayLowDistance<=5)
-        ].map(r=>evaluateRule(r,allEntries,parsed.bars,baseline));
-        const sessionLowStats=[
-          makeRule("東京時間安値更新",e=>isBase(e)&&e.bar.tokyoLowBreak),
-          makeRule("ロンドン時間安値更新",e=>isBase(e)&&e.bar.londonLowBreak),
-          makeRule("NY時間安値更新",e=>isBase(e)&&e.bar.nyLowBreak)
-        ].map(r=>evaluateRule(r,allEntries,parsed.bars,baseline));
-        const breakWidthStats=[
-          makeRule("安値更新 1pips以内",e=>isBase(e)&&e.bar.lowBreakAmount>0&&e.bar.lowBreakAmount<=1),
-          makeRule("安値更新 3pips以内",e=>isBase(e)&&e.bar.lowBreakAmount>0&&e.bar.lowBreakAmount<=3),
-          makeRule("安値更新 5pips以上",e=>isBase(e)&&e.bar.lowBreakAmount>=5)
-        ].map(r=>evaluateRule(r,allEntries,parsed.bars,baseline));
-        const afterBreakStats=[
-          makeRule("更新直後",e=>isBase(e)&&e.bar.barsAfterLowBreak===0),
-          makeRule("更新1本後",e=>isBase(e)&&e.bar.barsAfterLowBreak===1),
-          makeRule("更新2本後",e=>isBase(e)&&e.bar.barsAfterLowBreak===2),
-          makeRule("更新3本後",e=>isBase(e)&&e.bar.barsAfterLowBreak===3)
-        ].map(r=>evaluateRule(r,allEntries,parsed.bars,baseline));
-        const ranking=[...lookbackStats,...todayLowStats,...prevDayLowStats,...sessionLowStats,...breakWidthStats,...afterBreakStats].filter(r=>r.count>0).sort(rankRule).map((r,i)=>({rank:i+1,...r}));
-        const walkForward=buildWalkForward(ranking,allEntries,parsed.bars);
-        const finalJudgement=buildFinalJudgement(ranking,baseline);
-        researchResults={meta:{appVersion:"research-v5.2",symbol:"USDJPY",timeframe:"M1",sourceFileName:file.name,generatedAt:new Date().toISOString(),loadedRows:parsed.loadedRows,validBars:parsed.bars.length,missingRows:parsed.missingRows,startTime:formatDateTime(parsed.bars[0].time),endTime:formatDateTime(parsed.bars[parsed.bars.length-1].time),baselineCount:baseline.count,spread:SPREAD},fixedCondition:["RSI < 25","直近3本 <= -10","NY後半前半","決済 +10到達後 -5戻し"],baseline,lookbackStats,todayLowStats,prevDayLowStats,sessionLowStats,breakWidthStats,afterBreakStats,ranking,walkForward,finalJudgement,debug};
-        renderAll(researchResults);
-        document.getElementById("downloadBtn").disabled=false;
-        setStatus(debug.errorCount?`分析完了。ただしエラー${debug.errorCount}件。Debug Consoleを確認してください。`:"分析完了。research_v5_2_results.jsonを出力できます。");
-      }catch(e){
-        logError("runResearch",e,{index:"--"});
-        setStatus(`エラー発生箇所：runResearch / エラー内容：${e.message}`);
-      }finally{debug.lastRun=new Date().toLocaleString();updateDebug();document.getElementById("runBtn").disabled=false}
+  <section class="card">
+    <h2>2. 分析進捗</h2>
+    <progress id="progressBar" value="0" max="100"></progress>
+    <p id="progressText" class="small">待機中</p>
+    <p class="note">固定条件は <b>RSI &lt; 25 / 直近3本 &lt;= -10pips / NY後半前半 / BUY</b> です。安値更新の有無を比較するため、固定条件自体には安値更新を含めていません。</p>
+  </section>
+
+  <section class="card">
+    <h2>3. 安値更新条件 基本比較</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>条件名</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総pips</th><th>最大DD</th><th>最大連敗</th></tr></thead>
+        <tbody id="resultBody"><tr><td colspan="8" class="small">分析実行後に表示します。</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h2>4. JSON出力</h2>
+      <button id="downloadBtn" type="button" disabled>research_v5_2_1_results.json をダウンロード</button>
+      <p class="small">ChatGPTへ渡す場合は、このJSONだけで今回の軽量分析結果を確認できます。</p>
+    </div>
+    <div class="card">
+      <h2>5. Debug Console</h2>
+      <div class="kpi">
+        <div class="pill"><b>分析対象本数</b><span id="entryCount">--</span></div>
+        <div class="pill"><b>RSI計算件数</b><span id="rsiCount">--</span></div>
+        <div class="pill"><b>エラー件数</b><span id="errorCount">--</span></div>
+        <div class="pill"><b>最終実行時間</b><span id="lastRun">--</span></div>
+      </div>
+      <pre id="debugLog">Debug Consoleはここに表示されます。</pre>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const PIP = 100;
+const MIN_REQUIRED_BARS = 80;
+const MAX_HOLD = 180;
+const CHUNK_SIZE = 1000;
+const SPREAD_PIPS = 0;
+
+let loadedState = {
+  fileName: "",
+  bars: [],
+  loadedRows: 0,
+  missingRows: 0,
+  startTime: "--",
+  endTime: "--"
+};
+
+let researchResults = null;
+let debugState = createDebugState();
+
+document.getElementById("loadBtn").addEventListener("click", loadCsvOnly);
+document.getElementById("runBtn").addEventListener("click", runLightAnalysis);
+document.getElementById("downloadBtn").addEventListener("click", downloadJson);
+
+function createDebugState() {
+  return {
+    loadedRows: 0,
+    validBars: 0,
+    analyzedBars: 0,
+    rsiCount: 0,
+    errorCount: 0,
+    lastRun: "--",
+    firstEntryTime: "--",
+    errors: []
+  };
+}
+
+async function loadCsvOnly() {
+  const file = document.getElementById("csvFile").files[0];
+  if (!file) {
+    alert("USDJPY M1 CSVを選択してください。");
+    return;
+  }
+  setStatus("CSVを読み込み中...");
+  setProgress("CSVを読み込み中", 0, 100);
+  researchResults = null;
+  document.getElementById("downloadBtn").disabled = true;
+  document.getElementById("runBtn").disabled = true;
+  debugState = createDebugState();
+  try {
+    const text = await file.text();
+    const parsed = parseCsvBars(text);
+    loadedState = {
+      fileName: file.name,
+      bars: parsed.bars,
+      loadedRows: parsed.loadedRows,
+      missingRows: parsed.missingRows,
+      startTime: parsed.bars.length ? fmtDate(parsed.bars[0].time) : "--",
+      endTime: parsed.bars.length ? fmtDate(parsed.bars[parsed.bars.length - 1].time) : "--"
+    };
+    debugState.loadedRows = parsed.loadedRows;
+    debugState.validBars = parsed.bars.length;
+    updateLoadSummary();
+    updateDebugConsole();
+    setProgress("CSV読み込み完了。v5.2分析を実行できます。", 100, 100);
+    setStatus(`CSV読み込み完了：${parsed.bars.length.toLocaleString()}本の有効バーを読み込みました。`);
+    document.getElementById("runBtn").disabled = !parsed.bars.length;
+  } catch (error) {
+    logError("loadCsvOnly", "--", error);
+    setStatus("CSV読み込みでエラーが発生しました。Debug Consoleを確認してください。");
+    updateDebugConsole();
+  }
+}
+
+async function runLightAnalysis() {
+  const bars = loadedState.bars;
+  if (!bars.length) {
+    alert("先にCSVを読み込んでください。");
+    return;
+  }
+  researchResults = null;
+  debugState = createDebugState();
+  debugState.loadedRows = loadedState.loadedRows;
+  debugState.validBars = bars.length;
+  debugState.lastRun = fmtDate(new Date());
+  document.getElementById("runBtn").disabled = true;
+  document.getElementById("downloadBtn").disabled = true;
+  renderResults([]);
+  setStatus("v5.2.1 軽量分析を開始しました。");
+
+  try {
+    await enrichBarsChunked(bars);
+    const entries = await buildEntriesChunked(bars);
+    const comparisonResults = buildLowUpdateComparison(entries, bars);
+    researchResults = {
+      meta: {
+        version: "research-v5.2.1-light",
+        sourceFileName: loadedState.fileName,
+        generatedAt: new Date().toISOString(),
+        loadedRows: loadedState.loadedRows,
+        validBars: bars.length,
+        startTime: loadedState.startTime,
+        endTime: loadedState.endTime,
+        fixedCondition: "BUY / RSI < 25 / recent3Pips <= -10 / NY後半前半 / exit +10 reached then -5 pullback"
+      },
+      fixedCondition: {
+        direction: "BUY",
+        rsi: "<25",
+        recent3Pips: "<=-10",
+        sessionPart: "NY後半前半",
+        exitRule: "+10到達後 -5戻し",
+        spreadPips: SPREAD_PIPS,
+        note: "安値更新条件を比較するため、固定条件には安値更新を含めていません。"
+      },
+      comparisonResults,
+      debug: debugState
+    };
+    renderResults(comparisonResults);
+    document.getElementById("downloadBtn").disabled = false;
+    setProgress("分析完了", 100, 100);
+    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v5_2_1_results.json を出力できます。");
+  } catch (error) {
+    logError("runLightAnalysis", "--", error);
+    setStatus("分析中にエラーが発生しました。処理は可能な範囲で継続しました。Debug Consoleを確認してください。");
+  } finally {
+    document.getElementById("runBtn").disabled = false;
+    updateDebugConsole();
+  }
+}
+
+async function enrichBarsChunked(bars) {
+  let avgGain = null;
+  let avgLoss = null;
+  let gainSum = 0;
+  let lossSum = 0;
+  for (let start = 1; start < bars.length; start += CHUNK_SIZE) {
+    const end = Math.min(bars.length, start + CHUNK_SIZE);
+    for (let i = start; i < end; i++) {
+      try {
+        const bar = bars[i];
+        const prev = bars[i - 1];
+        if (!validBar(bar) || !validBar(prev)) continue;
+        const diff = bar.close - prev.close;
+        const gain = Math.max(0, diff);
+        const loss = Math.max(0, -diff);
+        if (i <= 14) {
+          gainSum += gain;
+          lossSum += loss;
+          if (i === 14) {
+            avgGain = gainSum / 14;
+            avgLoss = lossSum / 14;
+            bar.rsi = calcRsi(avgGain, avgLoss);
+            debugState.rsiCount++;
+          }
+        } else if (avgGain != null && avgLoss != null) {
+          avgGain = ((avgGain * 13) + gain) / 14;
+          avgLoss = ((avgLoss * 13) + loss) / 14;
+          bar.rsi = calcRsi(avgGain, avgLoss);
+          debugState.rsiCount++;
+        }
+        bar.session = getSessionJst(bar.time);
+        bar.nyLatePart = getNyLatePart(bar.time);
+        bar.recent3 = calcRecentPips(bars, i, 3);
+        bar.lowBreak3 = isLowBreak(bars, i, 3);
+        bar.lowBreak5 = isLowBreak(bars, i, 5);
+        bar.lowBreak10 = isLowBreak(bars, i, 10);
+      } catch (error) {
+        logError("enrichBarsChunked", i, error);
+      }
     }
+    setProgress(`指標計算中 ${end.toLocaleString()} / ${bars.length.toLocaleString()}`, end, bars.length);
+    updateDebugConsole();
+    await yieldToBrowser();
+  }
+}
 
-    function isBase(e){const b=e&&e.bar;return !!b&&b.rsi<25&&b.recent3<=-10&&nyLatePart(b.time)==="NY後半前半"}
-    function makeRule(name,filter){return{name,filter}}
-    function evaluateRule(rule,entries,bars,baseline=null){const selected=entries.filter(e=>safeStep(rule.name,()=>rule.filter(e),false,{index:e.index}));const trades=selected.map(e=>({...simulateExit(bars,e.index),entry:e})).filter(t=>Number.isFinite(t.pips));const m=metricsFromTrades(trades);return{ruleName:rule.name,count:m.count,winRate:m.winRate,pf:m.pf,expectancy:m.expectancy,totalPips:m.totalPips,maxDrawdown:m.maxDrawdown,baselineRatio:baseline&&baseline.expectancy?round(m.expectancy/baseline.expectancy*100,1):100}}
-    function simulateExit(bars,index){const entryBar=bars[index];if(!validBar(entryBar))return{pips:0,hold:0};const entry=entryBar.close;let peak=0,p=0,hold=MAX_HOLD;for(let m=1;m<=MAX_HOLD;m++){const b=bars[index+m];if(!validBar(b))continue;const fav=(b.high-entry)*PIP,closeP=(b.close-entry)*PIP;peak=Math.max(peak,fav);if(peak>=10&&fav<=peak-5){p=fav;hold=m;break}if(m===MAX_HOLD){p=closeP;hold=m;break}}return{pips:round(p-SPREAD,2),hold}}
-    function buildWalkForward(rows,entries,bars){const split=Math.floor(bars.length*.7);return rows.map(r=>{const rule={name:r.ruleName,filter:e=>matchRuleName(e,r.ruleName)};const train=evaluateRule(rule,entries.filter(e=>e.index<split),bars),test=evaluateRule(rule,entries.filter(e=>e.index>=split),bars);const deg=train.expectancy?round((train.expectancy-test.expectancy)/Math.abs(train.expectancy)*100,1):0;const judgement=test.count<15?"サンプル不足":test.pf>=1.5&&test.expectancy>0?"有望":test.expectancy>0?"追加検証":"過剰最適化";return{ruleName:r.ruleName,trainCount:train.count,testCount:test.count,trainPF:train.pf,testPF:test.pf,trainExpectancy:train.expectancy,testExpectancy:test.expectancy,degradationRate:deg,judgement}})}
-    function matchRuleName(e,name){const b=e.bar;if(!isBase(e))return false;return name==="直近3本安値更新"?b.lowBreak3:name==="直近5本安値更新"?b.lowBreak5:name==="直近10本安値更新"?b.lowBreak10:name==="当日安値更新"?b.todayLowBreak:name==="当日安値まで5pips以内"?b.todayLowDistance<=5:name==="前日安値更新"?b.prevDayLowBreak:name==="前日安値まで5pips以内"?b.prevDayLowDistance<=5:name==="東京時間安値更新"?b.tokyoLowBreak:name==="ロンドン時間安値更新"?b.londonLowBreak:name==="NY時間安値更新"?b.nyLowBreak:name==="安値更新 1pips以内"?b.lowBreakAmount>0&&b.lowBreakAmount<=1:name==="安値更新 3pips以内"?b.lowBreakAmount>0&&b.lowBreakAmount<=3:name==="安値更新 5pips以上"?b.lowBreakAmount>=5:name==="更新直後"?b.barsAfterLowBreak===0:name==="更新1本後"?b.barsAfterLowBreak===1:name==="更新2本後"?b.barsAfterLowBreak===2:name==="更新3本後"?b.barsAfterLowBreak===3:false}
-    function buildFinalJudgement(ranking,baseline){const top=ranking[0];if(!top)return{rank:"C",label:"候補なし",reason:"安値更新系の分解条件に該当がありません。"};const label=top.pf>=2&&top.expectancy>0?"安値更新後反発の優位性あり":"追加検証";return{rank:top.pf>=2?"A":"B",label,reason:`最上位は ${top.ruleName} / 件数${top.count} / PF${top.pf} / 期待値${signed(top.expectancy)}pips。Baseline比 ${top.baselineRatio}%`}}
-    function rankRule(a,b){return((b.expectancy*35)+(Math.min(b.pf,20)*8)+(b.count>=50?20:0)-(b.maxDrawdown*1.4))-((a.expectancy*35)+(Math.min(a.pf,20)*8)+(a.count>=50?20:0)-(a.maxDrawdown*1.4))}
-    function metricsFromTrades(trades){const rows=trades.filter(t=>Number.isFinite(t.pips)),wins=rows.filter(t=>t.pips>0),losses=rows.filter(t=>t.pips<0),gp=sum(wins.map(t=>t.pips)),gl=Math.abs(sum(losses.map(t=>t.pips))),total=sum(rows.map(t=>t.pips));let eq=0,peak=0,dd=0;rows.forEach(t=>{eq+=t.pips;peak=Math.max(peak,eq);dd=Math.max(dd,peak-eq)});return{count:rows.length,winRate:rows.length?round(wins.length/rows.length*100,1):0,pf:gl>0?round(gp/gl,2):gp>0?999:0,expectancy:rows.length?round(total/rows.length,2):0,totalPips:round(total,1),maxDrawdown:round(dd,1)}}
+async function buildEntriesChunked(bars) {
+  const entries = [];
+  const startIndex = MIN_REQUIRED_BARS;
+  const endIndex = Math.max(startIndex, bars.length - MAX_HOLD);
+  let skipped = 0;
+  for (let start = startIndex; start < endIndex; start += CHUNK_SIZE) {
+    const end = Math.min(endIndex, start + CHUNK_SIZE);
+    for (let i = start; i < end; i++) {
+      try {
+        const bar = bars[i];
+        if (!validBar(bar) || !Number.isFinite(bar.open) || !Number.isFinite(bar.rsi) || !Number.isFinite(bar.recent3)) {
+          skipped++;
+          continue;
+        }
+        const isCore = bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半";
+        if (!isCore) continue;
+        const result = simulatePullbackExit(bars, i, "BUY");
+        if (!result) {
+          skipped++;
+          continue;
+        }
+        entries.push({ index: i, time: bar.time, price: bar.close, bar, result });
+        if (debugState.firstEntryTime === "--") debugState.firstEntryTime = fmtDate(bar.time);
+      } catch (error) {
+        logError("buildEntriesChunked", i, error);
+        skipped++;
+      }
+    }
+    debugState.analyzedBars = entries.length;
+    setProgress(`分析中 ${end.toLocaleString()} / ${endIndex.toLocaleString()}`, end, endIndex);
+    updateDebugConsole();
+    await yieldToBrowser();
+  }
+  debugState.skippedBars = skipped;
+  return entries;
+}
 
-    function enrichBars(bars){let avgGain=0,avgLoss=0;const dayLow=new Map(),prevDayLow=new Map();for(const b of bars){const d=dayKey(b.time);dayLow.set(d,Math.min(dayLow.get(d)??Infinity,b.low))}const days=[...dayLow.keys()].sort();days.forEach((d,i)=>{if(i>0)prevDayLow.set(d,dayLow.get(days[i-1]))});for(let i=0;i<bars.length;i++){const b=bars[i];if(!validBar(b))continue;try{if(i>0&&validBar(bars[i-1])){const diff=b.close-bars[i-1].close,g=Math.max(0,diff),l=Math.max(0,-diff);if(i<=RSI_PERIOD){avgGain+=g;avgLoss+=l;if(i===RSI_PERIOD){avgGain/=RSI_PERIOD;avgLoss/=RSI_PERIOD;b.rsi=calcRsi(avgGain,avgLoss)}}else{avgGain=(avgGain*(RSI_PERIOD-1)+g)/RSI_PERIOD;avgLoss=(avgLoss*(RSI_PERIOD-1)+l)/RSI_PERIOD;b.rsi=calcRsi(avgGain,avgLoss)}}b.session=getSession(b.time);b.recent3=i>=3&&validBar(bars[i-3])?recentPips(bars,i,3):0;setLowFeatures(bars,i,b,dayLow,prevDayLow)}catch(e){logError("enrichBars",e,{index:i})}}}
-    function setLowFeatures(bars,i,b,dayLow,prevDayLow){const prev3=lowOf(bars.slice(Math.max(0,i-3),i)),prev5=lowOf(bars.slice(Math.max(0,i-5),i)),prev10=lowOf(bars.slice(Math.max(0,i-10),i));b.lowBreak3=Number.isFinite(prev3)&&b.low<prev3;b.lowBreak5=Number.isFinite(prev5)&&b.low<prev5;b.lowBreak10=Number.isFinite(prev10)&&b.low<prev10;b.lowBreakAmount=Number.isFinite(prev10)&&b.low<prev10?round((prev10-b.low)*PIP,2):0;const today=dayLow.get(dayKey(b.time)),prev=prevDayLow.get(dayKey(b.time));b.todayLowBreak=Number.isFinite(today)&&b.low<=today;b.todayLowDistance=Number.isFinite(today)?round((b.close-today)*PIP,2):999;b.prevDayLowBreak=Number.isFinite(prev)&&b.low<prev;b.prevDayLowDistance=Number.isFinite(prev)?round(Math.abs((b.close-prev)*PIP),2):999;b.tokyoLowBreak=sessionLowBreak(bars,i,b,"東京");b.londonLowBreak=sessionLowBreak(bars,i,b,"ロンドン");b.nyLowBreak=sessionLowBreak(bars,i,b,"NY");b.barsAfterLowBreak=barsAfterBreak(bars,i)}
-    function sessionLowBreak(bars,i,b,sessionPrefix){const rows=bars.slice(0,i).filter(x=>sameDay(x.time,b.time)&&getSession(x.time).startsWith(sessionPrefix)&&Number.isFinite(x.low));if(!rows.length)return false;return b.low<Math.min(...rows.map(x=>x.low))}
-    function barsAfterBreak(bars,i){for(let back=0;back<=3;back++){const idx=i-back;if(idx<3)continue;const prev=lowOf(bars.slice(Math.max(0,idx-10),idx));if(Number.isFinite(prev)&&bars[idx].low<prev)return back}return 99}
-    function lowOf(rows){const vals=rows.filter(x=>x&&Number.isFinite(x.low)).map(x=>x.low);return vals.length?Math.min(...vals):NaN}
-    function buildEntries(bars){const out=[];for(let i=MIN_REQUIRED_BARS;i<bars.length-MAX_HOLD;i++){const b=bars[i];if(validBar(b)&&Number.isFinite(b.rsi)&&b.session&&Number.isFinite(b.recent3))out.push({index:i,bar:b,price:b.close})}return out}
-    function parseCsvBars(text){const rows=parseCsv(text).filter(r=>r.some(c=>String(c).trim()!==""));if(!rows.length)return{bars:[],loadedRows:0,missingRows:0};const headers=rows[0].map(h=>normalizeHeader(h));const hasHeader=headers.some(h=>["datetime","time","date","日時"].includes(h))||headers.includes("close")||headers.includes("終値");const body=hasHeader?rows.slice(1):rows;const idx=hasHeader?{time:findHeader(headers,["日時","datetime","time","date"]),open:findHeader(headers,["始値","open"]),high:findHeader(headers,["高値","high"]),low:findHeader(headers,["安値","low"]),close:findHeader(headers,["終値","close"])}:{time:0,open:1,high:2,low:3,close:4};let missingRows=0;const bars=body.map((row,sourceIndex)=>{const b={sourceIndex,time:parseDate(row[idx.time]),open:toNumber(row[idx.open]),high:toNumber(row[idx.high]),low:toNumber(row[idx.low]),close:toNumber(row[idx.close])};if(!b.time||![b.open,b.high,b.low,b.close].every(Number.isFinite))missingRows++;return b}).filter(b=>b.time&&[b.open,b.high,b.low,b.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time).map((b,i)=>({...b,index:i}));return{bars,loadedRows:body.length,missingRows}}
-    function renderAll(d){const m=d.meta;document.getElementById("summary").innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${m.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>期間</span><strong>${escapeHtml(m.startTime)}<br>${escapeHtml(m.endTime)}</strong></div><div class="stat"><span>Baseline件数</span><strong>${m.baselineCount.toLocaleString()}</strong></div><div class="stat"><span>スプレッド</span><strong>${m.spread}pips</strong></div>`;document.getElementById("finalJudgement").innerHTML=`<strong>${d.finalJudgement.rank}：${escapeHtml(d.finalJudgement.label)}</strong><br><span class="small">${escapeHtml(d.finalJudgement.reason)}</span>`;renderRows("baseline",[d.baseline]);renderRows("lookbackStats",d.lookbackStats);renderRows("todayLowStats",d.todayLowStats);renderRows("prevDayLowStats",d.prevDayLowStats);renderRows("sessionLowStats",d.sessionLowStats);renderRows("breakWidthStats",d.breakWidthStats);renderRows("afterBreakStats",d.afterBreakStats);renderRows("ranking",d.ranking,true);renderWalkForward(d.walkForward);updateDebug()}
-    function renderRows(id,rows,rank=false){document.getElementById(id).innerHTML=tableHtml(rows,rank?["順位","条件","件数","勝率","PF","期待値","総利益","DD","Baseline比"]:["条件","件数","勝率","PF","期待値","総利益","DD","Baseline比"],r=>rank?[r.rank,r.ruleName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.totalPips),pips(-r.maxDrawdown),`${fmt(r.baselineRatio)}%`]:[r.ruleName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.totalPips),pips(-r.maxDrawdown),`${fmt(r.baselineRatio)}%`])}
-    function renderWalkForward(rows){document.getElementById("walkForward").innerHTML=tableHtml(rows,["条件","前半件数","後半件数","前半PF","後半PF","前半期待値","後半期待値","劣化率","判定"],r=>[r.ruleName,r.trainCount,r.testCount,fmt(r.trainPF),fmt(r.testPF),pips(r.trainExpectancy),pips(r.testExpectancy),pct(r.degradationRate),r.judgement])}
-    function downloadJson(){if(!researchResults)return;const blob=new Blob([JSON.stringify(researchResults,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="research_v5_2_results.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
-    function tableHtml(rows,headers,mapper){if(!rows||!rows.length)return"該当データがありません。";return`<table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${mapper(r).map(c=>`<td>${escapeHtml(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
-    function parseCsv(text){const rows=[];let row=[],cell="",quote=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(quote&&ch==='"'&&next==='"'){cell+='"';i++;continue}if(ch==='"'){quote=!quote;continue}if(!quote&&ch===","){row.push(cell);cell="";continue}if(!quote&&(ch==="\n"||ch==="\r")){if(ch==="\r"&&next==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";continue}cell+=ch}row.push(cell);rows.push(row);return rows}
-    function getSession(d){const h=d.getHours();if(h>=6&&h<=14)return"東京";if(h>=15&&h<=17)return"ロンドン前半";if(h>=18&&h<=20)return"ロンドン後半";if(h>=21&&h<=23)return"NY前半";if(h>=0&&h<=2)return"NY後半";return"深夜"}function nyLatePart(d){const t=d.getHours()*60+d.getMinutes();if(t<60)return"NY後半前半";if(t<120)return"NY後半中盤";return"NY後半終盤"}function sameDay(a,b){return dayKey(a)===dayKey(b)}function dayKey(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}function recentPips(bars,i,n){if(!validBar(bars[i])||!validBar(bars[i-n]))return 0;return round((bars[i].close-bars[i-n].close)*PIP,2)}function calcRsi(g,l){if(l===0)return 100;return round(100-100/(1+g/l),1)}
-    function validBar(b){return !!b&&Number.isFinite(b.open)&&Number.isFinite(b.high)&&Number.isFinite(b.low)&&Number.isFinite(b.close)}function safeStep(place,fn,fallback,meta={}){try{return fn()}catch(e){logError(place,e,meta);return fallback}}function logError(place,e,meta={}){debug.errorCount++;const row={place,message:e&&e.message?e.message:String(e),index:meta.index??"--",time:new Date().toLocaleTimeString()};debug.errors.push(row);console.error("Research v5.2 error",row,e);updateDebug()}function resetDebug(){debug={loadedRows:0,validBars:0,analyzedBars:0,baselineCount:0,errorCount:0,lastRun:"--",errors:[]};updateDebug()}function updateDebug(){const s=document.getElementById("debugStats");if(s)s.innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${debug.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>有効バー数</span><strong>${debug.validBars.toLocaleString()}</strong></div><div class="stat"><span>分析対象本数</span><strong>${debug.analyzedBars.toLocaleString()}</strong></div><div class="stat"><span>Baseline件数 / エラー</span><strong>${debug.baselineCount.toLocaleString()} / ${debug.errorCount}</strong></div>`;const l=document.getElementById("debugLog");if(l)l.textContent=`最小必要バー数: ${MIN_REQUIRED_BARS+MAX_HOLD}\n最終実行時間: ${debug.lastRun}\n`+(debug.errors.length?debug.errors.slice(-100).map(e=>`エラー発生箇所: ${e.place}\nエラー内容: ${e.message}\n対象index: ${e.index}\n時刻: ${e.time}\n---`).join("\n"):"エラーなし")}
-    function normalizeHeader(v){return String(v||"").trim().toLowerCase().replace(/\s+/g,"_")}function findHeader(headers,names){for(const name of names){const i=headers.indexOf(String(name).toLowerCase());if(i>=0)return i}return-1}function parseDate(value){const raw=String(value||"").trim().replace(/\./g,"-").replace("T"," ");const m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);if(m)return new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),Number(m[6]||0));const d=new Date(raw);return Number.isFinite(d.getTime())?d:null}function toNumber(v){const n=Number(String(v??"").replace(/,/g,"").trim());return Number.isFinite(n)?n:NaN}function average(a){return a.length?sum(a)/a.length:0}function sum(a){return a.reduce((x,y)=>x+Number(y||0),0)}function round(v,d=2){return Number(Number(v||0).toFixed(d))}function fmt(v){return Number.isFinite(Number(v))?Number(v).toLocaleString(undefined,{maximumFractionDigits:2}):"--"}function pct(v){return`${fmt(v)}%`}function pips(v){return`${Number(v)>=0?"+":""}${fmt(v)}pips`}function signed(v){return`${Number(v)>=0?"+":""}${fmt(v)}`}function formatDateTime(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`}function pad(v){return String(v).padStart(2,"0")}function setStatus(t){document.getElementById("status").textContent=t}function breathe(){return new Promise(r=>setTimeout(r,0))}function escapeHtml(v){return String(v??"").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]))}
-  </script>
+function buildLowUpdateComparison(entries) {
+  const filters = [
+    { name: "直近3本安値更新", test: e => e.bar.lowBreak3 === true },
+    { name: "直近5本安値更新", test: e => e.bar.lowBreak5 === true },
+    { name: "直近10本安値更新", test: e => e.bar.lowBreak10 === true },
+    { name: "安値更新なし", test: e => !e.bar.lowBreak3 && !e.bar.lowBreak5 && !e.bar.lowBreak10 },
+    { name: "安値更新あり", test: e => e.bar.lowBreak3 || e.bar.lowBreak5 || e.bar.lowBreak10 }
+  ];
+  return filters.map(filter => {
+    const selected = entries.filter(filter.test);
+    return {
+      conditionName: filter.name,
+      count: selected.length,
+      ...calcMetrics(selected.map(e => e.result.pips))
+    };
+  });
+}
+
+function simulatePullbackExit(bars, index, direction) {
+  const entryBar = bars[index];
+  if (!validBar(entryBar) || index + 1 >= bars.length) return null;
+  const entry = entryBar.close;
+  let peak = -Infinity;
+  let exitPips = null;
+  let exitMinutes = 0;
+  for (let m = 1; m <= MAX_HOLD; m++) {
+    const bar = bars[index + m];
+    if (!validBar(bar)) return null;
+    const favorable = direction === "BUY" ? (bar.high - entry) * PIP : (entry - bar.low) * PIP;
+    const closePips = direction === "BUY" ? (bar.close - entry) * PIP : (entry - bar.close) * PIP;
+    peak = Math.max(peak, favorable);
+    if (peak >= 10 && favorable <= peak - 5) {
+      exitPips = closePips - SPREAD_PIPS;
+      exitMinutes = m;
+      break;
+    }
+    if (m === MAX_HOLD) {
+      exitPips = closePips - SPREAD_PIPS;
+      exitMinutes = m;
+    }
+  }
+  if (!Number.isFinite(exitPips)) return null;
+  return { pips: exitPips, exitMinutes, peakPips: peak };
+}
+
+function calcMetrics(pipsList) {
+  const count = pipsList.length;
+  if (!count) return { winRate: 0, profitFactor: 0, expectancy: 0, totalPips: 0, maxDrawdown: 0, maxLosingStreak: 0 };
+  let wins = 0, grossProfit = 0, grossLoss = 0, total = 0, equity = 0, peak = 0, maxDd = 0, losing = 0, maxLosing = 0;
+  for (const pips of pipsList) {
+    total += pips;
+    if (pips > 0) {
+      wins++;
+      grossProfit += pips;
+      losing = 0;
+    } else if (pips < 0) {
+      grossLoss += Math.abs(pips);
+      losing++;
+      maxLosing = Math.max(maxLosing, losing);
+    }
+    equity += pips;
+    peak = Math.max(peak, equity);
+    maxDd = Math.max(maxDd, peak - equity);
+  }
+  return {
+    winRate: wins / count * 100,
+    profitFactor: grossLoss ? grossProfit / grossLoss : (grossProfit ? 999 : 0),
+    expectancy: total / count,
+    totalPips: total,
+    maxDrawdown: maxDd,
+    maxLosingStreak: maxLosing
+  };
+}
+
+function parseCsvBars(text) {
+  const rows = parseCsv(text).filter(row => row.some(cell => String(cell).trim() !== ""));
+  if (!rows.length) return { bars: [], loadedRows: 0, missingRows: 0 };
+  const headers = rows[0].map(normalizeHeader);
+  const hasHeader = headers.some(h => ["datetime", "time", "date", "日時"].includes(h)) || headers.includes("close") || headers.includes("終値");
+  const body = hasHeader ? rows.slice(1) : rows;
+  const idx = hasHeader ? {
+    time: findHeader(headers, ["日時", "datetime", "time", "date"]),
+    open: findHeader(headers, ["始値", "open"]),
+    high: findHeader(headers, ["高値", "high"]),
+    low: findHeader(headers, ["安値", "low"]),
+    close: findHeader(headers, ["終値", "close"])
+  } : { time: 0, open: 1, high: 2, low: 3, close: 4 };
+  let missingRows = 0;
+  const bars = [];
+  for (let sourceIndex = 0; sourceIndex < body.length; sourceIndex++) {
+    const row = body[sourceIndex];
+    const bar = {
+      sourceIndex,
+      time: parseDate(row[idx.time]),
+      open: toNumber(row[idx.open]),
+      high: toNumber(row[idx.high]),
+      low: toNumber(row[idx.low]),
+      close: toNumber(row[idx.close])
+    };
+    if (!bar.time || ![bar.open, bar.high, bar.low, bar.close].every(Number.isFinite)) {
+      missingRows++;
+      continue;
+    }
+    bars.push(bar);
+  }
+  bars.sort((a, b) => a.time - b.time);
+  bars.forEach((bar, index) => { bar.index = index; });
+  return { bars, loadedRows: body.length, missingRows };
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [], cell = "", quote = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i], next = text[i + 1];
+    if (quote && ch === '"' && next === '"') { cell += '"'; i++; continue; }
+    if (ch === '"') { quote = !quote; continue; }
+    if (!quote && ch === ",") { row.push(cell); cell = ""; continue; }
+    if (!quote && (ch === "\n" || ch === "\r")) {
+      if (ch === "\r" && next === "\n") i++;
+      row.push(cell); rows.push(row); row = []; cell = ""; continue;
+    }
+    cell += ch;
+  }
+  row.push(cell); rows.push(row);
+  return rows;
+}
+
+function normalizeHeader(value) {
+  return String(value || "").trim().replace(/^\uFEFF/, "").toLowerCase();
+}
+
+function findHeader(headers, names) {
+  for (const name of names) {
+    const idx = headers.indexOf(String(name).toLowerCase());
+    if (idx >= 0) return idx;
+  }
+  return -1;
+}
+
+function parseDate(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+  const normalized = raw.replace(/\./g, "-").replace(/\//g, "-").replace("T", " ");
+  const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+  if (match) {
+    const [, y, mo, d, h = "0", mi = "0", s = "0"] = match;
+    return new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s));
+  }
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function toNumber(value) {
+  const num = Number(String(value || "").replace(/,/g, "").trim());
+  return Number.isFinite(num) ? num : NaN;
+}
+
+function validBar(bar) {
+  return !!bar && bar.time instanceof Date && !Number.isNaN(bar.time.getTime()) && [bar.open, bar.high, bar.low, bar.close].every(Number.isFinite);
+}
+
+function calcRsi(avgGain, avgLoss) {
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
+
+function calcRecentPips(bars, index, length) {
+  if (index < length) return NaN;
+  const now = bars[index], prev = bars[index - length];
+  if (!validBar(now) || !validBar(prev)) return NaN;
+  return (now.close - prev.close) * PIP;
+}
+
+function isLowBreak(bars, index, length) {
+  const bar = bars[index];
+  if (!validBar(bar) || index < length) return false;
+  let prevLow = Infinity;
+  for (let i = index - length; i < index; i++) {
+    if (!validBar(bars[i])) return false;
+    prevLow = Math.min(prevLow, bars[i].low);
+  }
+  return Number.isFinite(prevLow) && bar.low < prevLow;
+}
+
+function getSessionJst(date) {
+  const h = date.getHours();
+  if (h >= 6 && h <= 14) return "東京";
+  if (h >= 15 && h <= 17) return "ロンドン前半";
+  if (h >= 18 && h <= 20) return "ロンドン後半";
+  if (h >= 21 && h <= 23) return "NY前半";
+  if (h >= 0 && h <= 2) return "NY後半";
+  return "深夜";
+}
+
+function getNyLatePart(date) {
+  const h = date.getHours();
+  if (h === 0) return "NY後半前半";
+  if (h === 1) return "NY後半中盤";
+  if (h === 2) return "NY後半終盤";
+  return "";
+}
+
+function fmtDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "--";
+  const p = n => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())} ${p(date.getHours())}:${p(date.getMinutes())}`;
+}
+
+function fmtNum(value, digits = 2) {
+  return Number.isFinite(value) ? value.toFixed(digits) : "--";
+}
+
+function renderResults(results) {
+  const body = document.getElementById("resultBody");
+  if (!results.length) {
+    body.innerHTML = '<tr><td colspan="8" class="small">分析実行後に表示します。</td></tr>';
+    return;
+  }
+  body.innerHTML = results.map(row => `
+    <tr>
+      <td>${escapeHtml(row.conditionName)}</td>
+      <td>${row.count.toLocaleString()}</td>
+      <td class="${row.winRate >= 55 ? "good" : row.winRate < 45 ? "bad" : ""}">${fmtNum(row.winRate, 1)}%</td>
+      <td class="${row.profitFactor >= 1.3 ? "good" : row.profitFactor < 1 ? "bad" : ""}">${fmtNum(row.profitFactor, 2)}</td>
+      <td class="${row.expectancy > 0 ? "good" : row.expectancy < 0 ? "bad" : ""}">${fmtNum(row.expectancy, 2)}</td>
+      <td class="${row.totalPips > 0 ? "good" : row.totalPips < 0 ? "bad" : ""}">${fmtNum(row.totalPips, 1)}</td>
+      <td>${fmtNum(row.maxDrawdown, 1)}</td>
+      <td>${row.maxLosingStreak}</td>
+    </tr>`).join("");
+}
+
+function updateLoadSummary() {
+  document.getElementById("loadedRows").textContent = loadedState.loadedRows.toLocaleString();
+  document.getElementById("validBars").textContent = loadedState.bars.length.toLocaleString();
+  document.getElementById("startTime").textContent = loadedState.startTime;
+  document.getElementById("endTime").textContent = loadedState.endTime;
+}
+
+function updateDebugConsole() {
+  document.getElementById("entryCount").textContent = debugState.analyzedBars ? debugState.analyzedBars.toLocaleString() : "--";
+  document.getElementById("rsiCount").textContent = debugState.rsiCount ? debugState.rsiCount.toLocaleString() : "--";
+  document.getElementById("errorCount").textContent = String(debugState.errorCount || 0);
+  document.getElementById("lastRun").textContent = debugState.lastRun || "--";
+  const lines = [
+    `読み込み本数: ${debugState.loadedRows.toLocaleString()}`,
+    `有効バー数: ${debugState.validBars.toLocaleString()}`,
+    `分析対象本数: ${debugState.analyzedBars.toLocaleString()}`,
+    `RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,
+    `エラー件数: ${debugState.errorCount.toLocaleString()}`,
+    `最初に一致した日時: ${debugState.firstEntryTime || "--"}`,
+    `最終実行時間: ${debugState.lastRun || "--"}`,
+    "",
+    "Errors:",
+    ...(debugState.errors.length ? debugState.errors.slice(-80).map(e => `${e.functionName} index=${e.index} ${e.message}`) : ["なし"])
+  ];
+  document.getElementById("debugLog").textContent = lines.join("\n");
+}
+
+function logError(functionName, index, error) {
+  debugState.errorCount++;
+  debugState.errors.push({ functionName, index, message: error && error.message ? error.message : String(error) });
+  if (debugState.errors.length > 200) debugState.errors.shift();
+  console.error(functionName, index, error);
+}
+
+function setStatus(text) {
+  document.getElementById("status").textContent = text;
+}
+
+function setProgress(label, done, total) {
+  const pct = total ? Math.min(100, Math.max(0, done / total * 100)) : 0;
+  document.getElementById("progressBar").value = pct;
+  document.getElementById("progressText").textContent = `${label} / 進捗 ${pct.toFixed(1)}%`;
+}
+
+function yieldToBrowser() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+function downloadJson() {
+  if (!researchResults) return;
+  const blob = new Blob([JSON.stringify(researchResults, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "research_v5_2_1_results.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+</script>
 </body>
 </html>
