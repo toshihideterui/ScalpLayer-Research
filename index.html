@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="scalplayer-version" content="research-v4.1">
-  <title>ScalpLayer Research v4.1</title>
+  <meta name="scalplayer-version" content="research-v4.2">
+  <title>ScalpLayer Research v4.2</title>
   <style>
     :root{--bg:#05070d;--panel:#10131c;--line:rgba(212,175,55,.28);--gold:#d4af37;--gold2:#f7dc75;--text:#f8fafc;--muted:#b8c0cc}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:20px;color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(212,175,55,.18),transparent 28%),linear-gradient(180deg,#141925,var(--bg) 46%);line-height:1.65}
@@ -19,23 +19,25 @@
 </head>
 <body>
   <main class="container">
-    <section class="hero"><h1>ScalpLayer Research v4.1</h1><p class="sub">RSI&lt;20を中心に、買い反発条件として実戦投入できるかを深掘りします。</p></section>
-    <section class="card notice">入力はUSDJPY M1 CSVのみです。JSON読込はありません。今回はCore Rule B全体ではなく、BUY / RSI&lt;20の優位性を確認します。</section>
-    <section class="card"><h2>1. CSV読み込み</h2><label for="csvFile">USDJPY M1 CSV</label><input id="csvFile" type="file" accept=".csv,text/csv"><button id="runBtn" onclick="runResearch()">Research v4.1 分析実行</button><div id="status" class="small">CSVを選択してください。</div></section>
-    <section class="card"><h2>2. データ概要</h2><div id="summary" class="grid"><div class="stat"><span>読み込み本数</span><strong>--</strong></div><div class="stat"><span>期間</span><strong>--</strong></div><div class="stat"><span>欠損行数</span><strong>--</strong></div><div class="stat"><span>RSI&lt;20件数</span><strong>--</strong></div></div></section>
+    <section class="hero"><h1>ScalpLayer Research v4.2</h1><p class="sub">RSI&lt;20 + NY後半の優位性の源泉を分解します。</p></section>
+    <section class="card notice">入力はUSDJPY M1 CSVのみです。JSON読込はありません。今回は新条件探索ではなく、BUY / RSI&lt;20 + NY後半の799件前後を深掘りします。</section>
+    <section class="card"><h2>1. CSV読み込み</h2><label for="csvFile">USDJPY M1 CSV</label><input id="csvFile" type="file" accept=".csv,text/csv"><button id="runBtn" onclick="runResearch()">Research v4.2 分析実行</button><div id="status" class="small">CSVを選択してください。</div></section>
+    <section class="card"><h2>2. データ概要</h2><div id="summary" class="grid"><div class="stat"><span>読み込み本数</span><strong>--</strong></div><div class="stat"><span>期間</span><strong>--</strong></div><div class="stat"><span>欠損行数</span><strong>--</strong></div><div class="stat"><span>RSI&lt;20 + NY後半件数</span><strong>--</strong></div></div></section>
     <section class="card judgement"><h2>Final Judgement</h2><div id="finalJudgement"><strong>未判定</strong><br><span class="small">分析後に表示します。</span></div></section>
-    <section class="card"><h2>3. RSI&lt;20 基本結果</h2><div id="baseResult" class="tableWrap small">--</div></section>
-    <section class="card"><h2>4. RSI帯比較</h2><div id="rsiBreakdown" class="tableWrap small">--</div></section>
-    <section class="card"><h2>5. 直近下落幅比較</h2><div id="recentBreakdown" class="tableWrap small">--</div></section>
-    <section class="card"><h2>6. ボリンジャーバンド比較</h2><div id="bbBreakdown" class="tableWrap small">--</div></section>
-    <section class="card"><h2>7. 陰線サイズ比較</h2><div id="candleBreakdown" class="tableWrap small">--</div></section>
-    <section class="card"><h2>8. 時間帯比較</h2><div id="nyLateBreakdown" class="tableWrap small">--</div></section>
-    <section class="card"><h2>9. RSI&lt;20重点組み合わせランキング</h2><div id="derivedRanking" class="tableWrap small">--</div></section>
-    <section class="card"><h2>10. Walk Forward Test</h2><div id="walkForward" class="tableWrap small">--</div></section>
-    <section class="card"><h2>11. Final Candidates</h2><div id="finalCandidates" class="tableWrap small">--</div></section>
-    <section class="card"><h2>12. ScalpLayer本体実装案</h2><div id="integrationPlan" class="small">--</div></section>
-    <section class="card"><h2>13. Debug Console</h2><div id="debugStats" class="grid"></div><div id="debugLog" class="debug">待機中</div></section>
-    <section class="card"><h2>14. research_v4_1_results.json 出力</h2><button id="downloadBtn" onclick="downloadJson()" disabled>research_v4_1_results.json をダウンロード</button></section>
+    <section class="card"><h2>3. RSI&lt;20 + NY後半 基本結果</h2><div id="baseResult" class="tableWrap small">--</div></section>
+    <section class="card"><h2>4. RSI深度分析</h2><div id="rsiBreakdown" class="tableWrap small">--</div></section>
+    <section class="card"><h2>5. EMA距離分析</h2><div id="emaBreakdown" class="tableWrap small">--</div></section>
+    <section class="card"><h2>6. 15分足方向分析</h2><div id="fifteenBreakdown" class="tableWrap small">--</div></section>
+    <section class="card"><h2>7. 直近下落幅分析</h2><div id="recentBreakdown" class="tableWrap small">--</div></section>
+    <section class="card"><h2>8. trendScore分析</h2><div id="trendBreakdown" class="tableWrap small">--</div></section>
+    <section class="card"><h2>9. 高値安値更新分析</h2><div id="breakoutBreakdown" class="tableWrap small">--</div></section>
+    <section class="card"><h2>10. NY後半内時間帯分析</h2><div id="nyLateBreakdown" class="tableWrap small">--</div></section>
+    <section class="card"><h2>11. 条件組み合わせ探索</h2><div id="derivedRanking" class="tableWrap small">--</div></section>
+    <section class="card"><h2>12. Walk Forward Test</h2><div id="walkForward" class="tableWrap small">--</div></section>
+    <section class="card"><h2>13. 実戦候補ランキング</h2><div id="finalCandidates" class="tableWrap small">--</div></section>
+    <section class="card"><h2>14. ScalpLayer本体実装案</h2><div id="integrationPlan" class="small">--</div></section>
+    <section class="card"><h2>15. Debug Console</h2><div id="debugStats" class="grid"></div><div id="debugLog" class="debug">待機中</div></section>
+    <section class="card"><h2>16. research_v4_2_results.json 出力</h2><button id="downloadBtn" onclick="downloadJson()" disabled>research_v4_2_results.json をダウンロード</button></section>
   </main>
 
   <script>
@@ -61,51 +63,60 @@
         safeStep("enrichBars",()=>enrichBars(parsed.bars));
         await breathe();
         const allEntries=safeStep("buildEntries",()=>buildEntries(parsed.bars),[]);
-        const entries=allEntries.filter(e=>safeStep("isRsi20Base",()=>isRsi20Base(e),false,{index:e.index}));
+        const entries=allEntries.filter(e=>safeStep("isRsi20NyLateBase",()=>isRsi20NyLateBase(e),false,{index:e.index}));
         debug.analyzedBars=allEntries.length; debug.coreRuleBCount=entries.length; updateDebug();
-        setStatus(`${entries.length.toLocaleString()}件のRSI<20候補を細分化中...`);
+        setStatus(`${entries.length.toLocaleString()}件のRSI<20 + NY後半候補を分解中...`);
         await breathe();
-        const rsi20BaseResult=safeStep("evaluateSet(RSI<20)",()=>evaluateSet("BUY RSI<20",entries,parsed.bars),emptyResult("BUY RSI<20"));
-        const rsiCompareEntries=allEntries.filter(e=>Number.isFinite(e.bar&&e.bar.rsi)&&e.bar.rsi<30);
-        const rsiBreakdown=safeStep("rsiBreakdown",()=>buildFixedBreakdown(rsiCompareEntries,parsed.bars,[
-          ["RSI<15",e=>e.bar.rsi<15],
+        const rsiNyLateBaseResult=safeStep("evaluateSet(RSI<20+NY後半)",()=>evaluateSet("BUY RSI<20 + NY後半",entries,parsed.bars),emptyResult("BUY RSI<20 + NY後半"));
+        const rsiBreakdown=safeStep("rsiDepthBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
           ["RSI15〜20",e=>e.bar.rsi>=15&&e.bar.rsi<20],
-          ["RSI20〜25",e=>e.bar.rsi>=20&&e.bar.rsi<25],
-          ["RSI25〜30",e=>e.bar.rsi>=25&&e.bar.rsi<30]
+          ["RSI10〜15",e=>e.bar.rsi>=10&&e.bar.rsi<15],
+          ["RSI5〜10",e=>e.bar.rsi>=5&&e.bar.rsi<10],
+          ["RSI0〜5",e=>e.bar.rsi>=0&&e.bar.rsi<5]
+        ]),[]);
+        const emaDistanceBreakdown=safeStep("emaDistanceBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
+          ["EMA距離 0〜2",e=>e.bar.emaDistance>=0&&e.bar.emaDistance<2],
+          ["EMA距離 2〜5",e=>e.bar.emaDistance>=2&&e.bar.emaDistance<5],
+          ["EMA距離 5〜8",e=>e.bar.emaDistance>=5&&e.bar.emaDistance<8],
+          ["EMA距離 8〜12",e=>e.bar.emaDistance>=8&&e.bar.emaDistance<12],
+          ["EMA距離 12以上",e=>e.bar.emaDistance>=12]
+        ]),[]);
+        const fifteenDirectionBreakdown=safeStep("fifteenDirectionBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
+          ["15分足 上昇",e=>e.bar.fifteenDirection==="上昇"],
+          ["15分足 横ばい",e=>e.bar.fifteenDirection==="横ばい"],
+          ["15分足 下降",e=>e.bar.fifteenDirection==="下降"]
         ]),[]);
         const recentMoveBreakdown=safeStep("recentMoveBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
           ["直近3本 -4以下",e=>e.bar.recent3<=-4],["直近3本 -8以下",e=>e.bar.recent3<=-8],["直近3本 -12以下",e=>e.bar.recent3<=-12],["直近3本 -16以下",e=>e.bar.recent3<=-16],
-          ["直近5本 -5以下",e=>e.bar.recent5<=-5],["直近5本 -10以下",e=>e.bar.recent5<=-10],["直近5本 -15以下",e=>e.bar.recent5<=-15],["直近5本 -20以下",e=>e.bar.recent5<=-20],
-          ["直近10本 -8以下",e=>e.bar.recent10<=-8],["直近10本 -12以下",e=>e.bar.recent10<=-12],["直近10本 -16以下",e=>e.bar.recent10<=-16],["直近10本 -20以下",e=>e.bar.recent10<=-20]
+          ["直近5本 -5以下",e=>e.bar.recent5<=-5],["直近5本 -10以下",e=>e.bar.recent5<=-10],["直近5本 -15以下",e=>e.bar.recent5<=-15],["直近5本 -20以下",e=>e.bar.recent5<=-20]
         ]),[]);
-        const bbPositionBreakdown=safeStep("bbPositionBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
-          ["BB下バンド外",e=>e.bbBand==="下バンド外"],
-          ["BB下バンド付近",e=>e.bbBand==="下バンド付近"],
-          ["BB中央より下",e=>e.bbBand==="中央より下"],
-          ["BB中央付近",e=>e.bbBand==="中央付近"]
+        const trendScoreBreakdown=safeStep("trendScoreBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
+          ["trendScore -10以下",e=>e.bar.trendScore<=-10],
+          ["trendScore -5以下",e=>e.bar.trendScore<=-5],
+          ["trendScore 0以下",e=>e.bar.trendScore<=0],
+          ["trendScore 0以上",e=>e.bar.trendScore>=0]
         ]),[]);
-        const candleSizeBreakdown=safeStep("candleSizeBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
-          ["小陰線",e=>e.candleSize==="小陰線"],
-          ["中陰線",e=>e.candleSize==="中陰線"],
-          ["大陰線",e=>e.candleSize==="大陰線"]
+        const breakoutBreakdown=safeStep("breakoutBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
+          ["高値更新あり",e=>e.bar.highUpdate===true],
+          ["高値更新なし",e=>e.bar.highUpdate===false],
+          ["安値更新あり",e=>e.bar.lowUpdate===true],
+          ["安値更新なし",e=>e.bar.lowUpdate===false]
         ]),[]);
         const nyLateBreakdown=safeStep("sessionBreakdown",()=>buildFixedBreakdown(entries,parsed.bars,[
-          ["ロンドン後半",e=>e.bar.session==="ロンドン後半"],
-          ["NY前半",e=>e.bar.session==="NY前半"],
-          ["NY後半前半",e=>e.bar.session==="NY後半"&&e.nyLatePart==="NY後半前半"],
-          ["NY後半中盤",e=>e.bar.session==="NY後半"&&e.nyLatePart==="NY後半中盤"],
-          ["NY後半終盤",e=>e.bar.session==="NY後半"&&e.nyLatePart==="NY後半終盤"]
+          ["NY後半前半",e=>e.nyLatePart==="NY後半前半"],
+          ["NY後半中盤",e=>e.nyLatePart==="NY後半中盤"],
+          ["NY後半終盤",e=>e.nyLatePart==="NY後半終盤"]
         ]),[]);
         const derivedRuleRanking=safeStep("buildDerivedRanking",()=>buildDerivedRanking(entries,parsed.bars),[]);
         const walkForwardResults=safeStep("buildWalkForward",()=>buildWalkForward(derivedRuleRanking,entries,parsed.bars),[]);
         const finalCandidates=safeStep("buildFinalCandidates",()=>buildFinalCandidates(derivedRuleRanking,walkForwardResults),[]);
         const finalJudgement=safeStep("buildFinalJudgement",()=>buildFinalJudgement(finalCandidates),{rank:"D",label:"未判定",reason:"分析中にエラーがありました。Debug Consoleを確認してください。"});
         const warnings=buildWarnings(finalCandidates,walkForwardResults);
-        const integrationPlan=safeStep("buildIntegrationPlan",()=>buildIntegrationPlan(finalCandidates),{title:"本体実装案なし",rules:[],note:"有望候補がありません。"});
-        researchResults={meta:{appVersion:"research-v4.1",symbol:"USDJPY",timeframe:"M1",sourceFileName:file.name,generatedAt:new Date().toISOString(),loadedRows:parsed.loadedRows,validBars:parsed.bars.length,missingRows:parsed.missingRows,startTime:formatDateTime(parsed.bars[0].time),endTime:formatDateTime(parsed.bars[parsed.bars.length-1].time),rsi20Count:entries.length,minRequiredBars:MIN_REQUIRED_BARS},rsi20BaseResult,rsiBreakdown,candleSizeBreakdown,bbPositionBreakdown,recentMoveBreakdown,nyLateBreakdown,derivedRuleRanking,walkForwardResults,finalCandidates,integrationPlan,finalJudgement,warnings,debug};
+        const integrationPlan=safeStep("buildIntegrationPlan",()=>buildIntegrationPlan(finalCandidates,rsiBreakdown,emaDistanceBreakdown),{title:"本体実装案なし",rules:[],note:"有望候補がありません。"});
+        researchResults={meta:{appVersion:"research-v4.2",symbol:"USDJPY",timeframe:"M1",sourceFileName:file.name,generatedAt:new Date().toISOString(),loadedRows:parsed.loadedRows,validBars:parsed.bars.length,missingRows:parsed.missingRows,startTime:formatDateTime(parsed.bars[0].time),endTime:formatDateTime(parsed.bars[parsed.bars.length-1].time),rsi20NyLateCount:entries.length,minRequiredBars:MIN_REQUIRED_BARS},rsiNyLateBaseResult,rsiBreakdown,emaDistanceBreakdown,fifteenDirectionBreakdown,recentMoveBreakdown,trendScoreBreakdown,breakoutBreakdown,nyLateBreakdown,derivedRuleRanking,walkForwardResults,finalCandidates,integrationPlan,finalJudgement,warnings,debug};
         renderAll(researchResults);
         document.getElementById("downloadBtn").disabled=false;
-        setStatus(debug.errorCount?`分析完了。ただしエラー${debug.errorCount}件。Debug Consoleを確認してください。`:"分析完了。research_v4_1_results.jsonを出力できます。");
+        setStatus(debug.errorCount?`分析完了。ただしエラー${debug.errorCount}件。Debug Consoleを確認してください。`:"分析完了。research_v4_2_results.jsonを出力できます。");
       }catch(e){
         logError("runResearch",e,{index:"--"});
         setStatus(`エラー発生箇所：runResearch / エラー内容：${e.message}`);
@@ -117,6 +128,11 @@
     function isRsi20Base(e){
       const bar=e&&e.bar;
       return !!bar&&Number.isFinite(bar.rsi)&&bar.rsi<20;
+    }
+
+    function isRsi20NyLateBase(e){
+      const bar=e&&e.bar;
+      return !!bar&&Number.isFinite(bar.rsi)&&bar.rsi<20&&bar.session==="NY後半";
     }
 
     function buildEntries(bars){
@@ -136,11 +152,12 @@
           if(!next||!Number.isFinite(next.close)){debug.buildSkipCount++;continue}
           if(!Number.isFinite(bar.rsi)||!bar.bbPosition||bar.bbPosition==="BB不足"||!bar.session||!bar.candleType){debug.buildSkipCount++;continue}
           if(!Number.isFinite(bar.recent3)||!Number.isFinite(bar.recent5)||!Number.isFinite(bar.recent10)){debug.buildSkipCount++;continue}
-          const entry={index:i,bar,price:bar.close,rsiBand:rsiBand(bar.rsi),candleSize:candleSizeFromBar(bar),bbBand:bbBandFromBar(bar),recent3Band:moveBand(bar.recent3),recent5Band:moveBand(bar.recent5),recent10Band:moveBand(bar.recent10),nyLatePart:nyLatePart(bar.time),features:[]};
+          if(!Number.isFinite(bar.emaDistance)||!bar.fifteenDirection||!Number.isFinite(bar.trendScore)){debug.buildSkipCount++;continue}
+          const entry={index:i,bar,price:bar.close,rsiBand:rsiBand(bar.rsi),emaDistanceBand:emaDistanceBand(bar.emaDistance),fifteenDirection:bar.fifteenDirection,trendScoreBand:trendScoreBand(bar.trendScore),breakoutBand:breakoutBand(bar),candleSize:candleSizeFromBar(bar),bbBand:bbBandFromBar(bar),recent3Band:moveBand(bar.recent3),recent5Band:moveBand(bar.recent5),recent10Band:moveBand(bar.recent10),nyLatePart:nyLatePart(bar.time),features:[]};
           out.push(entry);
           debug.buildSuccessCount++;
           if(debug.firstSuccessTime==="--")debug.firstSuccessTime=formatDateTime(bar.time);
-          if(debug.firstCoreRuleBTime==="--"&&isRsi20Base(entry))debug.firstCoreRuleBTime=formatDateTime(bar.time);
+          if(debug.firstCoreRuleBTime==="--"&&isRsi20NyLateBase(entry))debug.firstCoreRuleBTime=formatDateTime(bar.time);
         }catch(e){
           logError("buildEntries",e,{index:i});
           debug.buildSkipCount++;
@@ -180,19 +197,24 @@
     }
 
     function buildDerivedRanking(entries,bars){
-      const defs=[
-        ["RSI<20 + 直近3本 -12以下",["RSI<20","直近3<=-12"]],
-        ["RSI<20 + BB下バンド外",["RSI<20","BB下バンド外"]],
-        ["RSI<20 + NY後半",["RSI<20","NY後半"]],
-        ["RSI<20 + 陰線",["RSI<20","陰線"]],
-        ["RSI<20 + 直近3本 -12以下 + BB下バンド外",["RSI<20","直近3<=-12","BB下バンド外"]],
-        ["RSI<20 + 直近3本 -12以下 + NY後半",["RSI<20","直近3<=-12","NY後半"]],
-        ["RSI<20 + 直近3本 -12以下 + NY後半 + 陰線",["RSI<20","直近3<=-12","NY後半","陰線"]]
+      const seeds=[
+        ["RSI10〜15",e=>e.bar.rsi>=10&&e.bar.rsi<15],["RSI15〜20",e=>e.bar.rsi>=15&&e.bar.rsi<20],["EMA5〜8",e=>e.bar.emaDistance>=5&&e.bar.emaDistance<8],["EMA8〜12",e=>e.bar.emaDistance>=8&&e.bar.emaDistance<12],["EMA12以上",e=>e.bar.emaDistance>=12],
+        ["15分下降",e=>e.bar.fifteenDirection==="下降"],["15分横ばい",e=>e.bar.fifteenDirection==="横ばい"],["直近3<=-8",e=>e.bar.recent3<=-8],["直近3<=-12",e=>e.bar.recent3<=-12],["直近5<=-10",e=>e.bar.recent5<=-10],
+        ["trendScore<=-10",e=>e.bar.trendScore<=-10],["trendScore<=-5",e=>e.bar.trendScore<=-5],["安値更新あり",e=>e.bar.lowUpdate===true],["高値更新なし",e=>e.bar.highUpdate===false],["NY後半前半",e=>e.nyLatePart==="NY後半前半"],["NY後半中盤",e=>e.nyLatePart==="NY後半中盤"],["NY後半終盤",e=>e.nyLatePart==="NY後半終盤"]
       ];
+      const defs=[
+        ...seeds.map(([name])=>[name,[name]]),
+      ];
+      for(let i=0;i<seeds.length-1;i++)for(let j=i+1;j<seeds.length;j++)defs.push([`${seeds[i][0]} + ${seeds[j][0]}`,[seeds[i][0],seeds[j][0]]]);
+      for(let i=0;i<seeds.length-2;i++)for(let j=i+1;j<seeds.length-1;j++)for(let k=j+1;k<seeds.length;k++)defs.push([`${seeds[i][0]} + ${seeds[j][0]} + ${seeds[k][0]}`,[seeds[i][0],seeds[j][0],seeds[k][0]]]);
+      const predicates=Object.fromEntries(seeds.map(([name,fn])=>[name,fn]));
       return defs.map(([name,conditions])=>{
-        const rows=entries.filter(e=>conditions.every(c=>conditionMatches(e,c)));
+        const rows=entries.filter(e=>conditions.every(c=>safeStep(`condition ${c}`,()=>predicates[c]?predicates[c](e):conditionMatches(e,c),false,{index:e.index})));
         return {...evaluateSet(name,rows,bars),conditions};
-      }).sort(rankCondition).map((r,i)=>({rank:i+1,...r}));
+      }).filter(r=>r.count>=50).sort((a,b)=>{
+        const sampleBoost=(b.count>=100?1:0)-(a.count>=100?1:0);
+        return sampleBoost||rankCondition(a,b);
+      }).slice(0,80).map((r,i)=>({rank:i+1,...r}));
     }
 
     function buildWalkForward(ranking,entries,bars){
@@ -209,27 +231,28 @@
     }
 
     function buildFinalCandidates(ranking,wf){
-      return ranking.filter(r=>r.count>=30&&r.expectancy>0&&r.pf>=1.2).map(r=>{
+      return ranking.filter(r=>r.count>=100&&r.expectancy>=2&&r.pf>=1.5).map(r=>{
         const w=wf.find(x=>x.conditionName===r.conditionName)||{};
         const score=(r.expectancy*40)+(Math.min(r.pf,10)*12)+(r.count>=100?25:r.count>=50?12:0)+(w.testPF>=1.2&&w.testExpectancy>0?25:0)-(r.maxDrawdown*1.2)-(r.maxLosingStreak*2);
-        return {...r,walkForward:w,score:round(score,2),finalAdoption:w.testCount<30?"サンプル不足":w.testPF>=1.2&&w.testExpectancy>0&&r.count>=100?"本体候補":w.testPF>=1&&w.testExpectancy>0?"追加検証":"不採用"};
-      }).sort((a,b)=>b.score-a.score).slice(0,10).map((r,i)=>({rank:i+1,...r}));
+        return {...r,walkForward:w,score:round(score,2),finalAdoption:w.testCount<30?"サンプル不足":w.testExpectancy>0?"本体候補":w.testPF>=1&&w.testExpectancy>0?"追加検証":"不採用"};
+      }).filter(r=>r.walkForward&&r.walkForward.testCount>=30&&r.walkForward.testExpectancy>0).sort((a,b)=>b.score-a.score).slice(0,10).map((r,i)=>({rank:i+1,...r}));
     }
 
     function buildFinalJudgement(candidates){
       const top=candidates[0];
-      if(!top)return{rank:"D",label:"優位性なし",reason:"RSI<20派生条件に有望候補がありません。"};
+      if(!top)return{rank:"D",label:"優位性なし",reason:"RSI<20 + NY後半の中で、件数100以上・PF1.5以上・期待値+2pips以上を満たす候補がありません。"};
       if(top.finalAdoption==="本体候補")return{rank:"A",label:"本体移植候補あり",reason:`${top.conditionName} / ${top.recommendedExit} がPF${top.pf}、期待値${signed(top.expectancy)}pipsで、Walk Forwardも有望です。`};
       if(top.finalAdoption==="追加検証")return{rank:"B",label:"追加検証",reason:`${top.conditionName} はプラスですが、後半検証の安定性に注意が必要です。`};
       return{rank:"C",label:"弱い候補のみ",reason:"候補はありますが、サンプル不足または後半検証が弱いです。"};
     }
 
     function buildWarnings(candidates,wf){const out=[];candidates.forEach(c=>{if(c.count<50)out.push(`${c.conditionName}: 件数${c.count}で少なめです。`);if(c.walkForward&&c.walkForward.testCount<30)out.push(`${c.conditionName}: 後半件数30未満です。`)});return out}
-    function buildIntegrationPlan(candidates){
+    function buildIntegrationPlan(candidates,rsiRows=[],emaRows=[]){
       const top=candidates[0];
-      if(!top)return{title:"本体実装案なし",rules:[],note:"spread2.0とWalk Forwardを満たすRSI<20候補がありません。"};
-      const rules=[`BUYスコア +5`,...top.conditions.map(c=>`条件: ${c}`),`推奨決済: ${top.recommendedExit}`,`想定PF: ${top.pf}`,`想定期待値: ${signed(top.expectancy)}pips`];
-      return{title:`${top.conditionName} を買い反発候補として実装`,rules,note:"RSI<20は過熱反発狙いです。実装時は小ロットまたはデモで追加検証してください。"};
+      const baseRules=["RSI<20 → BUYスコア +1","RSI<15 → BUYスコア +2","RSI<10 → BUYスコア +3","RSI<20 + NY後半 → BUYスコア +3"];
+      if(!top)return{title:"段階スコア実装案",rules:baseRules,note:"最終候補は未確定です。まずRSI<20 + NY後半を参考表示として実装し、追加CSVで再検証してください。"};
+      const rules=[...baseRules,`最有力: ${top.conditionName} → BUYスコア +5`,...top.conditions.map(c=>`追加条件: ${c}`),`推奨決済: ${top.recommendedExit}`,`想定PF: ${top.pf}`,`想定期待値: ${signed(top.expectancy)}pips`];
+      return{title:`${top.conditionName} をBUYスコア+5候補として実装`,rules,note:"RSI<20 + NY後半は過熱反発狙いです。スプレッド2pips込み・Walk Forward後半の結果を優先してください。"};
     }
     function conditionMatches(e,c){
       const b=e&&e.bar;
@@ -239,7 +262,7 @@
       if(c==="BB下バンド外")return e.bbBand==="下バンド外";
       if(c==="NY後半")return b.session==="NY後半";
       if(c==="陰線")return b.close<b.open;
-      return [e.rsiBand,e.candleSize,e.bbBand,`直近3=${e.recent3Band}`,`直近5=${e.recent5Band}`,`直近10=${e.recent10Band}`,e.nyLatePart].includes(c);
+      return [e.rsiBand,e.emaDistanceBand,e.fifteenDirection,e.trendScoreBand,e.breakoutBand,e.candleSize,e.bbBand,`直近3=${e.recent3Band}`,`直近5=${e.recent5Band}`,`直近10=${e.recent10Band}`,e.nyLatePart].includes(c);
     }
 
     function simulateExit(bars,index,method,spread){
@@ -286,22 +309,29 @@
           if(i>0&&hasClose(bars[i-1])){const diff=bar.close-bars[i-1].close,gain=Math.max(0,diff),loss=Math.max(0,-diff);if(i<=RSI_PERIOD){avgGain+=gain;avgLoss+=loss;if(i===RSI_PERIOD){avgGain/=RSI_PERIOD;avgLoss/=RSI_PERIOD;bar.rsi=calcRsi(avgGain,avgLoss);debug.rsiCount++}}else{avgGain=(avgGain*(RSI_PERIOD-1)+gain)/RSI_PERIOD;avgLoss=(avgLoss*(RSI_PERIOD-1)+loss)/RSI_PERIOD;bar.rsi=calcRsi(avgGain,avgLoss);debug.rsiCount++}}
           if(i>=BB_PERIOD-1){const s=bars.slice(i-BB_PERIOD+1,i+1).filter(hasClose);if(s.length===BB_PERIOD){const mid=average(s.map(b=>b.close)),sd=Math.sqrt(average(s.map(b=>Math.pow(b.close-mid,2))));bar.bbMid=mid;bar.bbUpper=mid+sd*2;bar.bbLower=mid-sd*2;bar.bbPosition=classifyBb(bar);debug.bbCount++}else bar.bbPosition="BB不足"}else bar.bbPosition="BB不足";
           bar.session=getSession(bar.time);bar.recent3=i>=3&&hasClose(bars[i-3])?recentPips(bars,i,3):0;bar.recent5=i>=5&&hasClose(bars[i-5])?recentPips(bars,i,5):0;bar.recent10=i>=10&&hasClose(bars[i-10])?recentPips(bars,i,10):0;bar.candleType=bar.close>=bar.open?"陽線":"陰線";
+          bar.emaDistance=Number.isFinite(bar.ema20)?round(Math.abs((bar.close-bar.ema20)*PIP),2):0;
+          bar.emaSignedDistance=Number.isFinite(bar.ema20)?round((bar.close-bar.ema20)*PIP,2):0;
+          bar.fifteenDirection=i>=15&&hasClose(bars[i-15])?fifteenDirection((bar.close-bars[i-15].close)*PIP):"横ばい";
+          bar.trendScore=calcTrendScore(bar);
+          const lookback=i>=20?bars.slice(i-20,i).filter(b=>b&&Number.isFinite(b.high)&&Number.isFinite(b.low)):[];
+          bar.highUpdate=lookback.length?bar.high>Math.max(...lookback.map(b=>b.high)):false;
+          bar.lowUpdate=lookback.length?bar.low<Math.min(...lookback.map(b=>b.low)):false;
         }catch(e){logError("enrichBars",e,{index:i})}
       }
     }
 
-    function rsiBand(v){if(v<20)return"RSI<20";if(v<25)return"RSI20〜25";if(v<30)return"RSI25〜30";if(v<35)return"RSI30〜35";return"RSI35以上"}function candleSize(e){return candleSizeFromBar(e&&e.bar)}function candleSizeFromBar(b){if(!b||!Number.isFinite(b.close)||!Number.isFinite(b.open))return"不明";if(b.close>=b.open)return"陽線";const p=Math.abs((b.close-b.open)*PIP);if(p<1)return"小陰線";if(p<3)return"中陰線";return"大陰線"}function bbBand(e){return bbBandFromBar(e&&e.bar)}function bbBandFromBar(b){if(!b||!Number.isFinite(b.close)||!Number.isFinite(b.bbLower)||!Number.isFinite(b.bbUpper)||!Number.isFinite(b.bbMid))return"BB不足";if(b.close<b.bbLower)return"下バンド外";const near=(b.bbUpper-b.bbLower)*.12;if(b.close-b.bbLower<=near)return"下バンド付近";if(Math.abs(b.close-b.bbMid)<=near)return"中央付近";if(b.close<b.bbMid)return"中央より下";return"中央より上"}function moveBand(v){if(v<=-12)return"-12以下";if(v<=-8)return"-12〜-8";if(v<=-4)return"-8〜-4";if(v<0)return"-4〜0";return"0以上"}function nyLatePart(d){const h=d.getHours(),m=d.getMinutes(),t=h*60+m;if(t<60)return"NY後半前半";if(t<120)return"NY後半中盤";return"NY後半終盤"}
+    function rsiBand(v){if(v<5)return"RSI0〜5";if(v<10)return"RSI5〜10";if(v<15)return"RSI10〜15";if(v<20)return"RSI15〜20";if(v<25)return"RSI20〜25";return"RSI25以上"}function emaDistanceBand(v){if(v<2)return"EMA距離0〜2";if(v<5)return"EMA距離2〜5";if(v<8)return"EMA距離5〜8";if(v<12)return"EMA距離8〜12";return"EMA距離12以上"}function trendScoreBand(v){if(v<=-10)return"trendScore-10以下";if(v<=-5)return"trendScore-5以下";if(v<=0)return"trendScore0以下";return"trendScore0以上"}function breakoutBand(b){if(b.lowUpdate)return"安値更新あり";if(b.highUpdate)return"高値更新あり";return"更新なし"}function candleSize(e){return candleSizeFromBar(e&&e.bar)}function candleSizeFromBar(b){if(!b||!Number.isFinite(b.close)||!Number.isFinite(b.open))return"不明";if(b.close>=b.open)return"陽線";const p=Math.abs((b.close-b.open)*PIP);if(p<1)return"小陰線";if(p<3)return"中陰線";return"大陰線"}function bbBand(e){return bbBandFromBar(e&&e.bar)}function bbBandFromBar(b){if(!b||!Number.isFinite(b.close)||!Number.isFinite(b.bbLower)||!Number.isFinite(b.bbUpper)||!Number.isFinite(b.bbMid))return"BB不足";if(b.close<b.bbLower)return"下バンド外";const near=(b.bbUpper-b.bbLower)*.12;if(b.close-b.bbLower<=near)return"下バンド付近";if(Math.abs(b.close-b.bbMid)<=near)return"中央付近";if(b.close<b.bbMid)return"中央より下";return"中央より上"}function moveBand(v){if(v<=-12)return"-12以下";if(v<=-8)return"-12〜-8";if(v<=-4)return"-8〜-4";if(v<0)return"-4〜0";return"0以上"}function nyLatePart(d){const h=d.getHours(),m=d.getMinutes(),t=h*60+m;if(t<60)return"NY後半前半";if(t<120)return"NY後半中盤";return"NY後半終盤"}function fifteenDirection(p){if(p>=2)return"上昇";if(p<=-2)return"下降";return"横ばい"}function calcTrendScore(b){let s=0;s+=b.recent3<=-4?-3:b.recent3>=4?3:0;s+=b.recent5<=-6?-3:b.recent5>=6?3:0;s+=b.recent10<=-10?-4:b.recent10>=10?4:0;s+=b.emaSignedDistance<0?-2:b.emaSignedDistance>0?2:0;return s}
     function classifyBb(bar){if(!bar||!Number.isFinite(bar.bbUpper)||!Number.isFinite(bar.bbLower)||!hasClose(bar))return"BB不足";const range=bar.bbUpper-bar.bbLower,near=range*.12;if(bar.close>bar.bbUpper)return"上バンド超え";if(bar.bbUpper-bar.close<=near)return"上バンド付近";if(bar.close<bar.bbLower)return"下バンド割れ";if(bar.close-bar.bbLower<=near)return"下バンド付近";if(Math.abs(bar.close-bar.bbMid)<=near)return"ミドル付近";return bar.close>bar.bbMid?"ミドル上":"ミドル下"}function getSession(date){const h=date.getHours();if(h>=6&&h<=14)return"東京";if(h>=15&&h<=17)return"ロンドン前半";if(h>=18&&h<=20)return"ロンドン後半";if(h>=21&&h<=23)return"NY前半";if(h>=0&&h<=2)return"NY後半";return"深夜"}function recentPips(bars,i,n){if(!hasClose(bars[i])||!hasClose(bars[i-n]))return 0;return round((bars[i].close-bars[i-n].close)*PIP,2)}function calcRsi(gain,loss){if(loss===0)return 100;const rs=gain/loss;return round(100-100/(1+rs),1)}
 
-    function renderAll(d){const m=d.meta;document.getElementById("summary").innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${m.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>期間</span><strong>${escapeHtml(m.startTime)}<br>${escapeHtml(m.endTime)}</strong></div><div class="stat"><span>欠損行数</span><strong>${m.missingRows.toLocaleString()}</strong></div><div class="stat"><span>RSI&lt;20件数</span><strong>${m.rsi20Count.toLocaleString()}</strong></div>`;document.getElementById("finalJudgement").innerHTML=`<strong>${d.finalJudgement.rank}：${escapeHtml(d.finalJudgement.label)}</strong><br><span class="small">${escapeHtml(d.finalJudgement.reason)}</span>`;renderResult("baseResult",[d.rsi20BaseResult]);renderResult("rsiBreakdown",d.rsiBreakdown);renderResult("candleBreakdown",d.candleSizeBreakdown);renderResult("bbBreakdown",d.bbPositionBreakdown);renderResult("recentBreakdown",d.recentMoveBreakdown);renderResult("nyLateBreakdown",d.nyLateBreakdown);renderDerived(d.derivedRuleRanking);renderWalkForward(d.walkForwardResults);renderFinalCandidates(d.finalCandidates);renderIntegrationPlan(d.integrationPlan);updateDebug()}
+    function renderAll(d){const m=d.meta;document.getElementById("summary").innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${m.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>期間</span><strong>${escapeHtml(m.startTime)}<br>${escapeHtml(m.endTime)}</strong></div><div class="stat"><span>欠損行数</span><strong>${m.missingRows.toLocaleString()}</strong></div><div class="stat"><span>RSI&lt;20 + NY後半件数</span><strong>${m.rsi20NyLateCount.toLocaleString()}</strong></div>`;document.getElementById("finalJudgement").innerHTML=`<strong>${d.finalJudgement.rank}：${escapeHtml(d.finalJudgement.label)}</strong><br><span class="small">${escapeHtml(d.finalJudgement.reason)}</span>`;renderResult("baseResult",[d.rsiNyLateBaseResult]);renderResult("rsiBreakdown",d.rsiBreakdown);renderResult("emaBreakdown",d.emaDistanceBreakdown);renderResult("fifteenBreakdown",d.fifteenDirectionBreakdown);renderResult("recentBreakdown",d.recentMoveBreakdown);renderResult("trendBreakdown",d.trendScoreBreakdown);renderResult("breakoutBreakdown",d.breakoutBreakdown);renderResult("nyLateBreakdown",d.nyLateBreakdown);renderDerived(d.derivedRuleRanking);renderWalkForward(d.walkForwardResults);renderFinalCandidates(d.finalCandidates);renderIntegrationPlan(d.integrationPlan);updateDebug()}
     function renderResult(id,rows){document.getElementById(id).innerHTML=tableHtml(rows,["条件名","件数","勝率","PF","期待値(spread2)","総pips","最大連敗","最大DD","推奨決済","採用判定"],r=>[r.conditionName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.totalPips),r.maxLosingStreak,pips(-r.maxDrawdown),r.recommendedExit,r.adoption],false)}function renderDerived(rows){document.getElementById("derivedRanking").innerHTML=tableHtml(rows.slice(0,50),["順位","条件名","件数","勝率","PF","期待値(spread2)","総pips","最大連敗","最大DD","推奨決済","採用判定"],r=>[r.rank,r.conditionName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.totalPips),r.maxLosingStreak,pips(-r.maxDrawdown),r.recommendedExit,r.adoption],false)}function renderWalkForward(rows){document.getElementById("walkForward").innerHTML=tableHtml(rows,["条件名","前半件数","後半件数","前半PF","後半PF","前半期待値","後半期待値","劣化率","判定"],r=>[r.conditionName,r.trainCount,r.testCount,fmt(r.trainPF),fmt(r.testPF),pips(r.trainExpectancy),pips(r.testExpectancy),`${fmt(r.degradationRate)}%`,r.judgement],false)}function renderFinalCandidates(rows){document.getElementById("finalCandidates").innerHTML=tableHtml(rows,["順位","条件名","件数","PF","期待値(spread2)","推奨決済","Walk Forward","採用"],r=>[r.rank,r.conditionName,r.count,fmt(r.pf),pips(r.expectancy),r.recommendedExit,r.walkForward?`${r.walkForward.judgement} / 後半PF ${fmt(r.walkForward.testPF)}`:"--",r.finalAdoption],false)}function renderIntegrationPlan(plan){document.getElementById("integrationPlan").innerHTML=`<strong>${escapeHtml(plan.title)}</strong><div>${(plan.rules||[]).map(r=>`<span class="pill">${escapeHtml(r)}</span>`).join("")}</div><p class="small">${escapeHtml(plan.note||"")}</p>`}
-    function downloadJson(){if(!researchResults)return;const blob=new Blob([JSON.stringify(researchResults,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="research_v4_1_results.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+    function downloadJson(){if(!researchResults)return;const blob=new Blob([JSON.stringify(researchResults,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="research_v4_2_results.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
     function tableHtml(rows,headers,mapper,trusted){if(!rows.length)return"該当データがありません。";return`<table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${mapper(r).map(c=>`<td>${trusted?c:escapeHtml(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
 
     function safeStep(place,fn,fallback,meta={}){try{return fn()}catch(e){logError(place,e,meta);return fallback}}
     function logError(place,e,meta={}){debug.errorCount++;const row={place,message:e&&e.message?e.message:String(e),index:meta.index??"--",time:new Date().toLocaleTimeString()};debug.errors.push(row);console.error("Research v4 error",row,e);updateDebug()}
     function resetDebug(){debug={loadedRows:0,analyzedBars:0,coreRuleBCount:0,rsiCount:0,bbCount:0,errorCount:0,lastRun:"--",errors:[],buildStartIndex:"--",buildEndIndex:"--",buildSuccessCount:0,buildSkipCount:0,firstSuccessTime:"--",firstCoreRuleBTime:"--"};updateDebug()}
-    function updateDebug(){const s=document.getElementById("debugStats");if(s)s.innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${debug.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>分析対象本数</span><strong>${debug.analyzedBars.toLocaleString()}</strong></div><div class="stat"><span>RSI&lt;20検出件数</span><strong>${debug.coreRuleBCount.toLocaleString()}</strong></div><div class="stat"><span>RSI / BB / エラー</span><strong>${debug.rsiCount} / ${debug.bbCount} / ${debug.errorCount}</strong></div><div class="stat"><span>buildEntries範囲</span><strong>${debug.buildStartIndex} - ${debug.buildEndIndex}</strong></div><div class="stat"><span>build成功 / スキップ</span><strong>${debug.buildSuccessCount.toLocaleString()} / ${debug.buildSkipCount.toLocaleString()}</strong></div><div class="stat"><span>最初に成功したbar</span><strong>${escapeHtml(debug.firstSuccessTime)}</strong></div><div class="stat"><span>最初のRSI&lt;20</span><strong>${escapeHtml(debug.firstCoreRuleBTime)}</strong></div>`;const l=document.getElementById("debugLog");if(l)l.textContent=`最小必要バー数: ${MIN_REQUIRED_BARS}\n最終実行時間: ${debug.lastRun}\nbuildEntries開始index: ${debug.buildStartIndex}\nbuildEntries終了index: ${debug.buildEndIndex}\nbuildEntries処理成功件数: ${debug.buildSuccessCount}\nbuildEntriesスキップ件数: ${debug.buildSkipCount}\n最初に成功したbarの日時: ${debug.firstSuccessTime}\n最初にRSI<20に一致した日時: ${debug.firstCoreRuleBTime}\n`+(debug.errors.length?debug.errors.slice(-100).map(e=>`エラー発生箇所: ${e.place}\nエラー内容: ${e.message}\n対象index: ${e.index}\n時刻: ${e.time}\n---`).join("\n"):"エラーなし")}
+    function updateDebug(){const s=document.getElementById("debugStats");if(s)s.innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${debug.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>分析対象本数</span><strong>${debug.analyzedBars.toLocaleString()}</strong></div><div class="stat"><span>RSI&lt;20 + NY後半検出件数</span><strong>${debug.coreRuleBCount.toLocaleString()}</strong></div><div class="stat"><span>RSI / BB / エラー</span><strong>${debug.rsiCount} / ${debug.bbCount} / ${debug.errorCount}</strong></div><div class="stat"><span>buildEntries範囲</span><strong>${debug.buildStartIndex} - ${debug.buildEndIndex}</strong></div><div class="stat"><span>build成功 / スキップ</span><strong>${debug.buildSuccessCount.toLocaleString()} / ${debug.buildSkipCount.toLocaleString()}</strong></div><div class="stat"><span>最初に成功したbar</span><strong>${escapeHtml(debug.firstSuccessTime)}</strong></div><div class="stat"><span>最初のRSI&lt;20 + NY後半</span><strong>${escapeHtml(debug.firstCoreRuleBTime)}</strong></div>`;const l=document.getElementById("debugLog");if(l)l.textContent=`最小必要バー数: ${MIN_REQUIRED_BARS}\n最終実行時間: ${debug.lastRun}\nbuildEntries開始index: ${debug.buildStartIndex}\nbuildEntries終了index: ${debug.buildEndIndex}\nbuildEntries処理成功件数: ${debug.buildSuccessCount}\nbuildEntriesスキップ件数: ${debug.buildSkipCount}\n最初に成功したbarの日時: ${debug.firstSuccessTime}\n最初にRSI<20 + NY後半に一致した日時: ${debug.firstCoreRuleBTime}\n`+(debug.errors.length?debug.errors.slice(-100).map(e=>`エラー発生箇所: ${e.place}\nエラー内容: ${e.message}\n対象index: ${e.index}\n時刻: ${e.time}\n---`).join("\n"):"エラーなし")}
     function hasClose(b){return !!b&&Number.isFinite(Number(b.close))}
     function parseCsv(text){const rows=[];let row=[],cell="",quote=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(quote&&ch==='"'&&next==='"'){cell+='"';i++;continue}if(ch==='"'){quote=!quote;continue}if(!quote&&ch===","){row.push(cell);cell="";continue}if(!quote&&(ch==="\n"||ch==="\r")){if(ch==="\r"&&next==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";continue}cell+=ch}row.push(cell);rows.push(row);return rows}
     function emptyMetric(){return{count:0,winRate:0,pf:0,expectancy:0,totalPips:0,maxLosingStreak:0,maxDrawdown:0,exitMethod:"--",spread:"--"}}function emptyResult(name){return{conditionName:name,count:0,winRate:0,pf:0,expectancy:0,totalPips:0,maxLosingStreak:0,maxDrawdown:0,recommendedExit:"--",adoption:"D：不採用",exitRows:[]}}function normalizeHeader(v){return String(v||"").trim().toLowerCase().replace(/\s+/g,"_")}function findHeader(headers,names){for(const name of names){const i=headers.indexOf(String(name).toLowerCase());if(i>=0)return i}return-1}function parseDate(value){const raw=String(value||"").trim().replace(/\./g,"-").replace("T"," ");const m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);if(m)return new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),Number(m[6]||0));const d=new Date(raw);return Number.isFinite(d.getTime())?d:null}function toNumber(v){const n=Number(String(v??"").replace(/,/g,"").trim());return Number.isFinite(n)?n:NaN}function average(a){return a.length?sum(a)/a.length:0}function sum(a){return a.reduce((x,y)=>x+Number(y||0),0)}function round(v,d=2){return Number(Number(v||0).toFixed(d))}function fmt(v){return Number.isFinite(Number(v))?Number(v).toLocaleString(undefined,{maximumFractionDigits:2}):"--"}function pct(v){return`${fmt(v)}%`}function pips(v){return`${Number(v)>=0?"+":""}${fmt(v)}pips`}function signed(v){return`${Number(v)>=0?"+":""}${fmt(v)}`}function formatDateTime(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`}function pad(v){return String(v).padStart(2,"0")}function setStatus(t){document.getElementById("status").textContent=t}function breathe(){return new Promise(r=>setTimeout(r,0))}function escapeHtml(v){return String(v??"").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]))}
