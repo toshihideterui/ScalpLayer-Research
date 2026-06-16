@@ -3,33 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v5.4</title>
+  <title>ScalpLayer Research v5.5</title>
   <style>
     :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#263852;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b;--yellow:#ffd166}
     *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07111f,#0b1423 44%,#07111f);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
-    main{width:min(1200px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}.hero{padding:26px 0 12px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);letter-spacing:0;color:var(--gold)}.sub{margin:0;color:var(--muted)}
+    main{width:min(1220px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}.hero{padding:26px 0 12px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);color:var(--gold);letter-spacing:0}.sub{margin:0;color:var(--muted)}
     .card{background:rgba(16,27,44,.94);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0;box-shadow:0 18px 44px rgba(0,0,0,.24)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
     h2{margin:0 0 12px;font-size:19px}.small{font-size:13px;color:var(--muted)}.note{border-left:4px solid var(--gold);padding:10px 12px;background:rgba(215,183,90,.08);border-radius:6px;color:#f8edc4}
     input[type=file]{width:100%;padding:12px;border:1px dashed #4a5d7a;border-radius:8px;background:#0b1524;color:var(--text);margin:8px 0 12px}
     button{appearance:none;border:0;border-radius:8px;background:var(--gold);color:#101010;font-weight:800;padding:11px 16px;cursor:pointer;margin:4px 8px 4px 0}button:disabled{opacity:.45;cursor:not-allowed}
     progress{width:100%;height:16px;accent-color:var(--gold)}.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pill{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px}.pill b{display:block;color:var(--gold);font-size:13px}.pill span{font-size:18px}
-    table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}th:first-child,td:first-child{text-align:left}th{color:#f8edc4;background:#0b1524;position:sticky;top:0}.table-wrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:8px}
+    table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}th:first-child,td:first-child{text-align:left}th{color:#f8edc4;background:#0b1524;position:sticky;top:0}.table-wrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:8px}
     .good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)}pre{white-space:pre-wrap;word-break:break-word;background:#050b14;border:1px solid var(--line);border-radius:8px;padding:12px;max-height:360px;overflow:auto;font-size:12px}
-    @media(max-width:760px){main{width:min(100% - 18px,1200px);padding-top:18px}.grid,.kpi{grid-template-columns:1fr}.card{padding:14px;margin:12px 0}table{font-size:12px}th,td{padding:8px 6px}button{width:100%;margin-right:0}}
+    @media(max-width:760px){main{width:min(100% - 18px,1220px);padding-top:18px}.grid,.kpi{grid-template-columns:1fr}.card{padding:14px;margin:12px 0}table{font-size:12px}th,td{padding:8px 6px}button{width:100%;margin-right:0}}
   </style>
 </head>
 <body>
 <main>
   <section class="hero">
-    <h1>ScalpLayer Research v5.4</h1>
-    <p class="sub">v5.3の最優秀エントリータイミングを固定し、利確・損切り・トレーリング・時間決済のどれが最も実戦向きかを検証します。</p>
+    <h1>ScalpLayer Research v5.5</h1>
+    <p class="sub">Core Rule Eがどんな相場で強く、どんな相場で弱いかを特定します。危険フィルターとブースト条件を最優先で抽出します。</p>
   </section>
 
   <section class="card">
     <h2>1. CSV読み込み</h2>
     <input id="csvFile" type="file" accept=".csv,text/csv">
     <button id="loadBtn" type="button">CSVを読み込む</button>
-    <button id="runBtn" type="button" disabled>v5.4分析を実行</button>
+    <button id="runBtn" type="button" disabled>v5.5分析を実行</button>
     <p id="status" class="small">USDJPY M1 CSVを選択してください。</p>
     <div class="kpi">
       <div class="pill"><b>読み込み本数</b><span id="loadedRows">--</span></div>
@@ -40,68 +40,80 @@
   </section>
 
   <section class="card">
-    <h2>2. 分析条件と進捗</h2>
-    <p class="note">エントリー条件: <b>RSI &lt; 25 / 直近3本 &lt;= -10pips / NY後半前半 / 安値更新あり</b><br>まずv5.3の9種類のタイミングを同じ基準で再比較し、最上位タイミングを固定。その後、利確方法だけを比較します。</p>
+    <h2>2. 固定ルールと進捗</h2>
+    <p class="note">固定条件: <b>BUY / RSI &lt; 25 / 直近3本 &lt;= -10pips / NY後半前半 / 安値更新あり / 安値更新直後</b><br>決済: <b>+15pips到達後、-5pips戻し</b>。今回は入口・出口は固定し、相場環境だけを分解します。</p>
     <progress id="progressBar" value="0" max="100"></progress>
     <p id="progressText" class="small">待機中</p>
     <div class="kpi">
-      <div class="pill"><b>固定タイミング</b><span id="fixedTiming">--</span></div>
-      <div class="pill"><b>固定エントリー件数</b><span id="fixedEntryCount">--</span></div>
-      <div class="pill"><b>ATR計算件数</b><span id="atrCount">--</span></div>
-      <div class="pill"><b>Base検出件数</b><span id="baseCount">--</span></div>
+      <div class="pill"><b>Core Rule件数</b><span id="tradeCount">--</span></div>
+      <div class="pill"><b>PF</b><span id="basePf">--</span></div>
+      <div class="pill"><b>期待値</b><span id="baseExp">--</span></div>
+      <div class="pill"><b>総利益</b><span id="baseTotal">--</span></div>
     </div>
   </section>
 
   <section class="card">
-    <h2>3. 総合ランキング</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>順位</th><th>利確方法</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th><th>実戦評価</th></tr></thead>
-        <tbody id="rankingBody"><tr><td colspan="10" class="small">分析実行後に表示します。</td></tr></tbody>
-      </table>
-    </div>
+    <h2>3. 危険条件TOP10</h2>
+    <div class="table-wrap"><table><thead><tr><th>順位</th><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>除外後PF</th><th>改善</th></tr></thead><tbody id="dangerBody"><tr><td colspan="9" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
   </section>
 
   <section class="card">
-    <h2>4. 利確方法比較</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>利確方法</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th></tr></thead>
-        <tbody id="exitBody"><tr><td colspan="8" class="small">固定TP/SL、トレーリング、ATR利確、時間決済を比較します。</td></tr></tbody>
-      </table>
-    </div>
+    <h2>4. 有利条件TOP10</h2>
+    <div class="table-wrap"><table><thead><tr><th>順位</th><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>母集団比</th><th>BUYスコア案</th></tr></thead><tbody id="boostBody"><tr><td colspan="9" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
+  </section>
+
+  <section class="grid">
+    <section class="card">
+      <h2>5. 曜日別分析</h2>
+      <div class="table-wrap"><table><thead><tr><th>曜日</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th></tr></thead><tbody id="weekdayBody"></tbody></table></div>
+    </section>
+    <section class="card">
+      <h2>6. 月別分析</h2>
+      <div class="table-wrap"><table><thead><tr><th>月</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th></tr></thead><tbody id="monthBody"></tbody></table></div>
+    </section>
+  </section>
+
+  <section class="grid">
+    <section class="card">
+      <h2>7. ボラティリティ / ATR分析</h2>
+      <div class="table-wrap"><table><thead><tr><th>分類</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th></tr></thead><tbody id="volBody"></tbody></table></div>
+    </section>
+    <section class="card">
+      <h2>8. トレンド / EMA位置分析</h2>
+      <div class="table-wrap"><table><thead><tr><th>分類</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th></tr></thead><tbody id="trendBody"></tbody></table></div>
+    </section>
+  </section>
+
+  <section class="grid">
+    <section class="card">
+      <h2>9. 連敗分析</h2>
+      <div class="table-wrap"><table><thead><tr><th>日時</th><th>曜日</th><th>ATR</th><th>トレンド状態</th><th>損益</th></tr></thead><tbody id="streakBody"></tbody></table></div>
+    </section>
+    <section class="card">
+      <h2>10. 負け / 上位20勝トレード分析</h2>
+      <div class="table-wrap"><table><thead><tr><th>種別</th><th>日時</th><th>損益</th><th>ATR</th><th>トレンド</th><th>EMA位置</th></tr></thead><tbody id="tradeBody"></tbody></table></div>
+    </section>
   </section>
 
   <section class="card">
-    <h2>5. Walk Forward 70% / 30%</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>利確方法</th><th>前半PF</th><th>後半PF</th><th>前半期待値</th><th>後半期待値</th><th>劣化率</th><th>判定</th></tr></thead>
-        <tbody id="walkBody"><tr><td colspan="7" class="small">分析実行後に表示します。</td></tr></tbody>
-      </table>
-    </div>
+    <h2>11. Walk Forward 70% / 30%</h2>
+    <div class="table-wrap"><table><thead><tr><th>区分</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>判定</th></tr></thead><tbody id="walkBody"></tbody></table></div>
   </section>
 
   <section class="grid">
     <div class="card">
-      <h2>6. ScalpLayer推奨設定</h2>
-      <div id="planBox" class="small">分析結果から保守型・標準型・攻撃型を提案します。</div>
+      <h2>12. ScalpLayer実装案</h2>
+      <div id="planBox" class="small">分析結果からBUYスコアと危険スコアを提案します。</div>
     </div>
     <div class="card">
-      <h2>7. JSON出力</h2>
-      <button id="downloadBtn" type="button" disabled>research_v5_4_results.json をダウンロード</button>
-      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv5.4の分析結果を確認できます。</p>
+      <h2>13. JSON出力</h2>
+      <button id="downloadBtn" type="button" disabled>research_v5_5_results.json をダウンロード</button>
+      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv5.5の分析結果を確認できます。</p>
     </div>
   </section>
 
   <section class="card">
-    <h2>8. Debug Console</h2>
-    <div class="kpi">
-      <div class="pill"><b>RSI計算件数</b><span id="rsiCount">--</span></div>
-      <div class="pill"><b>エラー件数</b><span id="errorCount">--</span></div>
-      <div class="pill"><b>最終実行時間</b><span id="lastRun">--</span></div>
-      <div class="pill"><b>生成トレード数</b><span id="tradeCount">--</span></div>
-    </div>
+    <h2>14. Debug Console</h2>
     <pre id="debugLog">Debug Consoleはここに表示されます。</pre>
   </section>
 </main>
@@ -112,7 +124,6 @@
 const PIP = 100;
 const MIN_REQUIRED_BARS = 80;
 const MAX_HOLD = 180;
-const SEARCH_WINDOW = 10;
 const CHUNK_SIZE = 1000;
 
 let loadedState = { fileName: "", bars: [], loadedRows: 0, missingRows: 0, startTime: "--", endTime: "--" };
@@ -124,7 +135,7 @@ document.getElementById("runBtn").addEventListener("click", runResearch);
 document.getElementById("downloadBtn").addEventListener("click", downloadJson);
 
 function createDebugState() {
-  return { loadedRows: 0, validBars: 0, rsiCount: 0, atrCount: 0, baseCount: 0, fixedEntryCount: 0, tradeCount: 0, errorCount: 0, lastRun: "--", errors: [] };
+  return { loadedRows: 0, validBars: 0, rsiCount: 0, atrCount: 0, emaCount: 0, tradeCount: 0, errorCount: 0, lastRun: "--", errors: [] };
 }
 
 async function loadCsvOnly() {
@@ -152,7 +163,7 @@ async function loadCsvOnly() {
     updateLoadSummary();
     updateDebugConsole();
     setProgress("CSV読み込み完了", 100, 100);
-    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v5.4分析を実行できます。`);
+    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v5.5分析を実行できます。`);
     document.getElementById("runBtn").disabled = !parsed.bars.length;
   } catch (error) {
     logError("loadCsvOnly", "--", error);
@@ -164,32 +175,36 @@ async function loadCsvOnly() {
 async function runResearch() {
   const bars = loadedState.bars;
   if (!bars.length) { alert("先にCSVを読み込んでください。"); return; }
-  researchResults = null;
   debugState = createDebugState();
   debugState.loadedRows = loadedState.loadedRows;
   debugState.validBars = bars.length;
   debugState.lastRun = fmtDate(new Date());
+  researchResults = null;
   document.getElementById("runBtn").disabled = true;
   document.getElementById("downloadBtn").disabled = true;
   clearTables();
-  setStatus("v5.4分析を開始しました。");
+  setStatus("v5.5分析を開始しました。");
   try {
     await enrichBarsChunked(bars);
-    const baseEvents = await buildBaseEventsChunked(bars);
-    const timingRows = await evaluateV53Timing(baseEvents, bars);
-    const fixedTiming = timingRows.slice().sort(rankSort)[0] || null;
-    const fixedTrades = fixedTiming ? fixedTiming.trades : [];
-    debugState.fixedEntryCount = fixedTrades.length;
-    document.getElementById("fixedTiming").textContent = fixedTiming ? fixedTiming.condition : "--";
-    document.getElementById("fixedEntryCount").textContent = fixedTrades.length.toLocaleString();
-    const exitResults = await evaluateExitRules(fixedTrades, bars);
-    const ranking = exitResults.slice().sort(exitRankSort);
-    const walkForwardResults = buildWalkForward(exitResults, bars.length);
-    const recommendedSettings = buildRecommendedSettings(ranking);
-    const finalJudgement = buildFinalJudgement(ranking, walkForwardResults);
+    const trades = await buildCoreTradesChunked(bars);
+    const baseMetrics = calcMetrics(trades.map(t => t.pips));
+    const weekdayAnalysis = groupTrades(trades, t => t.weekdayLabel);
+    const monthAnalysis = groupTrades(trades, t => t.monthLabel);
+    const volatilityAnalysis = groupTrades(trades, t => `ボラ:${t.volatilityBucket}`);
+    const atrAnalysis = groupTrades(trades, t => `ATR:${t.atrBucket}`);
+    const trendAnalysis = groupTrades(trades, t => `トレンド:${t.trendState}`);
+    const emaAnalysis = groupTrades(trades, t => `EMA:${t.emaPosition}`);
+    const losingStreaks = buildLosingStreaks(trades);
+    const losingTrades = trades.filter(t => t.pips < 0).sort((a, b) => a.pips - b.pips);
+    const topWins = trades.filter(t => t.pips > 0).sort((a, b) => b.pips - a.pips).slice(0, 20);
+    const candidates = buildConditionCandidates(trades);
+    const dangerTop10 = buildDangerTop10(trades, candidates, baseMetrics);
+    const boostTop10 = buildBoostTop10(trades, candidates, baseMetrics);
+    const walkForward = buildWalkForward(trades, bars.length);
+    const implementationPlan = buildImplementationPlan(dangerTop10, boostTop10);
     researchResults = {
       meta: {
-        version: "research-v5.4",
+        version: "research-v5.5",
         sourceFileName: loadedState.fileName,
         generatedAt: new Date().toISOString(),
         loadedRows: loadedState.loadedRows,
@@ -197,25 +212,30 @@ async function runResearch() {
         startTime: loadedState.startTime,
         endTime: loadedState.endTime
       },
-      fixedEntryCondition: {
-        base: "BUY / RSI < 25 / recent3Pips <= -10 / NY後半前半 / 安値更新あり",
-        selectedTiming: fixedTiming ? fixedTiming.condition : "",
-        selectedTimingStats: fixedTiming ? stripTrades(fixedTiming) : null
+      fixedRule: {
+        entry: "BUY / RSI < 25 / recent3 <= -10pips / NY後半前半 / 安値更新あり / 安値更新直後",
+        exit: "+15到達後 -5戻し"
       },
-      exitComparison: exitResults.map(stripTrades),
-      ranking: ranking.map(stripTrades),
-      walkForwardResults,
-      recommendedSettings,
-      finalJudgement,
+      baseMetrics,
+      weekdayAnalysis,
+      monthAnalysis,
+      volatilityAnalysis,
+      atrAnalysis,
+      trendAnalysis,
+      emaAnalysis,
+      losingStreaks,
+      losingTrades: losingTrades.map(compactTrade),
+      topWins: topWins.map(compactTrade),
+      dangerTop10,
+      boostTop10,
+      walkForward,
+      implementationPlan,
       debug: debugState
     };
-    renderExit(exitResults);
-    renderRanking(ranking);
-    renderWalkForward(walkForwardResults);
-    renderPlan(recommendedSettings, finalJudgement);
+    renderAll(researchResults);
     document.getElementById("downloadBtn").disabled = false;
     setProgress("分析完了", 100, 100);
-    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v5_4_results.json を出力できます。");
+    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v5_5_results.json を出力できます。");
   } catch (error) {
     logError("runResearch", "--", error);
     setStatus("分析中にエラーが発生しました。Debug Consoleを確認してください。");
@@ -226,7 +246,7 @@ async function runResearch() {
 }
 
 async function enrichBarsChunked(bars) {
-  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0, atr = null, trSum = 0;
+  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0, atr = null, trSum = 0, ema = null;
   for (let start = 1; start < bars.length; start += CHUNK_SIZE) {
     const end = Math.min(bars.length, start + CHUNK_SIZE);
     for (let i = start; i < end; i++) {
@@ -253,15 +273,25 @@ async function enrichBarsChunked(bars) {
           bar.atrPips = atr * PIP;
           debugState.atrCount++;
         }
+        if (i < 20) {
+          const sum = bars.slice(0, i + 1).reduce((acc, b) => acc + (validBar(b) ? b.close : 0), 0);
+          if (i === 19) ema = sum / 20;
+        } else if (ema != null) {
+          ema = bar.close * (2 / 21) + ema * (1 - 2 / 21);
+          bar.ema20 = ema;
+          bar.emaDistance = (bar.close - ema) * PIP;
+          debugState.emaCount++;
+        }
         bar.session = getSessionJst(bar.time);
         bar.nyLatePart = getNyLatePart(bar.time);
         bar.recent3 = calcRecentPips(bars, i, 3);
+        bar.recent15 = calcRecentPips(bars, i, 15);
+        bar.recent30 = calcRecentPips(bars, i, 30);
         bar.lowBreak3 = isLowBreak(bars, i, 3);
         bar.lowBreak5 = isLowBreak(bars, i, 5);
         bar.lowBreak10 = isLowBreak(bars, i, 10);
         bar.lowUpdate = bar.lowBreak3 || bar.lowBreak5 || bar.lowBreak10;
-        bar.isBull = bar.close > bar.open;
-        bar.closeBreakPrevHigh = bar.close > prev.high;
+        bar.rangePips = (bar.high - bar.low) * PIP;
       } catch (error) {
         logError("enrichBarsChunked", i, error);
       }
@@ -272,156 +302,56 @@ async function enrichBarsChunked(bars) {
   }
 }
 
-async function buildBaseEventsChunked(bars) {
-  const events = [];
-  const startIndex = MIN_REQUIRED_BARS;
-  const endIndex = Math.max(startIndex, bars.length - MAX_HOLD - SEARCH_WINDOW - 6);
-  for (let start = startIndex; start < endIndex; start += CHUNK_SIZE) {
+async function buildCoreTradesChunked(bars) {
+  const trades = [];
+  const endIndex = Math.max(MIN_REQUIRED_BARS, bars.length - MAX_HOLD - 1);
+  for (let start = MIN_REQUIRED_BARS; start < endIndex; start += CHUNK_SIZE) {
     const end = Math.min(endIndex, start + CHUNK_SIZE);
     for (let i = start; i < end; i++) {
       try {
         const bar = bars[i];
         if (!validBar(bar) || !Number.isFinite(bar.rsi) || !Number.isFinite(bar.recent3)) continue;
-        if (bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半" && bar.lowUpdate) events.push({ index: i, time: bar.time });
+        const ok = bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半" && bar.lowUpdate;
+        if (!ok) continue;
+        const exit = simulateTrailingExit(bars, i, 15, 5);
+        if (!exit) continue;
+        trades.push(makeTrade(bars, i, exit));
       } catch (error) {
-        logError("buildBaseEventsChunked", i, error);
+        logError("buildCoreTradesChunked", i, error);
       }
     }
-    debugState.baseCount = events.length;
-    setProgress(`Base条件検出中 ${end.toLocaleString()} / ${endIndex.toLocaleString()}`, end, endIndex);
+    debugState.tradeCount = trades.length;
+    setProgress(`Core Rule抽出中 ${end.toLocaleString()} / ${endIndex.toLocaleString()}`, end, endIndex);
     updateDebugConsole();
     await yieldToBrowser();
   }
-  return events;
+  assignQuantileBuckets(trades, "atrPips", "atrBucket");
+  assignQuantileBuckets(trades, "volatilityPips", "volatilityBucket");
+  return trades;
 }
 
-async function evaluateV53Timing(baseEvents, bars) {
-  const defs = [
-    { key: "delay0", condition: "安値更新直後 0本後エントリー", type: "delay", delay: 0 },
-    { key: "delay1", condition: "安値更新後 1本後エントリー", type: "delay", delay: 1 },
-    { key: "delay2", condition: "安値更新後 2本後エントリー", type: "delay", delay: 2 },
-    { key: "delay3", condition: "安値更新後 3本後エントリー", type: "delay", delay: 3 },
-    { key: "delay5", condition: "安値更新後 5本後エントリー", type: "delay", delay: 5 },
-    { key: "firstBull", condition: "戻り確認: 陽線出現でエントリー", type: "firstBull" },
-    { key: "twoBull", condition: "戻り確認: 2連続陽線でエントリー", type: "twoBull" },
-    { key: "closeBreakHigh", condition: "戻り確認: 終値が前足高値を上抜け", type: "closeBreakHigh" },
-    { key: "rsiRecover", condition: "RSI回復確認: RSI > 25でエントリー", type: "rsiRecover" }
-  ];
-  const buckets = Object.fromEntries(defs.map(def => [def.key, { def, trades: [] }]));
-  for (let start = 0; start < baseEvents.length; start += CHUNK_SIZE) {
-    const end = Math.min(baseEvents.length, start + CHUNK_SIZE);
-    for (let n = start; n < end; n++) {
-      const event = baseEvents[n];
-      try {
-        for (const def of defs) {
-          const entryIndex = resolveEntryIndex(def, event.index, bars);
-          if (entryIndex == null) continue;
-          const result = simulateTrailingExit(bars, entryIndex, 10, 5);
-          if (!result) continue;
-          buckets[def.key].trades.push({ baseIndex: event.index, entryIndex, entryTime: bars[entryIndex].time, entryPrice: bars[entryIndex].close, pips: result.pips });
-        }
-      } catch (error) {
-        logError("evaluateV53Timing", event.index, error);
-      }
-    }
-    setProgress(`v5.3最優秀タイミング選定中 ${end.toLocaleString()} / ${baseEvents.length.toLocaleString()}`, end, baseEvents.length || 1);
-    await yieldToBrowser();
-  }
-  return defs.map(def => makeResultRow(def.key, def.condition, buckets[def.key].trades));
-}
-
-async function evaluateExitRules(fixedTrades, bars) {
-  const defs = [
-    { key: "tp5sl10", name: "固定利確 +5 / 固定損切 -10", type: "tpSl", tp: 5, sl: 10 },
-    { key: "tp10sl10", name: "固定利確 +10 / 固定損切 -10", type: "tpSl", tp: 10, sl: 10 },
-    { key: "tp15sl10", name: "固定利確 +15 / 固定損切 -10", type: "tpSl", tp: 15, sl: 10 },
-    { key: "tp20sl10", name: "固定利確 +20 / 固定損切 -10", type: "tpSl", tp: 20, sl: 10 },
-    { key: "tp30sl10", name: "固定利確 +30 / 固定損切 -10", type: "tpSl", tp: 30, sl: 10 },
-    { key: "trail5_3", name: "トレーリング +5到達後 -3戻し", type: "trail", trigger: 5, pullback: 3 },
-    { key: "trail10_5", name: "トレーリング +10到達後 -5戻し", type: "trail", trigger: 10, pullback: 5 },
-    { key: "trail15_5", name: "トレーリング +15到達後 -5戻し", type: "trail", trigger: 15, pullback: 5 },
-    { key: "trail20_10", name: "トレーリング +20到達後 -10戻し", type: "trail", trigger: 20, pullback: 10 },
-    { key: "atr05", name: "ATR利確 ATR×0.5 / SL -10", type: "atr", mult: 0.5, sl: 10 },
-    { key: "atr10", name: "ATR利確 ATR×1.0 / SL -10", type: "atr", mult: 1.0, sl: 10 },
-    { key: "atr15", name: "ATR利確 ATR×1.5 / SL -10", type: "atr", mult: 1.5, sl: 10 },
-    { key: "time10", name: "時間決済 10分後", type: "time", minutes: 10 },
-    { key: "time30", name: "時間決済 30分後", type: "time", minutes: 30 },
-    { key: "time60", name: "時間決済 60分後", type: "time", minutes: 60 }
-  ];
-  const results = [];
-  for (const def of defs) {
-    const trades = [];
-    for (let start = 0; start < fixedTrades.length; start += CHUNK_SIZE) {
-      const end = Math.min(fixedTrades.length, start + CHUNK_SIZE);
-      for (let i = start; i < end; i++) {
-        try {
-          const entryIndex = fixedTrades[i].entryIndex;
-          const result = simulateExitByRule(def, bars, entryIndex);
-          if (result) trades.push({ entryIndex, entryTime: bars[entryIndex].time, pips: result.pips, exitMinutes: result.exitMinutes });
-        } catch (error) {
-          logError("evaluateExitRules", fixedTrades[i] ? fixedTrades[i].entryIndex : "--", error);
-        }
-      }
-      debugState.tradeCount = results.reduce((sum, row) => sum + row.count, 0) + trades.length;
-      setProgress(`利確方法比較中 ${def.name} ${end.toLocaleString()} / ${fixedTrades.length.toLocaleString()}`, end, fixedTrades.length || 1);
-      updateDebugConsole();
-      await yieldToBrowser();
-    }
-    results.push(makeResultRow(def.key, def.name, trades));
-  }
-  return results;
-}
-
-function simulateExitByRule(def, bars, entryIndex) {
-  if (def.type === "tpSl") return simulateTpSlExit(bars, entryIndex, def.tp, def.sl);
-  if (def.type === "trail") return simulateTrailingExit(bars, entryIndex, def.trigger, def.pullback);
-  if (def.type === "atr") {
-    const atr = Number.isFinite(bars[entryIndex].atrPips) ? bars[entryIndex].atrPips : 0;
-    return simulateTpSlExit(bars, entryIndex, atr * def.mult, def.sl);
-  }
-  if (def.type === "time") return simulateTimeExit(bars, entryIndex, def.minutes);
-  return null;
-}
-
-function resolveEntryIndex(def, baseIndex, bars) {
-  if (def.type === "delay") return safeEntryIndex(baseIndex + def.delay, bars);
-  const max = Math.min(baseIndex + SEARCH_WINDOW, bars.length - MAX_HOLD - 1);
-  for (let i = baseIndex + 1; i <= max; i++) {
-    const bar = bars[i], prev = bars[i - 1];
-    if (!validBar(bar) || !validBar(prev)) continue;
-    if (def.type === "firstBull" && bar.isBull) return safeEntryIndex(i, bars);
-    if (def.type === "twoBull" && bar.isBull && prev.isBull) return safeEntryIndex(i, bars);
-    if (def.type === "closeBreakHigh" && bar.close > prev.high) return safeEntryIndex(i, bars);
-    if (def.type === "rsiRecover" && Number.isFinite(bar.rsi) && bar.rsi > 25) return safeEntryIndex(i, bars);
-  }
-  return null;
-}
-
-function safeEntryIndex(index, bars) {
-  if (index < 0 || index + MAX_HOLD >= bars.length) return null;
-  return validBar(bars[index]) ? index : null;
-}
-
-function simulateTimeExit(bars, entryIndex, minutes) {
-  const entry = bars[entryIndex];
-  const exit = bars[entryIndex + minutes];
-  if (!validBar(entry) || !validBar(exit)) return null;
-  return { pips: (exit.close - entry.close) * PIP, exitMinutes: minutes };
-}
-
-function simulateTpSlExit(bars, entryIndex, tp, sl) {
-  const entry = bars[entryIndex];
-  if (!validBar(entry) || !Number.isFinite(tp) || tp <= 0) return null;
-  const entryPrice = entry.close;
-  for (let m = 1; m <= MAX_HOLD; m++) {
-    const bar = bars[entryIndex + m];
-    if (!validBar(bar)) return null;
-    const highPips = (bar.high - entryPrice) * PIP;
-    const lowPips = (bar.low - entryPrice) * PIP;
-    if (lowPips <= -sl) return { pips: -sl, exitMinutes: m };
-    if (highPips >= tp) return { pips: tp, exitMinutes: m };
-  }
-  return simulateTimeExit(bars, entryIndex, MAX_HOLD);
+function makeTrade(bars, index, exit) {
+  const bar = bars[index];
+  return {
+    index,
+    datetime: fmtDate(bar.time),
+    weekdayLabel: weekdayLabel(bar.time),
+    monthLabel: monthLabel(bar.time),
+    entryPrice: bar.close,
+    pips: exit.pips,
+    exitMinutes: exit.exitMinutes,
+    atrPips: Number.isFinite(bar.atrPips) ? bar.atrPips : 0,
+    volatilityPips: calcVolatility(bars, index, 30),
+    trendState: classifyTrend(bar.recent30),
+    emaPosition: classifyEmaPosition(bar.emaDistance),
+    rsi: bar.rsi,
+    recent3: bar.recent3,
+    recent15: bar.recent15,
+    recent30: bar.recent30,
+    lowBreak3: bar.lowBreak3,
+    lowBreak5: bar.lowBreak5,
+    lowBreak10: bar.lowBreak10
+  };
 }
 
 function simulateTrailingExit(bars, entryIndex, trigger, pullback) {
@@ -442,8 +372,139 @@ function simulateTrailingExit(bars, entryIndex, trigger, pullback) {
   return null;
 }
 
-function makeResultRow(key, condition, trades) {
-  return { key, condition, count: trades.length, ...calcMetrics(trades.map(t => t.pips)), avgHoldMinutes: average(trades.map(t => t.exitMinutes).filter(Number.isFinite)), trades };
+function calcVolatility(bars, index, length) {
+  if (index < length) return 0;
+  let sum = 0, count = 0;
+  for (let i = index - length + 1; i <= index; i++) {
+    if (!validBar(bars[i])) continue;
+    sum += (bars[i].high - bars[i].low) * PIP;
+    count++;
+  }
+  return count ? sum / count : 0;
+}
+
+function assignQuantileBuckets(trades, key, outKey) {
+  const values = trades.map(t => t[key]).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!values.length) return;
+  const q1 = values[Math.floor(values.length * 0.25)];
+  const q3 = values[Math.floor(values.length * 0.75)];
+  for (const t of trades) {
+    const v = t[key];
+    t[outKey] = v <= q1 ? "低" : v >= q3 ? "高" : "中";
+  }
+}
+
+function groupTrades(trades, getter) {
+  const map = new Map();
+  for (const t of trades) {
+    const key = getter(t) || "不明";
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(t);
+  }
+  return [...map.entries()].map(([label, rows]) => ({ label, count: rows.length, ...calcMetrics(rows.map(t => t.pips)) })).sort((a, b) => b.count - a.count || b.expectancy - a.expectancy);
+}
+
+function buildConditionCandidates(trades) {
+  const defs = [
+    { name: "月曜", test: t => t.weekdayLabel === "月" },
+    { name: "火曜", test: t => t.weekdayLabel === "火" },
+    { name: "水曜", test: t => t.weekdayLabel === "水" },
+    { name: "木曜", test: t => t.weekdayLabel === "木" },
+    { name: "金曜", test: t => t.weekdayLabel === "金" },
+    { name: "低ボラ", test: t => t.volatilityBucket === "低" },
+    { name: "中ボラ", test: t => t.volatilityBucket === "中" },
+    { name: "高ボラ", test: t => t.volatilityBucket === "高" },
+    { name: "ATR下位25%", test: t => t.atrBucket === "低" },
+    { name: "ATR中位50%", test: t => t.atrBucket === "中" },
+    { name: "ATR上位25%", test: t => t.atrBucket === "高" },
+    { name: "強上昇", test: t => t.trendState === "強上昇" },
+    { name: "弱上昇", test: t => t.trendState === "弱上昇" },
+    { name: "レンジ", test: t => t.trendState === "レンジ" },
+    { name: "弱下降", test: t => t.trendState === "弱下降" },
+    { name: "強下降", test: t => t.trendState === "強下降" },
+    { name: "EMAより上", test: t => t.emaPosition === "EMAより上" },
+    { name: "EMA付近", test: t => t.emaPosition === "EMA付近" },
+    { name: "EMAより下", test: t => t.emaPosition === "EMAより下" },
+    { name: "直近3本安値更新", test: t => t.lowBreak3 },
+    { name: "直近5本安値更新", test: t => t.lowBreak5 },
+    { name: "直近10本安値更新", test: t => t.lowBreak10 },
+    { name: "RSI<20", test: t => t.rsi < 20 },
+    { name: "直近3本<=-15", test: t => t.recent3 <= -15 }
+  ];
+  for (const month of [...new Set(trades.map(t => t.monthLabel))]) defs.push({ name: month, test: t => t.monthLabel === month });
+  return defs.map(def => {
+    const selected = trades.filter(def.test);
+    return { condition: def.name, count: selected.length, selected, ...calcMetrics(selected.map(t => t.pips)) };
+  }).filter(r => r.count > 0);
+}
+
+function buildDangerTop10(trades, candidates, baseMetrics) {
+  return candidates.map(c => {
+    const excluded = trades.filter(t => !c.selected.includes(t));
+    const ex = calcMetrics(excluded.map(t => t.pips));
+    return {
+      condition: c.condition,
+      count: c.count,
+      winRate: c.winRate,
+      profitFactor: c.profitFactor,
+      expectancy: c.expectancy,
+      totalPips: c.totalPips,
+      excludedPF: ex.profitFactor,
+      improvement: ex.profitFactor - baseMetrics.profitFactor
+    };
+  }).filter(r => r.count >= 3).sort((a, b) => b.improvement - a.improvement || a.expectancy - b.expectancy).slice(0, 10);
+}
+
+function buildBoostTop10(trades, candidates, baseMetrics) {
+  return candidates.filter(r => r.count >= 3).map(r => ({
+    condition: r.condition,
+    count: r.count,
+    winRate: r.winRate,
+    profitFactor: r.profitFactor,
+    expectancy: r.expectancy,
+    totalPips: r.totalPips,
+    populationRatio: trades.length ? r.count / trades.length * 100 : 0,
+    buyScore: r.expectancy > baseMetrics.expectancy + 5 ? "+5" : r.expectancy > baseMetrics.expectancy + 2 ? "+3" : "+1"
+  })).sort((a, b) => b.expectancy - a.expectancy || b.profitFactor - a.profitFactor).slice(0, 10);
+}
+
+function buildLosingStreaks(trades) {
+  const out = [];
+  let current = [];
+  for (const t of trades) {
+    if (t.pips < 0) current.push(t);
+    else {
+      if (current.length) out.push(current);
+      current = [];
+    }
+  }
+  if (current.length) out.push(current);
+  return out.sort((a, b) => b.length - a.length).map(seq => ({
+    length: seq.length,
+    startDatetime: seq[0].datetime,
+    endDatetime: seq[seq.length - 1].datetime,
+    trades: seq.map(compactTrade)
+  }));
+}
+
+function buildWalkForward(trades, totalBars) {
+  const split = Math.floor(totalBars * 0.7);
+  const first = trades.filter(t => t.index < split);
+  const second = trades.filter(t => t.index >= split);
+  const rows = [
+    { label: "前半70%", rows: first },
+    { label: "後半30%", rows: second }
+  ].map(x => ({ label: x.label, count: x.rows.length, ...calcMetrics(x.rows.map(t => t.pips)), judgement: x.rows.length < 30 ? "サンプル不足" : "確認対象" }));
+  if (rows[1]) rows[1].judgement = rows[1].profitFactor >= 1.5 && rows[1].expectancy > 0 ? "有望" : rows[1].profitFactor >= 1 ? "追加検証" : "要注意";
+  return rows;
+}
+
+function buildImplementationPlan(danger, boost) {
+  return {
+    dangerScore: danger.slice(0, 5).map((r, i) => ({ condition: r.condition, score: i < 2 ? "+3" : "+2", reason: `除外後PF改善 ${fmtNum(r.improvement, 2)}` })),
+    buyScore: boost.slice(0, 5).map(r => ({ condition: r.condition, score: r.buyScore, reason: `期待値 ${fmtNum(r.expectancy, 2)}pips` })),
+    note: "Core Rule E自体は固定し、危険条件は警戒表示、ブースト条件は買いスコア補助として扱う案です。"
+  };
 }
 
 function calcMetrics(pipsList) {
@@ -461,64 +522,8 @@ function calcMetrics(pipsList) {
   return { winRate: wins / count * 100, profitFactor: grossLoss ? grossProfit / grossLoss : (grossProfit ? 999 : 0), expectancy: total / count, totalPips: total, maxDrawdown: maxDd, maxLosingStreak: maxLosing };
 }
 
-function buildWalkForward(rows, totalBars) {
-  const splitIndex = Math.floor(totalBars * 0.7);
-  return rows.map(row => {
-    const first = row.trades.filter(t => t.entryIndex < splitIndex).map(t => t.pips);
-    const second = row.trades.filter(t => t.entryIndex >= splitIndex).map(t => t.pips);
-    const a = calcMetrics(first), b = calcMetrics(second);
-    const degradation = a.expectancy ? ((b.expectancy - a.expectancy) / Math.abs(a.expectancy)) * 100 : 0;
-    let judgement = "追加検証";
-    if (second.length < 30) judgement = "サンプル不足";
-    else if (b.profitFactor >= 1.5 && b.expectancy > 0) judgement = "有望";
-    else if (b.profitFactor < 1 || b.expectancy <= 0) judgement = "過剰最適化疑い";
-    return { condition: row.condition, firstCount: first.length, secondCount: second.length, firstPF: a.profitFactor, secondPF: b.profitFactor, firstExpectancy: a.expectancy, secondExpectancy: b.expectancy, degradation, judgement };
-  });
-}
-
-function buildRecommendedSettings(ranking) {
-  const positive = ranking.filter(r => r.count > 0 && r.expectancy > 0);
-  const conservative = positive.find(r => r.maxDrawdown <= 20 && r.maxLosingStreak <= 2) || positive[0] || null;
-  const standard = positive.find(r => r.profitFactor >= 1.5 && r.count >= 30) || positive[0] || null;
-  const aggressive = positive[0] || null;
-  return {
-    conservative: makeSetting("保守型", conservative, "DDと最大連敗を優先。実運用では最初に検証する候補。"),
-    standard: makeSetting("標準型", standard, "PF、期待値、総利益のバランス重視。"),
-    aggressive: makeSetting("攻撃型", aggressive, "期待値と総利益を優先。ロットを抑えたデモ検証向き。")
-  };
-}
-
-function makeSetting(type, row, note) {
-  if (!row) return { type, exitRule: "候補なし", note };
-  return { type, exitRule: row.condition, count: row.count, pf: row.profitFactor, expectancy: row.expectancy, totalPips: row.totalPips, maxDrawdown: row.maxDrawdown, note };
-}
-
-function buildFinalJudgement(ranking, walkRows) {
-  const best = ranking[0] || null;
-  if (!best || !best.count) return { grade: "C", judgement: "候補不足", reason: "固定エントリー条件に一致するサンプルが不足しています。" };
-  const wf = walkRows.find(w => w.condition === best.condition);
-  if (best.profitFactor >= 2 && best.expectancy > 0 && best.maxDrawdown <= 30 && wf && ["有望", "追加検証", "サンプル不足"].includes(wf.judgement)) return { grade: "S", judgement: "実装候補", reason: `${best.condition} がPF ${fmtNum(best.profitFactor, 2)}、期待値 ${fmtNum(best.expectancy, 2)}pipsで最上位です。` };
-  if (best.profitFactor >= 1.3 && best.expectancy > 0) return { grade: "A", judgement: "追加検証候補", reason: "期待値はプラスですが、DDまたはWalk Forwardを追加確認してください。" };
-  if (best.expectancy > 0) return { grade: "B", judgement: "弱い候補", reason: "期待値はプラスですが、PFが十分ではありません。" };
-  return { grade: "C", judgement: "採用見送り", reason: "最上位候補でも期待値が弱い、またはマイナスです。" };
-}
-
-function rankSort(a, b) {
-  if ((b.expectancy > 0) !== (a.expectancy > 0)) return b.expectancy - a.expectancy;
-  if (Math.abs(b.profitFactor - a.profitFactor) > 0.01) return b.profitFactor - a.profitFactor;
-  return b.totalPips - a.totalPips;
-}
-
-function exitRankSort(a, b) {
-  if (Math.abs(b.expectancy - a.expectancy) > 0.01) return b.expectancy - a.expectancy;
-  if (Math.abs(b.profitFactor - a.profitFactor) > 0.01) return b.profitFactor - a.profitFactor;
-  if (Math.abs(a.maxDrawdown - b.maxDrawdown) > 0.01) return a.maxDrawdown - b.maxDrawdown;
-  return b.totalPips - a.totalPips;
-}
-
-function stripTrades(row) {
-  const { trades, ...rest } = row;
-  return rest;
+function compactTrade(t) {
+  return { datetime: t.datetime, weekday: t.weekdayLabel, pips: t.pips, atr: t.atrPips, volatility: t.volatilityPips, trendState: t.trendState, emaPosition: t.emaPosition, rsi: t.rsi, recent3: t.recent3 };
 }
 
 function parseCsvBars(text) {
@@ -559,58 +564,46 @@ function parseCsv(text) {
 function normalizeHeader(value) { return String(value || "").trim().replace(/^\uFEFF/, "").toLowerCase(); }
 function findHeader(headers, names) { for (const name of names) { const idx = headers.indexOf(String(name).toLowerCase()); if (idx >= 0) return idx; } return -1; }
 function toNumber(value) { const num = Number(String(value || "").replace(/,/g, "").trim()); return Number.isFinite(num) ? num : NaN; }
-
-function parseDate(value) {
-  const raw = String(value || "").trim();
-  if (!raw) return null;
-  const normalized = raw.replace(/\./g, "-").replace(/\//g, "-").replace("T", " ");
-  const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
-  if (match) {
-    const [, y, mo, d, h = "0", mi = "0", s = "0"] = match;
-    return new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s));
-  }
-  const parsed = new Date(raw);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
+function parseDate(value) { const raw = String(value || "").trim(); if (!raw) return null; const normalized = raw.replace(/\./g, "-").replace(/\//g, "-").replace("T", " "); const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/); if (match) { const [, y, mo, d, h = "0", mi = "0", s = "0"] = match; return new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)); } const parsed = new Date(raw); return Number.isNaN(parsed.getTime()) ? null : parsed; }
 function validBar(bar) { return !!bar && bar.time instanceof Date && !Number.isNaN(bar.time.getTime()) && [bar.open, bar.high, bar.low, bar.close].every(Number.isFinite); }
 function calcRsi(avgGain, avgLoss) { if (avgLoss === 0) return 100; const rs = avgGain / avgLoss; return 100 - (100 / (1 + rs)); }
 function calcRecentPips(bars, index, length) { if (index < length) return NaN; const now = bars[index], prev = bars[index - length]; if (!validBar(now) || !validBar(prev)) return NaN; return (now.close - prev.close) * PIP; }
 function isLowBreak(bars, index, length) { const bar = bars[index]; if (!validBar(bar) || index < length) return false; let prevLow = Infinity; for (let i = index - length; i < index; i++) { if (!validBar(bars[i])) return false; prevLow = Math.min(prevLow, bars[i].low); } return Number.isFinite(prevLow) && bar.low < prevLow; }
+function classifyTrend(pips) { if (pips >= 12) return "強上昇"; if (pips >= 4) return "弱上昇"; if (pips <= -12) return "強下降"; if (pips <= -4) return "弱下降"; return "レンジ"; }
+function classifyEmaPosition(distance) { if (!Number.isFinite(distance)) return "不明"; if (distance > 2) return "EMAより上"; if (distance < -2) return "EMAより下"; return "EMA付近"; }
 function getSessionJst(date) { const h = date.getHours(); if (h >= 6 && h <= 14) return "東京"; if (h >= 15 && h <= 17) return "ロンドン前半"; if (h >= 18 && h <= 20) return "ロンドン後半"; if (h >= 21 && h <= 23) return "NY前半"; if (h >= 0 && h <= 2) return "NY後半"; return "深夜"; }
 function getNyLatePart(date) { const h = date.getHours(); if (h === 0) return "NY後半前半"; if (h === 1) return "NY後半中盤"; if (h === 2) return "NY後半終盤"; return ""; }
-function average(values) { return values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0; }
+function weekdayLabel(date) { return ["日","月","火","水","木","金","土"][date.getDay()]; }
+function monthLabel(date) { return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}`; }
 
-function renderExit(rows) {
-  const body = document.getElementById("exitBody");
-  body.innerHTML = rows.map(row => `<tr><td>${escapeHtml(row.condition)}</td><td>${row.count.toLocaleString()}</td><td class="${classFor(row.winRate,55,45)}">${fmtNum(row.winRate,1)}%</td><td class="${classFor(row.profitFactor,1.3,1)}">${fmtNum(row.profitFactor,2)}</td><td class="${classFor(row.expectancy,0,0)}">${fmtNum(row.expectancy,2)}</td><td class="${classFor(row.totalPips,0,0)}">${fmtNum(row.totalPips,1)}</td><td>${fmtNum(row.maxDrawdown,1)}</td><td>${row.maxLosingStreak}</td></tr>`).join("");
+function renderAll(data) {
+  const b = data.baseMetrics;
+  document.getElementById("tradeCount").textContent = data.debug.tradeCount.toLocaleString();
+  document.getElementById("basePf").textContent = fmtNum(b.profitFactor, 2);
+  document.getElementById("baseExp").textContent = fmtNum(b.expectancy, 2);
+  document.getElementById("baseTotal").textContent = fmtNum(b.totalPips, 1);
+  renderDanger(data.dangerTop10);
+  renderBoost(data.boostTop10);
+  renderGroup("weekdayBody", data.weekdayAnalysis);
+  renderGroup("monthBody", data.monthAnalysis);
+  renderGroup("volBody", [...data.volatilityAnalysis, ...data.atrAnalysis]);
+  renderGroup("trendBody", [...data.trendAnalysis, ...data.emaAnalysis]);
+  renderStreaks(data.losingStreaks);
+  renderTradeSamples(data.losingTrades, data.topWins);
+  renderWalk(data.walkForward);
+  renderPlan(data.implementationPlan);
 }
 
-function renderRanking(rows) {
-  const body = document.getElementById("rankingBody");
-  body.innerHTML = rows.map((row, idx) => `<tr><td>${idx + 1}</td><td>${escapeHtml(row.condition)}</td><td>${row.count.toLocaleString()}</td><td class="${classFor(row.winRate,55,45)}">${fmtNum(row.winRate,1)}%</td><td class="${classFor(row.profitFactor,1.3,1)}">${fmtNum(row.profitFactor,2)}</td><td class="${classFor(row.expectancy,0,0)}">${fmtNum(row.expectancy,2)}</td><td class="${classFor(row.totalPips,0,0)}">${fmtNum(row.totalPips,1)}</td><td>${fmtNum(row.maxDrawdown,1)}</td><td>${row.maxLosingStreak}</td><td>${escapeHtml(gradeRow(row))}</td></tr>`).join("");
-}
-
-function renderWalkForward(rows) {
-  const body = document.getElementById("walkBody");
-  body.innerHTML = rows.map(row => `<tr><td>${escapeHtml(row.condition)}</td><td>${fmtNum(row.firstPF,2)}</td><td class="${classFor(row.secondPF,1.3,1)}">${fmtNum(row.secondPF,2)}</td><td>${fmtNum(row.firstExpectancy,2)}</td><td class="${classFor(row.secondExpectancy,0,0)}">${fmtNum(row.secondExpectancy,2)}</td><td>${fmtNum(row.degradation,1)}%</td><td>${escapeHtml(row.judgement)}</td></tr>`).join("");
-}
-
-function renderPlan(plan, finalJudgement) {
-  document.getElementById("planBox").innerHTML = `
-    <p><b>実戦評価:</b> ${escapeHtml(finalJudgement.grade)} / ${escapeHtml(finalJudgement.judgement)}</p>
-    <p>${escapeHtml(finalJudgement.reason)}</p>
-    <ul>
-      <li><b>保守型:</b> ${escapeHtml(plan.conservative.exitRule)}</li>
-      <li><b>標準型:</b> ${escapeHtml(plan.standard.exitRule)}</li>
-      <li><b>攻撃型:</b> ${escapeHtml(plan.aggressive.exitRule)}</li>
-    </ul>`;
-}
-
-function gradeRow(row) { if (row.count >= 50 && row.profitFactor >= 2 && row.expectancy > 0 && row.maxDrawdown <= 30) return "S"; if (row.count >= 30 && row.profitFactor >= 1.3 && row.expectancy > 0) return "A"; if (row.expectancy > 0) return "B"; return "C"; }
-function clearTables() { document.getElementById("rankingBody").innerHTML = '<tr><td colspan="10" class="small">分析中...</td></tr>'; document.getElementById("exitBody").innerHTML = '<tr><td colspan="8" class="small">分析中...</td></tr>'; document.getElementById("walkBody").innerHTML = '<tr><td colspan="7" class="small">分析中...</td></tr>'; document.getElementById("planBox").textContent = "分析中..."; }
+function renderDanger(rows) { document.getElementById("dangerBody").innerHTML = rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.condition)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td>${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${fmtNum(r.excludedPF,2)}</td><td class="${classFor(r.improvement,0,0)}">${fmtNum(r.improvement,2)}</td></tr>`).join("") || '<tr><td colspan="9" class="small">該当なし</td></tr>'; }
+function renderBoost(rows) { document.getElementById("boostBody").innerHTML = rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.condition)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td>${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${fmtNum(r.populationRatio,1)}%</td><td>${escapeHtml(r.buyScore)}</td></tr>`).join("") || '<tr><td colspan="9" class="small">該当なし</td></tr>'; }
+function renderGroup(id, rows) { document.getElementById(id).innerHTML = rows.map(r=>`<tr><td>${escapeHtml(r.label)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td>${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td></tr>`).join("") || '<tr><td colspan="6" class="small">該当なし</td></tr>'; }
+function renderStreaks(rows) { const flat = rows.flatMap(seq => seq.trades.map(t => ({...t, length: seq.length}))).slice(0, 40); document.getElementById("streakBody").innerHTML = flat.map(t=>`<tr><td>${escapeHtml(t.datetime)}</td><td>${escapeHtml(t.weekday)}</td><td>${fmtNum(t.atr,1)}</td><td>${escapeHtml(t.trendState)}</td><td class="bad">${fmtNum(t.pips,1)}</td></tr>`).join("") || '<tr><td colspan="5" class="small">連敗なし</td></tr>'; }
+function renderTradeSamples(losses, wins) { const rows = [...losses.slice(0,20).map(t=>({type:"負け",...t})), ...wins.slice(0,20).map(t=>({type:"上位勝ち",...t}))]; document.getElementById("tradeBody").innerHTML = rows.map(t=>`<tr><td>${escapeHtml(t.type)}</td><td>${escapeHtml(t.datetime)}</td><td class="${t.pips>=0?'good':'bad'}">${fmtNum(t.pips,1)}</td><td>${fmtNum(t.atr,1)}</td><td>${escapeHtml(t.trendState)}</td><td>${escapeHtml(t.emaPosition)}</td></tr>`).join("") || '<tr><td colspan="6" class="small">該当なし</td></tr>'; }
+function renderWalk(rows) { document.getElementById("walkBody").innerHTML = rows.map(r=>`<tr><td>${escapeHtml(r.label)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td>${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${escapeHtml(r.judgement)}</td></tr>`).join(""); }
+function renderPlan(plan) { document.getElementById("planBox").innerHTML = `<p>${escapeHtml(plan.note)}</p><h3>危険スコア</h3><ul>${plan.dangerScore.map(x=>`<li>${escapeHtml(x.condition)}: 危険スコア ${escapeHtml(x.score)} (${escapeHtml(x.reason)})</li>`).join("")}</ul><h3>BUYスコア</h3><ul>${plan.buyScore.map(x=>`<li>${escapeHtml(x.condition)}: BUYスコア ${escapeHtml(x.score)} (${escapeHtml(x.reason)})</li>`).join("")}</ul>`; }
+function clearTables() { ["dangerBody","boostBody","weekdayBody","monthBody","volBody","trendBody","streakBody","tradeBody","walkBody"].forEach(id=>{document.getElementById(id).innerHTML='<tr><td class="small">分析中...</td></tr>';}); document.getElementById("planBox").textContent = "分析中..."; }
 function updateLoadSummary() { document.getElementById("loadedRows").textContent = loadedState.loadedRows.toLocaleString(); document.getElementById("validBars").textContent = loadedState.bars.length.toLocaleString(); document.getElementById("startTime").textContent = loadedState.startTime; document.getElementById("endTime").textContent = loadedState.endTime; }
-function updateDebugConsole() { document.getElementById("baseCount").textContent = debugState.baseCount ? debugState.baseCount.toLocaleString() : "--"; document.getElementById("fixedEntryCount").textContent = debugState.fixedEntryCount ? debugState.fixedEntryCount.toLocaleString() : "--"; document.getElementById("atrCount").textContent = debugState.atrCount ? debugState.atrCount.toLocaleString() : "--"; document.getElementById("rsiCount").textContent = debugState.rsiCount ? debugState.rsiCount.toLocaleString() : "--"; document.getElementById("errorCount").textContent = String(debugState.errorCount || 0); document.getElementById("lastRun").textContent = debugState.lastRun || "--"; document.getElementById("tradeCount").textContent = debugState.tradeCount ? debugState.tradeCount.toLocaleString() : "--"; document.getElementById("debugLog").textContent = [`読み込み本数: ${debugState.loadedRows.toLocaleString()}`,`有効バー数: ${debugState.validBars.toLocaleString()}`,`Base検出件数: ${debugState.baseCount.toLocaleString()}`,`固定エントリー件数: ${debugState.fixedEntryCount.toLocaleString()}`,`生成トレード数: ${debugState.tradeCount.toLocaleString()}`,`RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,`ATR計算件数: ${debugState.atrCount.toLocaleString()}`,`エラー件数: ${debugState.errorCount.toLocaleString()}`,`最終実行時間: ${debugState.lastRun || "--"}`,"","Errors:",...(debugState.errors.length ? debugState.errors.slice(-80).map(e => `${e.functionName} index=${e.index} ${e.message}`) : ["なし"])].join("\n"); }
+function updateDebugConsole() { document.getElementById("debugLog").textContent = [`読み込み本数: ${debugState.loadedRows.toLocaleString()}`,`有効バー数: ${debugState.validBars.toLocaleString()}`,`Core Rule件数: ${debugState.tradeCount.toLocaleString()}`,`RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,`ATR計算件数: ${debugState.atrCount.toLocaleString()}`,`EMA計算件数: ${debugState.emaCount.toLocaleString()}`,`エラー件数: ${debugState.errorCount.toLocaleString()}`,`最終実行時間: ${debugState.lastRun || "--"}`,"","Errors:",...(debugState.errors.length ? debugState.errors.slice(-80).map(e => `${e.functionName} index=${e.index} ${e.message}`) : ["なし"])].join("\n"); }
 function logError(functionName, index, error) { debugState.errorCount++; debugState.errors.push({ functionName, index, message: error && error.message ? error.message : String(error) }); if (debugState.errors.length > 200) debugState.errors.shift(); console.error(functionName, index, error); }
 function setStatus(text) { document.getElementById("status").textContent = text; }
 function setProgress(label, done, total) { const pct = total ? Math.min(100, Math.max(0, done / total * 100)) : 0; document.getElementById("progressBar").value = pct; document.getElementById("progressText").textContent = `${label} / 進捗 ${pct.toFixed(1)}%`; }
@@ -626,7 +619,7 @@ function downloadJson() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "research_v5_4_results.json";
+  a.download = "research_v5_5_results.json";
   document.body.appendChild(a);
   a.click();
   a.remove();
