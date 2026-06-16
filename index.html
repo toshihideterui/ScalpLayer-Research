@@ -3,35 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v5.2.1</title>
+  <title>ScalpLayer Research v5.3</title>
   <style>
-    :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#24344d;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b;--yellow:#ffd166}
-    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#07111f,#0b1423 42%,#07111f);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
-    main{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}
-    .hero{padding:26px 0 12px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);letter-spacing:0;color:var(--gold)}.sub{margin:0;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:rgba(16,27,44,.92);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0;box-shadow:0 18px 44px rgba(0,0,0,.24)}
-    h2{margin:0 0 12px;font-size:19px;color:#fff}.small{font-size:13px;color:var(--muted)}.note{border-left:4px solid var(--gold);padding:10px 12px;background:rgba(215,183,90,.08);border-radius:6px;color:#f8edc4}
+    :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#263852;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b;--yellow:#ffd166}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07111f,#0b1423 44%,#07111f);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
+    main{width:min(1200px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}.hero{padding:26px 0 12px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);letter-spacing:0;color:var(--gold)}.sub{margin:0;color:var(--muted)}
+    .card{background:rgba(16,27,44,.94);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0;box-shadow:0 18px 44px rgba(0,0,0,.24)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    h2{margin:0 0 12px;font-size:19px}.small{font-size:13px;color:var(--muted)}.note{border-left:4px solid var(--gold);padding:10px 12px;background:rgba(215,183,90,.08);border-radius:6px;color:#f8edc4}
     input[type=file]{width:100%;padding:12px;border:1px dashed #4a5d7a;border-radius:8px;background:#0b1524;color:var(--text);margin:8px 0 12px}
     button{appearance:none;border:0;border-radius:8px;background:var(--gold);color:#101010;font-weight:800;padding:11px 16px;cursor:pointer;margin:4px 8px 4px 0}button:disabled{opacity:.45;cursor:not-allowed}
-    progress{width:100%;height:16px;accent-color:var(--gold)} table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top} th:first-child,td:first-child{text-align:left} th{color:#f8edc4;background:#0b1524;position:sticky;top:0}
-    .table-wrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:8px}.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pill{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px}.pill b{display:block;color:var(--gold);font-size:13px}.pill span{font-size:18px}
-    .good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)} pre{white-space:pre-wrap;word-break:break-word;background:#050b14;border:1px solid var(--line);border-radius:8px;padding:12px;max-height:360px;overflow:auto;font-size:12px}
-    @media(max-width:760px){main{width:min(100% - 18px,1180px);padding-top:18px}.grid,.kpi{grid-template-columns:1fr}.card{padding:14px;margin:12px 0}table{font-size:12px}th,td{padding:8px 6px}button{width:100%;margin-right:0}}
+    progress{width:100%;height:16px;accent-color:var(--gold)}.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pill{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px}.pill b{display:block;color:var(--gold);font-size:13px}.pill span{font-size:18px}
+    table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}th:first-child,td:first-child{text-align:left}th{color:#f8edc4;background:#0b1524;position:sticky;top:0}.table-wrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:8px}
+    .good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)}pre{white-space:pre-wrap;word-break:break-word;background:#050b14;border:1px solid var(--line);border-radius:8px;padding:12px;max-height:360px;overflow:auto;font-size:12px}
+    @media(max-width:760px){main{width:min(100% - 18px,1200px);padding-top:18px}.grid,.kpi{grid-template-columns:1fr}.card{padding:14px;margin:12px 0}table{font-size:12px}th,td{padding:8px 6px}button{width:100%;margin-right:0}}
   </style>
 </head>
 <body>
 <main>
   <section class="hero">
-    <h1>ScalpLayer Research v5.2.1</h1>
-    <p class="sub">軽量版：CSV読み込みと分析を分離し、安値更新条件の基本比較だけをチャンク処理で検証します。</p>
+    <h1>ScalpLayer Research v5.3</h1>
+    <p class="sub">安値更新後の最適エントリータイミングを比較します。0本後、1本後、2本後、3本後、5本後を最優先で検証します。</p>
   </section>
 
   <section class="card">
     <h2>1. CSV読み込み</h2>
     <input id="csvFile" type="file" accept=".csv,text/csv">
     <button id="loadBtn" type="button">CSVを読み込む</button>
-    <button id="runBtn" type="button" disabled>v5.2分析を実行</button>
-    <p id="status" class="small">CSVを選択してください。読み込み後、分析ボタンが有効になります。</p>
+    <button id="runBtn" type="button" disabled>v5.3分析を実行</button>
+    <p id="status" class="small">USDJPY M1 CSVを選択してください。</p>
     <div class="kpi">
       <div class="pill"><b>読み込み本数</b><span id="loadedRows">--</span></div>
       <div class="pill"><b>有効バー数</b><span id="validBars">--</span></div>
@@ -41,38 +40,63 @@
   </section>
 
   <section class="card">
-    <h2>2. 分析進捗</h2>
+    <h2>2. 分析条件と進捗</h2>
+    <p class="note">固定条件: <b>BUY / RSI &lt; 25 / 直近3本 &lt;= -10pips / NY後半前半 / 安値更新あり</b><br>決済: <b>+10pips到達後、-5pips戻しで決済</b>。今回の研究は「条件を変える」のではなく「何本待つか」を比較します。</p>
     <progress id="progressBar" value="0" max="100"></progress>
     <p id="progressText" class="small">待機中</p>
-    <p class="note">固定条件は <b>RSI &lt; 25 / 直近3本 &lt;= -10pips / NY後半前半 / BUY</b> です。安値更新の有無を比較するため、固定条件自体には安値更新を含めていません。</p>
   </section>
 
   <section class="card">
-    <h2>3. 安値更新条件 基本比較</h2>
+    <h2>3. 総合ランキング</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>条件名</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総pips</th><th>最大DD</th><th>最大連敗</th></tr></thead>
-        <tbody id="resultBody"><tr><td colspan="8" class="small">分析実行後に表示します。</td></tr></tbody>
+        <thead><tr><th>順位</th><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th><th>実戦評価</th></tr></thead>
+        <tbody id="rankingBody"><tr><td colspan="10" class="small">分析実行後に表示します。</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>4. エントリータイミング比較</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th></tr></thead>
+        <tbody id="timingBody"><tr><td colspan="8" class="small">0/1/2/3/5本後と戻り確認ルールを比較します。</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>5. Walk Forward 70% / 30%</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>条件</th><th>前半PF</th><th>後半PF</th><th>前半期待値</th><th>後半期待値</th><th>劣化率</th><th>判定</th></tr></thead>
+        <tbody id="walkBody"><tr><td colspan="7" class="small">分析実行後に表示します。</td></tr></tbody>
       </table>
     </div>
   </section>
 
   <section class="grid">
     <div class="card">
-      <h2>4. JSON出力</h2>
-      <button id="downloadBtn" type="button" disabled>research_v5_2_1_results.json をダウンロード</button>
-      <p class="small">ChatGPTへ渡す場合は、このJSONだけで今回の軽量分析結果を確認できます。</p>
+      <h2>6. ScalpLayer実装案</h2>
+      <div id="planBox" class="small">分析結果から安全型・標準型・攻撃型を生成します。</div>
     </div>
     <div class="card">
-      <h2>5. Debug Console</h2>
-      <div class="kpi">
-        <div class="pill"><b>分析対象本数</b><span id="entryCount">--</span></div>
-        <div class="pill"><b>RSI計算件数</b><span id="rsiCount">--</span></div>
-        <div class="pill"><b>エラー件数</b><span id="errorCount">--</span></div>
-        <div class="pill"><b>最終実行時間</b><span id="lastRun">--</span></div>
-      </div>
-      <pre id="debugLog">Debug Consoleはここに表示されます。</pre>
+      <h2>7. JSON出力</h2>
+      <button id="downloadBtn" type="button" disabled>research_v5_3_results.json をダウンロード</button>
+      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv5.3の分析結果を確認できます。</p>
     </div>
+  </section>
+
+  <section class="card">
+    <h2>8. Debug Console</h2>
+    <div class="kpi">
+      <div class="pill"><b>Base検出件数</b><span id="baseCount">--</span></div>
+      <div class="pill"><b>RSI計算件数</b><span id="rsiCount">--</span></div>
+      <div class="pill"><b>エラー件数</b><span id="errorCount">--</span></div>
+      <div class="pill"><b>最終実行時間</b><span id="lastRun">--</span></div>
+    </div>
+    <pre id="debugLog">Debug Consoleはここに表示されます。</pre>
   </section>
 </main>
 
@@ -82,44 +106,24 @@
 const PIP = 100;
 const MIN_REQUIRED_BARS = 80;
 const MAX_HOLD = 180;
+const SEARCH_WINDOW = 10;
 const CHUNK_SIZE = 1000;
-const SPREAD_PIPS = 0;
 
-let loadedState = {
-  fileName: "",
-  bars: [],
-  loadedRows: 0,
-  missingRows: 0,
-  startTime: "--",
-  endTime: "--"
-};
-
+let loadedState = { fileName: "", bars: [], loadedRows: 0, missingRows: 0, startTime: "--", endTime: "--" };
 let researchResults = null;
 let debugState = createDebugState();
 
 document.getElementById("loadBtn").addEventListener("click", loadCsvOnly);
-document.getElementById("runBtn").addEventListener("click", runLightAnalysis);
+document.getElementById("runBtn").addEventListener("click", runResearch);
 document.getElementById("downloadBtn").addEventListener("click", downloadJson);
 
 function createDebugState() {
-  return {
-    loadedRows: 0,
-    validBars: 0,
-    analyzedBars: 0,
-    rsiCount: 0,
-    errorCount: 0,
-    lastRun: "--",
-    firstEntryTime: "--",
-    errors: []
-  };
+  return { loadedRows: 0, validBars: 0, rsiCount: 0, baseCount: 0, generatedEntryCount: 0, errorCount: 0, lastRun: "--", firstBaseTime: "--", errors: [] };
 }
 
 async function loadCsvOnly() {
   const file = document.getElementById("csvFile").files[0];
-  if (!file) {
-    alert("USDJPY M1 CSVを選択してください。");
-    return;
-  }
+  if (!file) { alert("USDJPY M1 CSVを選択してください。"); return; }
   setStatus("CSVを読み込み中...");
   setProgress("CSVを読み込み中", 0, 100);
   researchResults = null;
@@ -141,8 +145,8 @@ async function loadCsvOnly() {
     debugState.validBars = parsed.bars.length;
     updateLoadSummary();
     updateDebugConsole();
-    setProgress("CSV読み込み完了。v5.2分析を実行できます。", 100, 100);
-    setStatus(`CSV読み込み完了：${parsed.bars.length.toLocaleString()}本の有効バーを読み込みました。`);
+    setProgress("CSV読み込み完了", 100, 100);
+    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v5.3分析を実行できます。`);
     document.getElementById("runBtn").disabled = !parsed.bars.length;
   } catch (error) {
     logError("loadCsvOnly", "--", error);
@@ -151,12 +155,9 @@ async function loadCsvOnly() {
   }
 }
 
-async function runLightAnalysis() {
+async function runResearch() {
   const bars = loadedState.bars;
-  if (!bars.length) {
-    alert("先にCSVを読み込んでください。");
-    return;
-  }
+  if (!bars.length) { alert("先にCSVを読み込んでください。"); return; }
   researchResults = null;
   debugState = createDebugState();
   debugState.loadedRows = loadedState.loadedRows;
@@ -164,43 +165,51 @@ async function runLightAnalysis() {
   debugState.lastRun = fmtDate(new Date());
   document.getElementById("runBtn").disabled = true;
   document.getElementById("downloadBtn").disabled = true;
-  renderResults([]);
-  setStatus("v5.2.1 軽量分析を開始しました。");
-
+  clearTables();
+  setStatus("v5.3分析を開始しました。");
   try {
     await enrichBarsChunked(bars);
-    const entries = await buildEntriesChunked(bars);
-    const comparisonResults = buildLowUpdateComparison(entries, bars);
+    const baseEvents = await buildBaseEventsChunked(bars);
+    const strategyResults = await evaluateTimingStrategies(baseEvents, bars);
+    const ranking = strategyResults.slice().sort(rankSort);
+    const walkForwardResults = buildWalkForward(strategyResults, bars.length);
+    const implementationPlan = buildImplementationPlan(ranking);
+    const finalJudgement = buildFinalJudgement(ranking, walkForwardResults);
     researchResults = {
       meta: {
-        version: "research-v5.2.1-light",
+        version: "research-v5.3",
         sourceFileName: loadedState.fileName,
         generatedAt: new Date().toISOString(),
         loadedRows: loadedState.loadedRows,
         validBars: bars.length,
         startTime: loadedState.startTime,
-        endTime: loadedState.endTime,
-        fixedCondition: "BUY / RSI < 25 / recent3Pips <= -10 / NY後半前半 / exit +10 reached then -5 pullback"
+        endTime: loadedState.endTime
       },
       fixedCondition: {
         direction: "BUY",
         rsi: "<25",
         recent3Pips: "<=-10",
         sessionPart: "NY後半前半",
-        exitRule: "+10到達後 -5戻し",
-        spreadPips: SPREAD_PIPS,
-        note: "安値更新条件を比較するため、固定条件には安値更新を含めていません。"
+        lowUpdate: "あり",
+        exitRule: "+10到達後 -5戻し"
       },
-      comparisonResults,
+      timingComparison: strategyResults,
+      ranking,
+      walkForwardResults,
+      implementationPlan,
+      finalJudgement,
       debug: debugState
     };
-    renderResults(comparisonResults);
+    renderTiming(strategyResults);
+    renderRanking(ranking);
+    renderWalkForward(walkForwardResults);
+    renderPlan(implementationPlan, finalJudgement);
     document.getElementById("downloadBtn").disabled = false;
     setProgress("分析完了", 100, 100);
-    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v5_2_1_results.json を出力できます。");
+    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v5_3_results.json を出力できます。");
   } catch (error) {
-    logError("runLightAnalysis", "--", error);
-    setStatus("分析中にエラーが発生しました。処理は可能な範囲で継続しました。Debug Consoleを確認してください。");
+    logError("runResearch", "--", error);
+    setStatus("分析中にエラーが発生しました。Debug Consoleを確認してください。");
   } finally {
     document.getElementById("runBtn").disabled = false;
     updateDebugConsole();
@@ -208,29 +217,18 @@ async function runLightAnalysis() {
 }
 
 async function enrichBarsChunked(bars) {
-  let avgGain = null;
-  let avgLoss = null;
-  let gainSum = 0;
-  let lossSum = 0;
+  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0;
   for (let start = 1; start < bars.length; start += CHUNK_SIZE) {
     const end = Math.min(bars.length, start + CHUNK_SIZE);
     for (let i = start; i < end; i++) {
       try {
-        const bar = bars[i];
-        const prev = bars[i - 1];
+        const bar = bars[i], prev = bars[i - 1];
         if (!validBar(bar) || !validBar(prev)) continue;
         const diff = bar.close - prev.close;
-        const gain = Math.max(0, diff);
-        const loss = Math.max(0, -diff);
+        const gain = Math.max(0, diff), loss = Math.max(0, -diff);
         if (i <= 14) {
-          gainSum += gain;
-          lossSum += loss;
-          if (i === 14) {
-            avgGain = gainSum / 14;
-            avgLoss = lossSum / 14;
-            bar.rsi = calcRsi(avgGain, avgLoss);
-            debugState.rsiCount++;
-          }
+          gainSum += gain; lossSum += loss;
+          if (i === 14) { avgGain = gainSum / 14; avgLoss = lossSum / 14; bar.rsi = calcRsi(avgGain, avgLoss); debugState.rsiCount++; }
         } else if (avgGain != null && avgLoss != null) {
           avgGain = ((avgGain * 13) + gain) / 14;
           avgLoss = ((avgLoss * 13) + loss) / 14;
@@ -243,6 +241,10 @@ async function enrichBarsChunked(bars) {
         bar.lowBreak3 = isLowBreak(bars, i, 3);
         bar.lowBreak5 = isLowBreak(bars, i, 5);
         bar.lowBreak10 = isLowBreak(bars, i, 10);
+        bar.lowUpdate = bar.lowBreak3 || bar.lowBreak5 || bar.lowBreak10;
+        bar.isBull = bar.close > bar.open;
+        bar.isBear = bar.close < bar.open;
+        bar.closeBreakPrevHigh = validBar(prev) && bar.close > prev.high;
       } catch (error) {
         logError("enrichBarsChunked", i, error);
       }
@@ -253,68 +255,102 @@ async function enrichBarsChunked(bars) {
   }
 }
 
-async function buildEntriesChunked(bars) {
-  const entries = [];
+async function buildBaseEventsChunked(bars) {
+  const events = [];
   const startIndex = MIN_REQUIRED_BARS;
-  const endIndex = Math.max(startIndex, bars.length - MAX_HOLD);
-  let skipped = 0;
+  const endIndex = Math.max(startIndex, bars.length - MAX_HOLD - SEARCH_WINDOW - 6);
   for (let start = startIndex; start < endIndex; start += CHUNK_SIZE) {
     const end = Math.min(endIndex, start + CHUNK_SIZE);
     for (let i = start; i < end; i++) {
       try {
         const bar = bars[i];
-        if (!validBar(bar) || !Number.isFinite(bar.open) || !Number.isFinite(bar.rsi) || !Number.isFinite(bar.recent3)) {
-          skipped++;
-          continue;
-        }
-        const isCore = bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半";
-        if (!isCore) continue;
-        const result = simulatePullbackExit(bars, i, "BUY");
-        if (!result) {
-          skipped++;
-          continue;
-        }
-        entries.push({ index: i, time: bar.time, price: bar.close, bar, result });
-        if (debugState.firstEntryTime === "--") debugState.firstEntryTime = fmtDate(bar.time);
+        if (!validBar(bar) || !Number.isFinite(bar.rsi) || !Number.isFinite(bar.recent3)) continue;
+        const ok = bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半" && bar.lowUpdate;
+        if (!ok) continue;
+        events.push({ index: i, time: bar.time, price: bar.close });
+        if (debugState.firstBaseTime === "--") debugState.firstBaseTime = fmtDate(bar.time);
       } catch (error) {
-        logError("buildEntriesChunked", i, error);
-        skipped++;
+        logError("buildBaseEventsChunked", i, error);
       }
     }
-    debugState.analyzedBars = entries.length;
-    setProgress(`分析中 ${end.toLocaleString()} / ${endIndex.toLocaleString()}`, end, endIndex);
+    debugState.baseCount = events.length;
+    setProgress(`Base条件検出中 ${end.toLocaleString()} / ${endIndex.toLocaleString()}`, end, endIndex);
     updateDebugConsole();
     await yieldToBrowser();
   }
-  debugState.skippedBars = skipped;
-  return entries;
+  return events;
 }
 
-function buildLowUpdateComparison(entries) {
-  const filters = [
-    { name: "直近3本安値更新", test: e => e.bar.lowBreak3 === true },
-    { name: "直近5本安値更新", test: e => e.bar.lowBreak5 === true },
-    { name: "直近10本安値更新", test: e => e.bar.lowBreak10 === true },
-    { name: "安値更新なし", test: e => !e.bar.lowBreak3 && !e.bar.lowBreak5 && !e.bar.lowBreak10 },
-    { name: "安値更新あり", test: e => e.bar.lowBreak3 || e.bar.lowBreak5 || e.bar.lowBreak10 }
+async function evaluateTimingStrategies(baseEvents, bars) {
+  const strategyDefs = [
+    { key: "delay0", name: "安値更新直後 0本後エントリー", type: "delay", delay: 0 },
+    { key: "delay1", name: "安値更新後 1本後エントリー", type: "delay", delay: 1 },
+    { key: "delay2", name: "安値更新後 2本後エントリー", type: "delay", delay: 2 },
+    { key: "delay3", name: "安値更新後 3本後エントリー", type: "delay", delay: 3 },
+    { key: "delay5", name: "安値更新後 5本後エントリー", type: "delay", delay: 5 },
+    { key: "firstBull", name: "戻り確認: 陽線出現でエントリー", type: "firstBull" },
+    { key: "twoBull", name: "戻り確認: 2連続陽線でエントリー", type: "twoBull" },
+    { key: "closeBreakHigh", name: "戻り確認: 終値が前足高値を上抜け", type: "closeBreakHigh" },
+    { key: "rsiRecover", name: "RSI回復確認: RSI > 25でエントリー", type: "rsiRecover" }
   ];
-  return filters.map(filter => {
-    const selected = entries.filter(filter.test);
+  const buckets = Object.fromEntries(strategyDefs.map(def => [def.key, { def, trades: [] }]));
+  for (let start = 0; start < baseEvents.length; start += CHUNK_SIZE) {
+    const end = Math.min(baseEvents.length, start + CHUNK_SIZE);
+    for (let n = start; n < end; n++) {
+      const event = baseEvents[n];
+      try {
+        for (const def of strategyDefs) {
+          const entryIndex = resolveEntryIndex(def, event.index, bars);
+          if (entryIndex == null) continue;
+          const result = simulatePullbackExit(bars, entryIndex, "BUY");
+          if (!result) continue;
+          buckets[def.key].trades.push({ baseIndex: event.index, entryIndex, entryTime: bars[entryIndex].time, entryPrice: bars[entryIndex].close, pips: result.pips, exitMinutes: result.exitMinutes, peakPips: result.peakPips });
+        }
+      } catch (error) {
+        logError("evaluateTimingStrategies", event.index, error);
+      }
+    }
+    debugState.generatedEntryCount = Object.values(buckets).reduce((sum, bucket) => sum + bucket.trades.length, 0);
+    setProgress(`タイミング比較中 ${end.toLocaleString()} / ${baseEvents.length.toLocaleString()}`, end, baseEvents.length || 1);
+    updateDebugConsole();
+    await yieldToBrowser();
+  }
+  return strategyDefs.map(def => {
+    const trades = buckets[def.key].trades;
     return {
-      conditionName: filter.name,
-      count: selected.length,
-      ...calcMetrics(selected.map(e => e.result.pips))
+      key: def.key,
+      condition: def.name,
+      count: trades.length,
+      ...calcMetrics(trades.map(t => t.pips)),
+      trades
     };
   });
+}
+
+function resolveEntryIndex(def, baseIndex, bars) {
+  if (def.type === "delay") return safeEntryIndex(baseIndex + def.delay, bars);
+  const max = Math.min(baseIndex + SEARCH_WINDOW, bars.length - MAX_HOLD - 1);
+  for (let i = baseIndex + 1; i <= max; i++) {
+    const bar = bars[i], prev = bars[i - 1];
+    if (!validBar(bar) || !validBar(prev)) continue;
+    if (def.type === "firstBull" && bar.isBull) return safeEntryIndex(i, bars);
+    if (def.type === "twoBull" && bar.isBull && prev.isBull) return safeEntryIndex(i, bars);
+    if (def.type === "closeBreakHigh" && bar.close > prev.high) return safeEntryIndex(i, bars);
+    if (def.type === "rsiRecover" && Number.isFinite(bar.rsi) && bar.rsi > 25) return safeEntryIndex(i, bars);
+  }
+  return null;
+}
+
+function safeEntryIndex(index, bars) {
+  if (index < 0 || index + MAX_HOLD >= bars.length) return null;
+  return validBar(bars[index]) ? index : null;
 }
 
 function simulatePullbackExit(bars, index, direction) {
   const entryBar = bars[index];
   if (!validBar(entryBar) || index + 1 >= bars.length) return null;
   const entry = entryBar.close;
-  let peak = -Infinity;
-  let exitPips = null;
-  let exitMinutes = 0;
+  let peak = -Infinity, exitPips = null, exitMinutes = 0;
   for (let m = 1; m <= MAX_HOLD; m++) {
     const bar = bars[index + m];
     if (!validBar(bar)) return null;
@@ -322,17 +358,32 @@ function simulatePullbackExit(bars, index, direction) {
     const closePips = direction === "BUY" ? (bar.close - entry) * PIP : (entry - bar.close) * PIP;
     peak = Math.max(peak, favorable);
     if (peak >= 10 && favorable <= peak - 5) {
-      exitPips = closePips - SPREAD_PIPS;
+      exitPips = closePips;
       exitMinutes = m;
       break;
     }
     if (m === MAX_HOLD) {
-      exitPips = closePips - SPREAD_PIPS;
+      exitPips = closePips;
       exitMinutes = m;
     }
   }
   if (!Number.isFinite(exitPips)) return null;
   return { pips: exitPips, exitMinutes, peakPips: peak };
+}
+
+function buildWalkForward(strategyResults, totalBars) {
+  const splitIndex = Math.floor(totalBars * 0.7);
+  return strategyResults.map(row => {
+    const first = row.trades.filter(t => t.entryIndex < splitIndex).map(t => t.pips);
+    const second = row.trades.filter(t => t.entryIndex >= splitIndex).map(t => t.pips);
+    const a = calcMetrics(first), b = calcMetrics(second);
+    const degradation = a.expectancy ? ((b.expectancy - a.expectancy) / Math.abs(a.expectancy)) * 100 : 0;
+    let judgement = "追加検証";
+    if (second.length < 30) judgement = "サンプル不足";
+    else if (b.profitFactor >= 1.3 && b.expectancy > 0) judgement = "有望";
+    else if (b.profitFactor < 1 || b.expectancy <= 0) judgement = "過剰最適化疑い";
+    return { condition: row.condition, firstCount: first.length, secondCount: second.length, firstPF: a.profitFactor, secondPF: b.profitFactor, firstExpectancy: a.expectancy, secondExpectancy: b.expectancy, degradation, judgement };
+  });
 }
 
 function calcMetrics(pipsList) {
@@ -341,27 +392,48 @@ function calcMetrics(pipsList) {
   let wins = 0, grossProfit = 0, grossLoss = 0, total = 0, equity = 0, peak = 0, maxDd = 0, losing = 0, maxLosing = 0;
   for (const pips of pipsList) {
     total += pips;
-    if (pips > 0) {
-      wins++;
-      grossProfit += pips;
-      losing = 0;
-    } else if (pips < 0) {
-      grossLoss += Math.abs(pips);
-      losing++;
-      maxLosing = Math.max(maxLosing, losing);
-    }
+    if (pips > 0) { wins++; grossProfit += pips; losing = 0; }
+    else if (pips < 0) { grossLoss += Math.abs(pips); losing++; maxLosing = Math.max(maxLosing, losing); }
     equity += pips;
     peak = Math.max(peak, equity);
     maxDd = Math.max(maxDd, peak - equity);
   }
+  return { winRate: wins / count * 100, profitFactor: grossLoss ? grossProfit / grossLoss : (grossProfit ? 999 : 0), expectancy: total / count, totalPips: total, maxDrawdown: maxDd, maxLosingStreak: maxLosing };
+}
+
+function rankSort(a, b) {
+  if ((b.expectancy > 0) !== (a.expectancy > 0)) return b.expectancy - a.expectancy;
+  if (Math.abs(b.profitFactor - a.profitFactor) > 0.01) return b.profitFactor - a.profitFactor;
+  return b.totalPips - a.totalPips;
+}
+
+function buildImplementationPlan(ranking) {
+  const valid = ranking.filter(r => r.count > 0);
+  const safe = valid.find(r => r.maxDrawdown <= 20 && r.expectancy > 0) || valid[0] || null;
+  const standard = valid.find(r => r.count >= 50 && r.profitFactor >= 1.3 && r.expectancy > 0) || valid[0] || null;
+  const attack = valid[0] || null;
   return {
-    winRate: wins / count * 100,
-    profitFactor: grossLoss ? grossProfit / grossLoss : (grossProfit ? 999 : 0),
-    expectancy: total / count,
-    totalPips: total,
-    maxDrawdown: maxDd,
-    maxLosingStreak: maxLosing
+    safe: makePlan("安全型", safe, "DDと最大連敗を優先。無理に待たず、安値更新後の確認が入った候補を優先します。"),
+    standard: makePlan("標準型", standard, "件数、PF、期待値のバランスを重視。v6系本体に載せる場合の第一候補です。"),
+    attack: makePlan("攻撃型", attack, "期待値と総利益を優先。デモ検証でブレを確認してから採用します。")
   };
+}
+
+function makePlan(type, row, note) {
+  if (!row) return { type, entryTiming: "候補なし", exitRule: "+10到達後 -5戻し", note };
+  return { type, entryTiming: row.condition, exitRule: "+10到達後 -5戻し", expectancy: row.expectancy, pf: row.profitFactor, count: row.count, note };
+}
+
+function buildFinalJudgement(ranking, walkForward) {
+  const best = ranking[0] || null;
+  if (!best || !best.count) return { grade: "C", judgement: "候補不足", reason: "固定条件に一致するサンプルが不足しています。" };
+  const wf = walkForward.find(w => w.condition === best.condition);
+  if (best.count >= 50 && best.profitFactor >= 2 && best.expectancy > 0 && wf && ["有望", "追加検証"].includes(wf.judgement)) {
+    return { grade: "S", judgement: "実装候補", reason: `${best.condition} がPF ${fmtNum(best.profitFactor, 2)}、期待値 ${fmtNum(best.expectancy, 2)}pipsで最上位です。` };
+  }
+  if (best.profitFactor >= 1.3 && best.expectancy > 0) return { grade: "A", judgement: "追加検証候補", reason: "期待値はプラスですが、件数またはWalk Forwardの確認が必要です。" };
+  if (best.expectancy > 0) return { grade: "B", judgement: "弱い候補", reason: "期待値はプラスですが、PFが十分ではありません。" };
+  return { grade: "C", judgement: "採用見送り", reason: "最上位候補でも期待値が弱い、またはマイナスです。" };
 }
 
 function parseCsvBars(text) {
@@ -381,18 +453,8 @@ function parseCsvBars(text) {
   const bars = [];
   for (let sourceIndex = 0; sourceIndex < body.length; sourceIndex++) {
     const row = body[sourceIndex];
-    const bar = {
-      sourceIndex,
-      time: parseDate(row[idx.time]),
-      open: toNumber(row[idx.open]),
-      high: toNumber(row[idx.high]),
-      low: toNumber(row[idx.low]),
-      close: toNumber(row[idx.close])
-    };
-    if (!bar.time || ![bar.open, bar.high, bar.low, bar.close].every(Number.isFinite)) {
-      missingRows++;
-      continue;
-    }
+    const bar = { sourceIndex, time: parseDate(row[idx.time]), open: toNumber(row[idx.open]), high: toNumber(row[idx.high]), low: toNumber(row[idx.low]), close: toNumber(row[idx.close]) };
+    if (!bar.time || ![bar.open, bar.high, bar.low, bar.close].every(Number.isFinite)) { missingRows++; continue; }
     bars.push(bar);
   }
   bars.sort((a, b) => a.time - b.time);
@@ -418,17 +480,9 @@ function parseCsv(text) {
   return rows;
 }
 
-function normalizeHeader(value) {
-  return String(value || "").trim().replace(/^\uFEFF/, "").toLowerCase();
-}
-
-function findHeader(headers, names) {
-  for (const name of names) {
-    const idx = headers.indexOf(String(name).toLowerCase());
-    if (idx >= 0) return idx;
-  }
-  return -1;
-}
+function normalizeHeader(value) { return String(value || "").trim().replace(/^\uFEFF/, "").toLowerCase(); }
+function findHeader(headers, names) { for (const name of names) { const idx = headers.indexOf(String(name).toLowerCase()); if (idx >= 0) return idx; } return -1; }
+function toNumber(value) { const num = Number(String(value || "").replace(/,/g, "").trim()); return Number.isFinite(num) ? num : NaN; }
 
 function parseDate(value) {
   const raw = String(value || "").trim();
@@ -443,27 +497,9 @@ function parseDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function toNumber(value) {
-  const num = Number(String(value || "").replace(/,/g, "").trim());
-  return Number.isFinite(num) ? num : NaN;
-}
-
-function validBar(bar) {
-  return !!bar && bar.time instanceof Date && !Number.isNaN(bar.time.getTime()) && [bar.open, bar.high, bar.low, bar.close].every(Number.isFinite);
-}
-
-function calcRsi(avgGain, avgLoss) {
-  if (avgLoss === 0) return 100;
-  const rs = avgGain / avgLoss;
-  return 100 - (100 / (1 + rs));
-}
-
-function calcRecentPips(bars, index, length) {
-  if (index < length) return NaN;
-  const now = bars[index], prev = bars[index - length];
-  if (!validBar(now) || !validBar(prev)) return NaN;
-  return (now.close - prev.close) * PIP;
-}
+function validBar(bar) { return !!bar && bar.time instanceof Date && !Number.isNaN(bar.time.getTime()) && [bar.open, bar.high, bar.low, bar.close].every(Number.isFinite); }
+function calcRsi(avgGain, avgLoss) { if (avgLoss === 0) return 100; const rs = avgGain / avgLoss; return 100 - (100 / (1 + rs)); }
+function calcRecentPips(bars, index, length) { if (index < length) return NaN; const now = bars[index], prev = bars[index - length]; if (!validBar(now) || !validBar(prev)) return NaN; return (now.close - prev.close) * PIP; }
 
 function isLowBreak(bars, index, length) {
   const bar = bars[index];
@@ -494,33 +530,44 @@ function getNyLatePart(date) {
   return "";
 }
 
-function fmtDate(date) {
-  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "--";
-  const p = n => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())} ${p(date.getHours())}:${p(date.getMinutes())}`;
+function renderTiming(rows) {
+  const body = document.getElementById("timingBody");
+  body.innerHTML = rows.map(row => `<tr><td>${escapeHtml(row.condition)}</td><td>${row.count.toLocaleString()}</td><td class="${classFor(row.winRate,55,45)}">${fmtNum(row.winRate,1)}%</td><td class="${classFor(row.profitFactor,1.3,1)}">${fmtNum(row.profitFactor,2)}</td><td class="${classFor(row.expectancy,0,0)}">${fmtNum(row.expectancy,2)}</td><td class="${classFor(row.totalPips,0,0)}">${fmtNum(row.totalPips,1)}</td><td>${fmtNum(row.maxDrawdown,1)}</td><td>${row.maxLosingStreak}</td></tr>`).join("");
 }
 
-function fmtNum(value, digits = 2) {
-  return Number.isFinite(value) ? value.toFixed(digits) : "--";
+function renderRanking(rows) {
+  const body = document.getElementById("rankingBody");
+  body.innerHTML = rows.map((row, idx) => `<tr><td>${idx + 1}</td><td>${escapeHtml(row.condition)}</td><td>${row.count.toLocaleString()}</td><td class="${classFor(row.winRate,55,45)}">${fmtNum(row.winRate,1)}%</td><td class="${classFor(row.profitFactor,1.3,1)}">${fmtNum(row.profitFactor,2)}</td><td class="${classFor(row.expectancy,0,0)}">${fmtNum(row.expectancy,2)}</td><td class="${classFor(row.totalPips,0,0)}">${fmtNum(row.totalPips,1)}</td><td>${fmtNum(row.maxDrawdown,1)}</td><td>${row.maxLosingStreak}</td><td>${escapeHtml(gradeRow(row))}</td></tr>`).join("");
 }
 
-function renderResults(results) {
-  const body = document.getElementById("resultBody");
-  if (!results.length) {
-    body.innerHTML = '<tr><td colspan="8" class="small">分析実行後に表示します。</td></tr>';
-    return;
-  }
-  body.innerHTML = results.map(row => `
-    <tr>
-      <td>${escapeHtml(row.conditionName)}</td>
-      <td>${row.count.toLocaleString()}</td>
-      <td class="${row.winRate >= 55 ? "good" : row.winRate < 45 ? "bad" : ""}">${fmtNum(row.winRate, 1)}%</td>
-      <td class="${row.profitFactor >= 1.3 ? "good" : row.profitFactor < 1 ? "bad" : ""}">${fmtNum(row.profitFactor, 2)}</td>
-      <td class="${row.expectancy > 0 ? "good" : row.expectancy < 0 ? "bad" : ""}">${fmtNum(row.expectancy, 2)}</td>
-      <td class="${row.totalPips > 0 ? "good" : row.totalPips < 0 ? "bad" : ""}">${fmtNum(row.totalPips, 1)}</td>
-      <td>${fmtNum(row.maxDrawdown, 1)}</td>
-      <td>${row.maxLosingStreak}</td>
-    </tr>`).join("");
+function renderWalkForward(rows) {
+  const body = document.getElementById("walkBody");
+  body.innerHTML = rows.map(row => `<tr><td>${escapeHtml(row.condition)}</td><td>${fmtNum(row.firstPF,2)}</td><td class="${classFor(row.secondPF,1.3,1)}">${fmtNum(row.secondPF,2)}</td><td>${fmtNum(row.firstExpectancy,2)}</td><td class="${classFor(row.secondExpectancy,0,0)}">${fmtNum(row.secondExpectancy,2)}</td><td>${fmtNum(row.degradation,1)}%</td><td>${escapeHtml(row.judgement)}</td></tr>`).join("");
+}
+
+function renderPlan(plan, finalJudgement) {
+  document.getElementById("planBox").innerHTML = `
+    <p><b>実戦評価:</b> ${escapeHtml(finalJudgement.grade)} / ${escapeHtml(finalJudgement.judgement)}</p>
+    <p>${escapeHtml(finalJudgement.reason)}</p>
+    <ul>
+      <li><b>安全型:</b> ${escapeHtml(plan.safe.entryTiming)} / ${escapeHtml(plan.safe.exitRule)}</li>
+      <li><b>標準型:</b> ${escapeHtml(plan.standard.entryTiming)} / ${escapeHtml(plan.standard.exitRule)}</li>
+      <li><b>攻撃型:</b> ${escapeHtml(plan.attack.entryTiming)} / ${escapeHtml(plan.attack.exitRule)}</li>
+    </ul>`;
+}
+
+function gradeRow(row) {
+  if (row.count >= 50 && row.profitFactor >= 2 && row.expectancy > 0) return "S";
+  if (row.count >= 30 && row.profitFactor >= 1.3 && row.expectancy > 0) return "A";
+  if (row.expectancy > 0) return "B";
+  return "C";
+}
+
+function clearTables() {
+  document.getElementById("rankingBody").innerHTML = '<tr><td colspan="10" class="small">分析中...</td></tr>';
+  document.getElementById("timingBody").innerHTML = '<tr><td colspan="8" class="small">分析中...</td></tr>';
+  document.getElementById("walkBody").innerHTML = '<tr><td colspan="7" class="small">分析中...</td></tr>';
+  document.getElementById("planBox").textContent = "分析中...";
 }
 
 function updateLoadSummary() {
@@ -531,17 +578,18 @@ function updateLoadSummary() {
 }
 
 function updateDebugConsole() {
-  document.getElementById("entryCount").textContent = debugState.analyzedBars ? debugState.analyzedBars.toLocaleString() : "--";
+  document.getElementById("baseCount").textContent = debugState.baseCount ? debugState.baseCount.toLocaleString() : "--";
   document.getElementById("rsiCount").textContent = debugState.rsiCount ? debugState.rsiCount.toLocaleString() : "--";
   document.getElementById("errorCount").textContent = String(debugState.errorCount || 0);
   document.getElementById("lastRun").textContent = debugState.lastRun || "--";
   const lines = [
     `読み込み本数: ${debugState.loadedRows.toLocaleString()}`,
     `有効バー数: ${debugState.validBars.toLocaleString()}`,
-    `分析対象本数: ${debugState.analyzedBars.toLocaleString()}`,
+    `Base検出件数: ${debugState.baseCount.toLocaleString()}`,
+    `生成エントリー件数: ${debugState.generatedEntryCount.toLocaleString()}`,
     `RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,
     `エラー件数: ${debugState.errorCount.toLocaleString()}`,
-    `最初に一致した日時: ${debugState.firstEntryTime || "--"}`,
+    `最初にBase一致した日時: ${debugState.firstBaseTime || "--"}`,
     `最終実行時間: ${debugState.lastRun || "--"}`,
     "",
     "Errors:",
@@ -557,19 +605,13 @@ function logError(functionName, index, error) {
   console.error(functionName, index, error);
 }
 
-function setStatus(text) {
-  document.getElementById("status").textContent = text;
-}
-
-function setProgress(label, done, total) {
-  const pct = total ? Math.min(100, Math.max(0, done / total * 100)) : 0;
-  document.getElementById("progressBar").value = pct;
-  document.getElementById("progressText").textContent = `${label} / 進捗 ${pct.toFixed(1)}%`;
-}
-
-function yieldToBrowser() {
-  return new Promise(resolve => setTimeout(resolve, 0));
-}
+function setStatus(text) { document.getElementById("status").textContent = text; }
+function setProgress(label, done, total) { const pct = total ? Math.min(100, Math.max(0, done / total * 100)) : 0; document.getElementById("progressBar").value = pct; document.getElementById("progressText").textContent = `${label} / 進捗 ${pct.toFixed(1)}%`; }
+function yieldToBrowser() { return new Promise(resolve => setTimeout(resolve, 0)); }
+function fmtDate(date) { if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "--"; const p = n => String(n).padStart(2, "0"); return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())} ${p(date.getHours())}:${p(date.getMinutes())}`; }
+function fmtNum(value, digits = 2) { return Number.isFinite(value) ? value.toFixed(digits) : "--"; }
+function classFor(value, good, bad) { if (!Number.isFinite(value)) return ""; if (value > good) return "good"; if (value < bad) return "bad"; return ""; }
+function escapeHtml(value) { return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch])); }
 
 function downloadJson() {
   if (!researchResults) return;
@@ -577,15 +619,11 @@ function downloadJson() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "research_v5_2_1_results.json";
+  a.download = "research_v5_3_results.json";
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 }
 </script>
 </body>
