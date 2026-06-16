@@ -13,14 +13,14 @@
     label{display:block;margin:8px 0 6px;color:var(--muted);font-weight:800}input,button{width:100%;min-height:48px;border-radius:10px;border:1px solid rgba(212,175,55,.38);background:#070a11;color:var(--text);padding:12px 14px;font-size:15px;margin-bottom:10px}button{border:0;background:linear-gradient(135deg,var(--gold),#9f7d1d);color:#111827;font-weight:950;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
     .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{background:rgba(5,7,13,.68);border:1px solid rgba(212,175,55,.22);border-radius:12px;padding:14px}.stat span{display:block;color:var(--muted);font-size:13px}.stat strong{display:block;font-size:22px;margin-top:4px;overflow-wrap:anywhere}
     .tableWrap{overflow-x:auto;margin-top:10px}table{width:100%;border-collapse:collapse;min-width:940px}th,td{border-bottom:1px solid rgba(148,163,184,.16);padding:9px 8px;text-align:left;font-size:13px;vertical-align:top}th{color:#fff;background:rgba(5,7,13,.92);position:sticky;top:0}.pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid rgba(212,175,55,.28);background:rgba(212,175,55,.12);color:#f7e6a5;margin:2px;white-space:nowrap}
-    .good{color:#bbf7d0;font-weight:900}.bad{color:#fecaca;font-weight:900}.warn{color:#fde68a;font-weight:900}.heat-high{background:rgba(34,197,94,.20);color:#d9fbe4;font-weight:900}.heat-mid{background:rgba(250,204,21,.16);color:#fff3b0;font-weight:900}.heat-low{background:rgba(239,68,68,.17);color:#ffd2d2;font-weight:900}
+    .good{color:#bbf7d0;font-weight:900}.bad{color:#fecaca;font-weight:900}.warn{color:#fde68a;font-weight:900}.debug{white-space:pre-wrap;background:#05070d;border:1px solid rgba(212,175,55,.2);border-radius:12px;padding:12px;color:#cbd5e1;max-height:280px;overflow:auto}
     @media(max-width:760px){body{padding:12px}h1{font-size:25px}.card{padding:16px;border-radius:12px}.grid{grid-template-columns:1fr}table{min-width:880px}}
   </style>
 </head>
 <body>
   <main class="container">
-    <section class="hero"><h1>ScalpLayer Research v4.0</h1><p class="sub">Core Rule B「RSI&lt;30 + NY後半 + 陰線」を細分化し、実戦投入できる条件まで絞り込みます。</p></section>
-    <section class="card notice">入力はUSDJPY M1 CSVのみです。JSON読込はありません。Core Rule A/C/D/SELL Rule Aは今回は対象外で、Core Rule Bを主役に検証します。</section>
+    <section class="hero"><h1>ScalpLayer Research v4.0</h1><p class="sub">Core Rule B「RSI&lt;30 + NY後半 + 陰線」を細分化し、買い反発条件として使えるか検証します。</p></section>
+    <section class="card notice">入力はUSDJPY M1 CSVのみです。JSON読込はありません。まず分析完走を最優先し、エラーはDebug Consoleへ記録して処理を継続します。</section>
     <section class="card"><h2>1. CSV読み込み</h2><label for="csvFile">USDJPY M1 CSV</label><input id="csvFile" type="file" accept=".csv,text/csv"><button id="runBtn" onclick="runResearch()">Research v4.0 分析実行</button><div id="status" class="small">CSVを選択してください。</div></section>
     <section class="card"><h2>2. データ概要</h2><div id="summary" class="grid"><div class="stat"><span>読み込み本数</span><strong>--</strong></div><div class="stat"><span>期間</span><strong>--</strong></div><div class="stat"><span>欠損行数</span><strong>--</strong></div><div class="stat"><span>Core Rule B件数</span><strong>--</strong></div></div></section>
     <section class="card judgement"><h2>Final Judgement</h2><div id="finalJudgement"><strong>未判定</strong><br><span class="small">分析後に表示します。</span></div></section>
@@ -33,99 +33,108 @@
     <section class="card"><h2>9. Core Rule B派生ランキング</h2><div id="derivedRanking" class="tableWrap small">--</div></section>
     <section class="card"><h2>10. Walk Forward Test</h2><div id="walkForward" class="tableWrap small">--</div></section>
     <section class="card"><h2>11. Final Candidates</h2><div id="finalCandidates" class="tableWrap small">--</div></section>
-    <section class="card"><h2>12. research_v4_results.json 出力</h2><button id="downloadBtn" onclick="downloadJson()" disabled>research_v4_results.json をダウンロード</button></section>
+    <section class="card"><h2>12. Debug Console</h2><div id="debugStats" class="grid"></div><div id="debugLog" class="debug">待機中</div></section>
+    <section class="card"><h2>13. research_v4_results.json 出力</h2><button id="downloadBtn" onclick="downloadJson()" disabled>research_v4_results.json をダウンロード</button></section>
   </main>
 
   <script>
-    const PIP=100, RSI_PERIOD=14, EMA_PERIOD=20, BB_PERIOD=20;
+    const PIP=100, RSI_PERIOD=14, EMA_PERIOD=20, BB_PERIOD=20, MIN_REQUIRED_BARS=80;
     const EXIT_METHODS=[{name:"15分後",type:"time",minutes:15},{name:"30分後",type:"time",minutes:30},{name:"45分後",type:"time",minutes:45},{name:"60分後",type:"time",minutes:60},{name:"TP5 SL5",type:"fixed",tp:5,sl:5},{name:"TP8 SL5",type:"fixed",tp:8,sl:5},{name:"TP10 SL5",type:"fixed",tp:10,sl:5},{name:"TP12 SL6",type:"fixed",tp:12,sl:6}];
     const SPREADS=[0,1,2];
     let researchResults=null;
+    let debug={loadedRows:0,analyzedBars:0,coreRuleBCount:0,rsiCount:0,bbCount:0,errorCount:0,lastRun:"--",errors:[]};
 
     async function runResearch(){
+      resetDebug();
       const file=document.getElementById("csvFile").files[0];
       if(!file){alert("USDJPY M1 CSVを選択してください。");return;}
       document.getElementById("runBtn").disabled=true;document.getElementById("downloadBtn").disabled=true;
       try{
         setStatus("CSVを読み込み中...");
-        const text=await file.text();await breathe();
-        const parsed=parseCsvBars(text);
-        if(parsed.bars.length<120)throw new Error("分析に必要なM1データが不足しています。");
-        setStatus(`${parsed.bars.length.toLocaleString()}本を読み込みました。特徴量を計算中...`);
-        enrichBars(parsed.bars);await breathe();
-        const entries=buildEntries(parsed.bars).filter(isCoreRuleB);
+        const text=await file.text(); await breathe();
+        const parsed=safeStep("parseCsvBars",()=>parseCsvBars(text),{bars:[],loadedRows:0,missingRows:0});
+        debug.loadedRows=parsed.loadedRows;
+        updateDebug();
+        if(parsed.bars.length<MIN_REQUIRED_BARS)throw new Error(`有効バー数が不足しています。有効バー数=${parsed.bars.length} / 最小必要バー数=${MIN_REQUIRED_BARS}`);
+        setStatus(`有効バー数 ${parsed.bars.length.toLocaleString()} / 最小必要バー数 ${MIN_REQUIRED_BARS}。特徴量を計算中...`);
+        safeStep("enrichBars",()=>enrichBars(parsed.bars));
+        await breathe();
+        const allEntries=safeStep("buildEntries",()=>buildEntries(parsed.bars),[]);
+        const entries=allEntries.filter(e=>safeStep("isCoreRuleB",()=>isCoreRuleB(e),false,{index:e.index}));
+        debug.analyzedBars=allEntries.length; debug.coreRuleBCount=entries.length; updateDebug();
         setStatus(`${entries.length.toLocaleString()}件のCore Rule Bを細分化中...`);
         await breathe();
-        const coreRuleBBaseResult=evaluateSet("Core Rule B",entries,parsed.bars);
-        const rsiBreakdown=breakdown(entries,parsed.bars,e=>e.rsiBand,"RSI");
-        const candleSizeBreakdown=breakdown(entries,parsed.bars,e=>e.candleSize,"陰線サイズ");
-        const bbPositionBreakdown=breakdown(entries,parsed.bars,e=>e.bbBand,"BB位置");
+        const coreRuleBBaseResult=safeStep("evaluateSet(Core Rule B)",()=>evaluateSet("Core Rule B",entries,parsed.bars),emptyResult("Core Rule B"));
+        const rsiBreakdown=safeStep("rsiBreakdown",()=>breakdown(entries,parsed.bars,e=>e.rsiBand,"RSI"),[]);
+        const candleSizeBreakdown=safeStep("candleSizeBreakdown",()=>breakdown(entries,parsed.bars,e=>e.candleSize,"陰線サイズ"),[]);
+        const bbPositionBreakdown=safeStep("bbPositionBreakdown",()=>breakdown(entries,parsed.bars,e=>e.bbBand,"BB位置"),[]);
         const recentMoveBreakdown=[
-          ...breakdown(entries,parsed.bars,e=>`直近3本=${e.recent3Band}`,"直近3本"),
-          ...breakdown(entries,parsed.bars,e=>`直近5本=${e.recent5Band}`,"直近5本"),
-          ...breakdown(entries,parsed.bars,e=>`直近10本=${e.recent10Band}`,"直近10本")
+          ...safeStep("recent3Breakdown",()=>breakdown(entries,parsed.bars,e=>`直近3本=${e.recent3Band}`,"直近3本"),[]),
+          ...safeStep("recent5Breakdown",()=>breakdown(entries,parsed.bars,e=>`直近5本=${e.recent5Band}`,"直近5本"),[]),
+          ...safeStep("recent10Breakdown",()=>breakdown(entries,parsed.bars,e=>`直近10本=${e.recent10Band}`,"直近10本"),[])
         ];
-        const nyLateBreakdown=breakdown(entries,parsed.bars,e=>e.nyLatePart,"NY後半内");
-        const derivedRuleRanking=buildDerivedRanking(entries,parsed.bars);
-        const walkForwardResults=buildWalkForward(derivedRuleRanking,entries,parsed.bars);
-        const finalCandidates=buildFinalCandidates(derivedRuleRanking,walkForwardResults);
-        const finalJudgement=buildFinalJudgement(finalCandidates);
+        const nyLateBreakdown=safeStep("nyLateBreakdown",()=>breakdown(entries,parsed.bars,e=>e.nyLatePart,"NY後半内"),[]);
+        const derivedRuleRanking=safeStep("buildDerivedRanking",()=>buildDerivedRanking(entries,parsed.bars),[]);
+        const walkForwardResults=safeStep("buildWalkForward",()=>buildWalkForward(derivedRuleRanking,entries,parsed.bars),[]);
+        const finalCandidates=safeStep("buildFinalCandidates",()=>buildFinalCandidates(derivedRuleRanking,walkForwardResults),[]);
+        const finalJudgement=safeStep("buildFinalJudgement",()=>buildFinalJudgement(finalCandidates),{rank:"D",label:"未判定",reason:"分析中にエラーがありました。Debug Consoleを確認してください。"});
         const warnings=buildWarnings(finalCandidates,walkForwardResults);
-        researchResults={meta:{appVersion:"research-v4.0",symbol:"USDJPY",timeframe:"M1",sourceFileName:file.name,generatedAt:new Date().toISOString(),loadedRows:parsed.loadedRows,validBars:parsed.bars.length,missingRows:parsed.missingRows,startTime:formatDateTime(parsed.bars[0].time),endTime:formatDateTime(parsed.bars[parsed.bars.length-1].time),coreRuleBCount:entries.length},coreRuleBBaseResult,rsiBreakdown,candleSizeBreakdown,bbPositionBreakdown,recentMoveBreakdown,nyLateBreakdown,derivedRuleRanking,walkForwardResults,finalCandidates,finalJudgement,warnings};
+        researchResults={meta:{appVersion:"research-v4.0",symbol:"USDJPY",timeframe:"M1",sourceFileName:file.name,generatedAt:new Date().toISOString(),loadedRows:parsed.loadedRows,validBars:parsed.bars.length,missingRows:parsed.missingRows,startTime:formatDateTime(parsed.bars[0].time),endTime:formatDateTime(parsed.bars[parsed.bars.length-1].time),coreRuleBCount:entries.length,minRequiredBars:MIN_REQUIRED_BARS},coreRuleBBaseResult,rsiBreakdown,candleSizeBreakdown,bbPositionBreakdown,recentMoveBreakdown,nyLateBreakdown,derivedRuleRanking,walkForwardResults,finalCandidates,finalJudgement,warnings,debug};
         renderAll(researchResults);
         document.getElementById("downloadBtn").disabled=false;
-        setStatus("分析完了。research_v4_results.jsonを出力できます。");
-      }catch(e){console.error(e);setStatus("エラー："+e.message);}
-      finally{document.getElementById("runBtn").disabled=false;}
+        setStatus(debug.errorCount?`分析完了。ただしエラー${debug.errorCount}件。Debug Consoleを確認してください。`:"分析完了。research_v4_results.jsonを出力できます。");
+      }catch(e){
+        logError("runResearch",e,{index:"--"});
+        setStatus(`エラー発生箇所：runResearch / エラー内容：${e.message}`);
+      }finally{
+        debug.lastRun=new Date().toLocaleString(); updateDebug(); document.getElementById("runBtn").disabled=false;
+      }
     }
 
-    function isCoreRuleB(e){return e.bar.rsi<30&&e.bar.session==="NY後半"&&e.bar.candleType==="陰線"}
-    function buildEntries(bars){const out=[];for(let i=30;i<bars.length-60;i++){const bar=bars[i];if(!Number.isFinite(bar.rsi)||bar.bbPosition==="BB不足")continue;out.push({index:i,bar,price:bar.close,rsiBand:rsiBand(bar.rsi),candleSize:candleSize(bar),bbBand:bbBand(bar),recent3Band:moveBand(bar.recent3),recent5Band:moveBand(bar.recent5),recent10Band:moveBand(bar.recent10),nyLatePart:nyLatePart(bar.time),features:[]})}return out}
+    function isCoreRuleB(e){return e&&e.bar&&Number.isFinite(e.bar.rsi)&&e.bar.rsi<30&&e.bar.session==="NY後半"&&e.bar.candleType==="陰線"}
+
+    function buildEntries(bars){
+      const out=[];
+      for(let i=30;i<bars.length-60;i++){
+        const bar=bars[i];
+        if(!hasClose(bar)||!Number.isFinite(bar.rsi)||bar.bbPosition==="BB不足")continue;
+        out.push({index:i,bar,price:bar.close,rsiBand:rsiBand(bar.rsi),candleSize:candleSize(bar),bbBand:bbBand(bar),recent3Band:moveBand(bar.recent3),recent5Band:moveBand(bar.recent5),recent10Band:moveBand(bar.recent10),nyLatePart:nyLatePart(bar.time),features:[]});
+      }
+      return out;
+    }
 
     function evaluateSet(name,entries,bars){
-      const exitRows=EXIT_METHODS.flatMap(method=>SPREADS.map(spread=>{
-        const trades=entries.map(e=>simulateExit(bars,e.index,method,spread));
-        return {conditionName:name,exitMethod:method.name,spread,...metricsFromTrades(trades)};
-      })).sort(rankExit);
+      const exitRows=[];
+      EXIT_METHODS.forEach(method=>SPREADS.forEach(spread=>{
+        const trades=[];
+        entries.forEach(e=>{
+          const trade=safeStep("simulateExit",()=>simulateExit(bars,e.index,method,spread),null,{index:e.index});
+          if(trade)trades.push(trade);
+        });
+        exitRows.push({conditionName:name,exitMethod:method.name,spread,...metricsFromTrades(trades)});
+      }));
+      exitRows.sort(rankExit);
       const best=exitRows[0]||emptyMetric();
-      return {conditionName:name,count:best.count,bestExit:best.exitMethod,spread:best.spread,winRate:best.winRate,pf:best.pf,expectancy:best.expectancy,expectancySpread2:best.spread===2?best.expectancy:null,totalPips:best.totalPips,maxLosingStreak:best.maxLosingStreak,maxDrawdown:best.maxDrawdown,recommendedExit:best.exitMethod,adoption:judgeAdoption(best),exitRows};
+      return {conditionName:name,count:best.count,bestExit:best.exitMethod||"--",spread:best.spread??"--",winRate:best.winRate,pf:best.pf,expectancy:best.expectancy,expectancySpread2:best.spread===2?best.expectancy:null,totalPips:best.totalPips,maxLosingStreak:best.maxLosingStreak,maxDrawdown:best.maxDrawdown,recommendedExit:best.exitMethod||"--",adoption:judgeAdoption(best),exitRows};
     }
 
     function breakdown(entries,bars,keyFn,type){
-      const keys=[...new Set(entries.map(keyFn).filter(Boolean))];
-      return keys.map(key=>evaluateSet(`${type}: ${key}`,entries.filter(e=>keyFn(e)===key),bars)).sort(rankCondition);
+      const keys=[...new Set(entries.map(e=>safeStep(`${type} key`,()=>keyFn(e),null,{index:e.index})).filter(Boolean))];
+      return keys.map(key=>evaluateSet(`${type}: ${key}`,entries.filter(e=>safeStep(`${type} filter`,()=>keyFn(e)===key,false,{index:e.index})),bars)).sort(rankCondition);
     }
 
     function buildDerivedRanking(entries,bars){
       const derived=[];
-      const featureDefs=[
-        ["RSI",e=>e.rsiBand],
-        ["陰線",e=>e.candleSize],
-        ["BB",e=>e.bbBand],
-        ["直近3",e=>`直近3=${e.recent3Band}`],
-        ["直近5",e=>`直近5=${e.recent5Band}`],
-        ["直近10",e=>`直近10=${e.recent10Band}`],
-        ["NY内",e=>e.nyLatePart]
-      ];
-      const labels=featureDefs.map(([name,fn])=>[name,[...new Set(entries.map(fn).filter(Boolean))],fn]);
-      for(let i=0;i<labels.length-1;i++){
-        for(let j=i+1;j<labels.length;j++){
-          labels[i][1].forEach(a=>labels[j][1].forEach(b=>{
-            const rows=entries.filter(e=>labels[i][2](e)===a&&labels[j][2](e)===b);
-            if(rows.length>=20)derived.push({...evaluateSet(`${a} + ${b}`,rows,bars),conditions:[a,b]});
-          }));
-        }
-      }
-      for(let i=0;i<labels.length-2;i++){
-        for(let j=i+1;j<labels.length-1;j++){
-          for(let k=j+1;k<labels.length;k++){
-            labels[i][1].forEach(a=>labels[j][1].forEach(b=>labels[k][1].forEach(c=>{
-              const rows=entries.filter(e=>labels[i][2](e)===a&&labels[j][2](e)===b&&labels[k][2](e)===c);
-              if(rows.length>=20)derived.push({...evaluateSet(`${a} + ${b} + ${c}`,rows,bars),conditions:[a,b,c]});
-            })));
-          }
-        }
-      }
+      const defs=[["RSI",e=>e.rsiBand],["陰線",e=>e.candleSize],["BB",e=>e.bbBand],["直近3",e=>`直近3=${e.recent3Band}`],["直近5",e=>`直近5=${e.recent5Band}`],["直近10",e=>`直近10=${e.recent10Band}`],["NY内",e=>e.nyLatePart]];
+      const labels=defs.map(([n,fn])=>[n,[...new Set(entries.map(e=>safeStep(`${n} label`,()=>fn(e),null,{index:e.index})).filter(Boolean))],fn]);
+      for(let i=0;i<labels.length-1;i++)for(let j=i+1;j<labels.length;j++)labels[i][1].forEach(a=>labels[j][1].forEach(b=>{
+        const rows=entries.filter(e=>safeStep("derived2",()=>labels[i][2](e)===a&&labels[j][2](e)===b,false,{index:e.index}));
+        if(rows.length>=20)derived.push({...evaluateSet(`${a} + ${b}`,rows,bars),conditions:[a,b]});
+      }));
+      for(let i=0;i<labels.length-2;i++)for(let j=i+1;j<labels.length-1;j++)for(let k=j+1;k<labels.length;k++)labels[i][1].forEach(a=>labels[j][1].forEach(b=>labels[k][1].forEach(c=>{
+        const rows=entries.filter(e=>safeStep("derived3",()=>labels[i][2](e)===a&&labels[j][2](e)===b&&labels[k][2](e)===c,false,{index:e.index}));
+        if(rows.length>=20)derived.push({...evaluateSet(`${a} + ${b} + ${c}`,rows,bars),conditions:[a,b,c]});
+      })));
       return derived.sort(rankCondition).slice(0,80).map((r,i)=>({rank:i+1,...r}));
     }
 
@@ -159,26 +168,71 @@
     }
 
     function buildWarnings(candidates,wf){const out=[];candidates.forEach(c=>{if(c.count<50)out.push(`${c.conditionName}: 件数${c.count}で少なめです。`);if(c.walkForward&&c.walkForward.testCount<30)out.push(`${c.conditionName}: 後半件数30未満です。`)});return out}
-
     function conditionMatches(e,c){return [e.rsiBand,e.candleSize,e.bbBand,`直近3=${e.recent3Band}`,`直近5=${e.recent5Band}`,`直近10=${e.recent10Band}`,e.nyLatePart].includes(c)}
-    function simulateExit(bars,index,method,spread){const entry=bars[index].close;let p=0,hold=30;if(method.type==="time"){hold=method.minutes;p=(bars[Math.min(index+hold,bars.length-1)].close-entry)*PIP}else{for(let m=1;m<=60&&index+m<bars.length;m++){const b=bars[index+m],fav=(b.high-entry)*PIP,adv=(b.low-entry)*PIP;if(adv<=-method.sl){p=-method.sl;hold=m;break}if(fav>=method.tp){p=method.tp;hold=m;break}if(m===60){p=(b.close-entry)*PIP;hold=m}}}return{pips:round(p-spread,2),hold}}
-    function metricsFromTrades(trades){const rows=trades.filter(t=>Number.isFinite(t.pips)),wins=rows.filter(t=>t.pips>0),losses=rows.filter(t=>t.pips<0),gp=sum(wins.map(t=>t.pips)),gl=Math.abs(sum(losses.map(t=>t.pips))),total=sum(rows.map(t=>t.pips));let eq=0,peak=0,dd=0,ls=0,maxLs=0;rows.forEach(t=>{eq+=t.pips;peak=Math.max(peak,eq);dd=Math.max(dd,peak-eq);if(t.pips<0){ls++;maxLs=Math.max(maxLs,ls)}else if(t.pips>0)ls=0});return{count:rows.length,winRate:rows.length?round(wins.length/rows.length*100,1):0,pf:gl>0?round(gp/gl,2):gp>0?999:0,expectancy:rows.length?round(total/rows.length,2):0,totalPips:round(total,1),maxLosingStreak:maxLs,maxDrawdown:round(dd,1),avgHold:rows.length?round(sum(rows.map(t=>t.hold))/rows.length,1):0}}
+
+    function simulateExit(bars,index,method,spread){
+      if(!Array.isArray(bars)||!bars[index]||!hasClose(bars[index]))throw new Error("entry bar close missing");
+      const entry=bars[index].close; let p=0,hold=method.minutes||30;
+      if(method.type==="time"){
+        const target=bars[index+method.minutes];
+        if(!hasClose(target))throw new Error(`future close missing at ${index+method.minutes}`);
+        p=(target.close-entry)*PIP;
+      }else{
+        for(let m=1;m<=60;m++){
+          const b=bars[index+m];
+          if(!b||!Number.isFinite(b.high)||!Number.isFinite(b.low)||!hasClose(b))continue;
+          const fav=(b.high-entry)*PIP, adv=(b.low-entry)*PIP;
+          if(adv<=-method.sl){p=-method.sl;hold=m;break}
+          if(fav>=method.tp){p=method.tp;hold=m;break}
+          if(m===60){p=(b.close-entry)*PIP;hold=m}
+        }
+      }
+      return {pips:round(p-spread,2),hold};
+    }
+
+    function metricsFromTrades(trades){const rows=trades.filter(t=>t&&Number.isFinite(t.pips)),wins=rows.filter(t=>t.pips>0),losses=rows.filter(t=>t.pips<0),gp=sum(wins.map(t=>t.pips)),gl=Math.abs(sum(losses.map(t=>t.pips))),total=sum(rows.map(t=>t.pips));let eq=0,peak=0,dd=0,ls=0,maxLs=0;rows.forEach(t=>{eq+=t.pips;peak=Math.max(peak,eq);dd=Math.max(dd,peak-eq);if(t.pips<0){ls++;maxLs=Math.max(maxLs,ls)}else if(t.pips>0)ls=0});return{count:rows.length,winRate:rows.length?round(wins.length/rows.length*100,1):0,pf:gl>0?round(gp/gl,2):gp>0?999:0,expectancy:rows.length?round(total/rows.length,2):0,totalPips:round(total,1),maxLosingStreak:maxLs,maxDrawdown:round(dd,1),avgHold:rows.length?round(sum(rows.map(t=>t.hold))/rows.length,1):0}}
     function rankExit(a,b){return scoreExit(b)-scoreExit(a)}function scoreExit(r){return(r.expectancy*35)+(Math.min(r.pf,10)*12)+(Math.log(Math.max(r.count,1))*8)-(r.maxLosingStreak*3)-(r.maxDrawdown*1.2)+(r.count>=30?10:0)}function rankCondition(a,b){return scoreExit(b)-scoreExit(a)}function judgeAdoption(r){if(r.count>=50&&r.pf>=1.3&&r.expectancy>0)return"A：本体候補";if(r.count>=30&&r.expectancy>0)return"B：追加検証";if(r.expectancy>0)return"C：弱い";return"D：不採用"}
 
-    function renderAll(d){const m=d.meta;document.getElementById("summary").innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${m.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>期間</span><strong>${escapeHtml(m.startTime)}<br>${escapeHtml(m.endTime)}</strong></div><div class="stat"><span>欠損行数</span><strong>${m.missingRows.toLocaleString()}</strong></div><div class="stat"><span>Core Rule B件数</span><strong>${m.coreRuleBCount.toLocaleString()}</strong></div>`;document.getElementById("finalJudgement").innerHTML=`<strong>${d.finalJudgement.rank}：${escapeHtml(d.finalJudgement.label)}</strong><br><span class="small">${escapeHtml(d.finalJudgement.reason)}</span>`;renderResult("baseResult",[d.coreRuleBBaseResult]);renderResult("rsiBreakdown",d.rsiBreakdown);renderResult("candleBreakdown",d.candleSizeBreakdown);renderResult("bbBreakdown",d.bbPositionBreakdown);renderResult("recentBreakdown",d.recentMoveBreakdown);renderResult("nyLateBreakdown",d.nyLateBreakdown);renderDerived(d.derivedRuleRanking);renderWalkForward(d.walkForwardResults);renderFinalCandidates(d.finalCandidates)}
-    function renderResult(id,rows){document.getElementById(id).innerHTML=tableHtml(rows,["条件名","件数","勝率","PF","期待値","総pips","最大連敗","最大DD","推奨決済","採用判定"],r=>[r.conditionName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.totalPips),r.maxLosingStreak,pips(-r.maxDrawdown),r.recommendedExit,r.adoption],false)}
-    function renderDerived(rows){document.getElementById("derivedRanking").innerHTML=tableHtml(rows.slice(0,50),["順位","条件名","件数","勝率","PF","期待値","spread2後","総pips","最大連敗","最大DD","推奨決済","採用判定"],r=>[r.rank,r.conditionName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.expectancy-2),pips(r.totalPips),r.maxLosingStreak,pips(-r.maxDrawdown),r.recommendedExit,r.adoption],false)}
-    function renderWalkForward(rows){document.getElementById("walkForward").innerHTML=tableHtml(rows,["条件名","前半件数","後半件数","前半PF","後半PF","前半期待値","後半期待値","劣化率","判定"],r=>[r.conditionName,r.trainCount,r.testCount,fmt(r.trainPF),fmt(r.testPF),pips(r.trainExpectancy),pips(r.testExpectancy),`${fmt(r.degradationRate)}%`,r.judgement],false)}
-    function renderFinalCandidates(rows){document.getElementById("finalCandidates").innerHTML=tableHtml(rows,["順位","条件名","件数","PF","期待値","推奨決済","Walk Forward","採用"],r=>[r.rank,r.conditionName,r.count,fmt(r.pf),pips(r.expectancy),r.recommendedExit,r.walkForward?`${r.walkForward.judgement} / 後半PF ${fmt(r.walkForward.testPF)}`:"--",r.finalAdoption],false)}
-    function downloadJson(){if(!researchResults)return;const blob=new Blob([JSON.stringify(researchResults,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="research_v4_results.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+    function parseCsvBars(text){
+      const rows=parseCsv(text).filter(r=>r.some(c=>String(c).trim()!==""));
+      if(!rows.length)return{bars:[],loadedRows:0,missingRows:0};
+      const headers=rows[0].map(h=>normalizeHeader(h));
+      const hasHeader=headers.some(h=>["datetime","time","date","日時"].includes(h))||headers.includes("close")||headers.includes("終値");
+      const body=hasHeader?rows.slice(1):rows;
+      const idx=hasHeader?{time:findHeader(headers,["日時","datetime","time","date"]),open:findHeader(headers,["始値","open"]),high:findHeader(headers,["高値","high"]),low:findHeader(headers,["安値","low"]),close:findHeader(headers,["終値","close"])}:{time:0,open:1,high:2,low:3,close:4};
+      let missingRows=0;
+      const bars=body.map((row,sourceIndex)=>{const b={sourceIndex,time:parseDate(row[idx.time]),open:toNumber(row[idx.open]),high:toNumber(row[idx.high]),low:toNumber(row[idx.low]),close:toNumber(row[idx.close])};if(!b.time||![b.open,b.high,b.low,b.close].every(Number.isFinite))missingRows++;return b}).filter(b=>b.time&&[b.open,b.high,b.low,b.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time).map((b,i)=>({...b,index:i}));
+      return{bars,loadedRows:body.length,missingRows};
+    }
 
-    function parseCsvBars(text){const rows=parseCsv(text).filter(r=>r.some(c=>String(c).trim()!==""));const headers=rows[0].map(h=>normalizeHeader(h));const hasHeader=headers.some(h=>["datetime","time","date","日時"].includes(h))||headers.includes("close")||headers.includes("終値");const body=hasHeader?rows.slice(1):rows;const idx=hasHeader?{time:findHeader(headers,["日時","datetime","time","date"]),open:findHeader(headers,["始値","open"]),high:findHeader(headers,["高値","high"]),low:findHeader(headers,["安値","low"]),close:findHeader(headers,["終値","close"])}:{time:0,open:1,high:2,low:3,close:4};let missingRows=0;const bars=body.map((row,sourceIndex)=>{const b={sourceIndex,time:parseDate(row[idx.time]),open:toNumber(row[idx.open]),high:toNumber(row[idx.high]),low:toNumber(row[idx.low]),close:toNumber(row[idx.close])};if(!b.time||![b.open,b.high,b.low,b.close].every(Number.isFinite))missingRows++;return b}).filter(b=>b.time&&[b.open,b.high,b.low,b.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time).map((b,i)=>({...b,index:i}));return{bars,loadedRows:body.length,missingRows}}
-    function enrichBars(bars){let ema=bars[0].close;const alpha=2/(EMA_PERIOD+1);let avgGain=0,avgLoss=0;bars.forEach((bar,i)=>{if(i===0)bar.ema20=bar.close;else{ema=bar.close*alpha+ema*(1-alpha);bar.ema20=ema}if(i>0){const diff=bar.close-bars[i-1].close,gain=Math.max(0,diff),loss=Math.max(0,-diff);if(i<=RSI_PERIOD){avgGain+=gain;avgLoss+=loss;if(i===RSI_PERIOD){avgGain/=RSI_PERIOD;avgLoss/=RSI_PERIOD;bar.rsi=calcRsi(avgGain,avgLoss)}}else{avgGain=(avgGain*(RSI_PERIOD-1)+gain)/RSI_PERIOD;avgLoss=(avgLoss*(RSI_PERIOD-1)+loss)/RSI_PERIOD;bar.rsi=calcRsi(avgGain,avgLoss)}}const s=bars.slice(Math.max(0,i-BB_PERIOD+1),i+1);if(s.length>=BB_PERIOD){const mid=average(s.map(b=>b.close)),sd=Math.sqrt(average(s.map(b=>Math.pow(b.close-mid,2))));bar.bbMid=mid;bar.bbUpper=mid+sd*2;bar.bbLower=mid-sd*2;bar.bbPosition=classifyBb(bar)}else bar.bbPosition="BB不足";bar.session=getSession(bar.time);bar.recent3=recentPips(bars,i,3);bar.recent5=recentPips(bars,i,5);bar.recent10=recentPips(bars,i,10);bar.candleType=bar.close>=bar.open?"陽線":"陰線"})}
-    function rsiBand(v){if(v<20)return"RSI<20";if(v<25)return"RSI20〜25";if(v<30)return"RSI25〜30";if(v<35)return"RSI30〜35";return"RSI35以上"}function candleSize(e){const p=Math.abs((e.bar.close-e.bar.open)*PIP);if(p<1)return"小陰線";if(p<3)return"中陰線";return"大陰線"}function bbBand(e){const b=e.bar;if(b.close<b.bbLower)return"下バンド外";const near=(b.bbUpper-b.bbLower)*.12;if(b.close-b.bbLower<=near)return"下バンド付近";if(Math.abs(b.close-b.bbMid)<=near)return"中央付近";if(b.close<b.bbMid)return"中央より下";return"中央より上"}function moveBand(v){if(v<=-12)return"-12以下";if(v<=-8)return"-12〜-8";if(v<=-4)return"-8〜-4";if(v<0)return"-4〜0";return"0以上"}function nyLatePart(d){const h=d.getHours(),m=d.getMinutes();const t=h*60+m;if(t<60)return"NY後半前半";if(t<120)return"NY後半中盤";return"NY後半終盤"}
-    function classifyBb(bar){const range=bar.bbUpper-bar.bbLower,near=range*.12;if(bar.close>bar.bbUpper)return"上バンド超え";if(bar.bbUpper-bar.close<=near)return"上バンド付近";if(bar.close<bar.bbLower)return"下バンド割れ";if(bar.close-bar.bbLower<=near)return"下バンド付近";if(Math.abs(bar.close-bar.bbMid)<=near)return"ミドル付近";return bar.close>bar.bbMid?"ミドル上":"ミドル下"}function getSession(date){const h=date.getHours();if(h>=6&&h<=14)return"東京";if(h>=15&&h<=17)return"ロンドン前半";if(h>=18&&h<=20)return"ロンドン後半";if(h>=21&&h<=23)return"NY前半";if(h>=0&&h<=2)return"NY後半";return"深夜"}function recentPips(bars,i,n){return i>=n?round((bars[i].close-bars[i-n].close)*PIP,2):0}function calcRsi(gain,loss){if(loss===0)return 100;const rs=gain/loss;return round(100-100/(1+rs),1)}
+    function enrichBars(bars){
+      let ema=bars[0].close; const alpha=2/(EMA_PERIOD+1); let avgGain=0,avgLoss=0;
+      for(let i=0;i<bars.length;i++){
+        const bar=bars[i]; if(!hasClose(bar))continue;
+        try{
+          if(i===0)bar.ema20=bar.close; else{ema=bar.close*alpha+ema*(1-alpha);bar.ema20=ema}
+          if(i>0&&hasClose(bars[i-1])){const diff=bar.close-bars[i-1].close,gain=Math.max(0,diff),loss=Math.max(0,-diff);if(i<=RSI_PERIOD){avgGain+=gain;avgLoss+=loss;if(i===RSI_PERIOD){avgGain/=RSI_PERIOD;avgLoss/=RSI_PERIOD;bar.rsi=calcRsi(avgGain,avgLoss);debug.rsiCount++}}else{avgGain=(avgGain*(RSI_PERIOD-1)+gain)/RSI_PERIOD;avgLoss=(avgLoss*(RSI_PERIOD-1)+loss)/RSI_PERIOD;bar.rsi=calcRsi(avgGain,avgLoss);debug.rsiCount++}}
+          if(i>=BB_PERIOD-1){const s=bars.slice(i-BB_PERIOD+1,i+1).filter(hasClose);if(s.length===BB_PERIOD){const mid=average(s.map(b=>b.close)),sd=Math.sqrt(average(s.map(b=>Math.pow(b.close-mid,2))));bar.bbMid=mid;bar.bbUpper=mid+sd*2;bar.bbLower=mid-sd*2;bar.bbPosition=classifyBb(bar);debug.bbCount++}else bar.bbPosition="BB不足"}else bar.bbPosition="BB不足";
+          bar.session=getSession(bar.time);bar.recent3=i>=3&&hasClose(bars[i-3])?recentPips(bars,i,3):0;bar.recent5=i>=5&&hasClose(bars[i-5])?recentPips(bars,i,5):0;bar.recent10=i>=10&&hasClose(bars[i-10])?recentPips(bars,i,10):0;bar.candleType=bar.close>=bar.open?"陽線":"陰線";
+        }catch(e){logError("enrichBars",e,{index:i})}
+      }
+    }
+
+    function rsiBand(v){if(v<20)return"RSI<20";if(v<25)return"RSI20〜25";if(v<30)return"RSI25〜30";if(v<35)return"RSI30〜35";return"RSI35以上"}function candleSize(e){const p=Math.abs((e.bar.close-e.bar.open)*PIP);if(p<1)return"小陰線";if(p<3)return"中陰線";return"大陰線"}function bbBand(e){const b=e.bar;if(b.close<b.bbLower)return"下バンド外";const near=(b.bbUpper-b.bbLower)*.12;if(b.close-b.bbLower<=near)return"下バンド付近";if(Math.abs(b.close-b.bbMid)<=near)return"中央付近";if(b.close<b.bbMid)return"中央より下";return"中央より上"}function moveBand(v){if(v<=-12)return"-12以下";if(v<=-8)return"-12〜-8";if(v<=-4)return"-8〜-4";if(v<0)return"-4〜0";return"0以上"}function nyLatePart(d){const h=d.getHours(),m=d.getMinutes(),t=h*60+m;if(t<60)return"NY後半前半";if(t<120)return"NY後半中盤";return"NY後半終盤"}
+    function classifyBb(bar){if(!bar||!Number.isFinite(bar.bbUpper)||!Number.isFinite(bar.bbLower)||!hasClose(bar))return"BB不足";const range=bar.bbUpper-bar.bbLower,near=range*.12;if(bar.close>bar.bbUpper)return"上バンド超え";if(bar.bbUpper-bar.close<=near)return"上バンド付近";if(bar.close<bar.bbLower)return"下バンド割れ";if(bar.close-bar.bbLower<=near)return"下バンド付近";if(Math.abs(bar.close-bar.bbMid)<=near)return"ミドル付近";return bar.close>bar.bbMid?"ミドル上":"ミドル下"}function getSession(date){const h=date.getHours();if(h>=6&&h<=14)return"東京";if(h>=15&&h<=17)return"ロンドン前半";if(h>=18&&h<=20)return"ロンドン後半";if(h>=21&&h<=23)return"NY前半";if(h>=0&&h<=2)return"NY後半";return"深夜"}function recentPips(bars,i,n){if(!hasClose(bars[i])||!hasClose(bars[i-n]))return 0;return round((bars[i].close-bars[i-n].close)*PIP,2)}function calcRsi(gain,loss){if(loss===0)return 100;const rs=gain/loss;return round(100-100/(1+rs),1)}
+
+    function renderAll(d){const m=d.meta;document.getElementById("summary").innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${m.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>期間</span><strong>${escapeHtml(m.startTime)}<br>${escapeHtml(m.endTime)}</strong></div><div class="stat"><span>欠損行数</span><strong>${m.missingRows.toLocaleString()}</strong></div><div class="stat"><span>Core Rule B件数</span><strong>${m.coreRuleBCount.toLocaleString()}</strong></div>`;document.getElementById("finalJudgement").innerHTML=`<strong>${d.finalJudgement.rank}：${escapeHtml(d.finalJudgement.label)}</strong><br><span class="small">${escapeHtml(d.finalJudgement.reason)}</span>`;renderResult("baseResult",[d.coreRuleBBaseResult]);renderResult("rsiBreakdown",d.rsiBreakdown);renderResult("candleBreakdown",d.candleSizeBreakdown);renderResult("bbBreakdown",d.bbPositionBreakdown);renderResult("recentBreakdown",d.recentMoveBreakdown);renderResult("nyLateBreakdown",d.nyLateBreakdown);renderDerived(d.derivedRuleRanking);renderWalkForward(d.walkForwardResults);renderFinalCandidates(d.finalCandidates);updateDebug()}
+    function renderResult(id,rows){document.getElementById(id).innerHTML=tableHtml(rows,["条件名","件数","勝率","PF","期待値","総pips","最大連敗","最大DD","推奨決済","採用判定"],r=>[r.conditionName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.totalPips),r.maxLosingStreak,pips(-r.maxDrawdown),r.recommendedExit,r.adoption],false)}function renderDerived(rows){document.getElementById("derivedRanking").innerHTML=tableHtml(rows.slice(0,50),["順位","条件名","件数","勝率","PF","期待値","spread2後","総pips","最大連敗","最大DD","推奨決済","採用判定"],r=>[r.rank,r.conditionName,r.count,pct(r.winRate),fmt(r.pf),pips(r.expectancy),pips(r.expectancy-2),pips(r.totalPips),r.maxLosingStreak,pips(-r.maxDrawdown),r.recommendedExit,r.adoption],false)}function renderWalkForward(rows){document.getElementById("walkForward").innerHTML=tableHtml(rows,["条件名","前半件数","後半件数","前半PF","後半PF","前半期待値","後半期待値","劣化率","判定"],r=>[r.conditionName,r.trainCount,r.testCount,fmt(r.trainPF),fmt(r.testPF),pips(r.trainExpectancy),pips(r.testExpectancy),`${fmt(r.degradationRate)}%`,r.judgement],false)}function renderFinalCandidates(rows){document.getElementById("finalCandidates").innerHTML=tableHtml(rows,["順位","条件名","件数","PF","期待値","推奨決済","Walk Forward","採用"],r=>[r.rank,r.conditionName,r.count,fmt(r.pf),pips(r.expectancy),r.recommendedExit,r.walkForward?`${r.walkForward.judgement} / 後半PF ${fmt(r.walkForward.testPF)}`:"--",r.finalAdoption],false)}
+    function downloadJson(){if(!researchResults)return;const blob=new Blob([JSON.stringify(researchResults,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="research_v4_results.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+    function tableHtml(rows,headers,mapper,trusted){if(!rows.length)return"該当データがありません。";return`<table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${mapper(r).map(c=>`<td>${trusted?c:escapeHtml(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
+
+    function safeStep(place,fn,fallback,meta={}){try{return fn()}catch(e){logError(place,e,meta);return fallback}}
+    function logError(place,e,meta={}){debug.errorCount++;const row={place,message:e&&e.message?e.message:String(e),index:meta.index??"--",time:new Date().toLocaleTimeString()};debug.errors.push(row);console.error("Research v4 error",row,e);updateDebug()}
+    function resetDebug(){debug={loadedRows:0,analyzedBars:0,coreRuleBCount:0,rsiCount:0,bbCount:0,errorCount:0,lastRun:"--",errors:[]};updateDebug()}
+    function updateDebug(){const s=document.getElementById("debugStats");if(s)s.innerHTML=`<div class="stat"><span>読み込み本数</span><strong>${debug.loadedRows.toLocaleString()}</strong></div><div class="stat"><span>分析対象本数</span><strong>${debug.analyzedBars.toLocaleString()}</strong></div><div class="stat"><span>Core Rule B検出件数</span><strong>${debug.coreRuleBCount.toLocaleString()}</strong></div><div class="stat"><span>RSI / BB / エラー</span><strong>${debug.rsiCount} / ${debug.bbCount} / ${debug.errorCount}</strong></div>`;const l=document.getElementById("debugLog");if(l)l.textContent=`最小必要バー数: ${MIN_REQUIRED_BARS}\n最終実行時間: ${debug.lastRun}\n`+(debug.errors.length?debug.errors.map(e=>`エラー発生箇所: ${e.place}\nエラー内容: ${e.message}\n対象index: ${e.index}\n時刻: ${e.time}\n---`).join("\n"):"エラーなし")}
+    function hasClose(b){return !!b&&Number.isFinite(Number(b.close))}
     function parseCsv(text){const rows=[];let row=[],cell="",quote=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(quote&&ch==='"'&&next==='"'){cell+='"';i++;continue}if(ch==='"'){quote=!quote;continue}if(!quote&&ch===","){row.push(cell);cell="";continue}if(!quote&&(ch==="\n"||ch==="\r")){if(ch==="\r"&&next==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";continue}cell+=ch}row.push(cell);rows.push(row);return rows}
-    function tableHtml(rows,headers,mapper,trusted){if(!rows.length)return"該当データがありません。";return`<table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${mapper(r).map(c=>`<td class="${String(c).includes("%")?heatClass(parseFloat(c)):""}">${trusted?c:escapeHtml(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
-    function heatClass(rate){if(!Number.isFinite(rate))return"";if(rate>=60)return"heat-high";if(rate<=45)return"heat-low";return"heat-mid"}function emptyMetric(){return{count:0,winRate:0,pf:0,expectancy:0,totalPips:0,maxLosingStreak:0,maxDrawdown:0,exitMethod:"--"}}function normalizeHeader(v){return String(v||"").trim().toLowerCase().replace(/\s+/g,"_")}function findHeader(headers,names){for(const name of names){const i=headers.indexOf(String(name).toLowerCase());if(i>=0)return i}return-1}function parseDate(value){const raw=String(value||"").trim().replace(/\./g,"-").replace("T"," ");const m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);if(m)return new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),Number(m[6]||0));const d=new Date(raw);return Number.isFinite(d.getTime())?d:null}function toNumber(v){const n=Number(String(v??"").replace(/,/g,"").trim());return Number.isFinite(n)?n:NaN}function average(a){return a.length?sum(a)/a.length:0}function sum(a){return a.reduce((x,y)=>x+Number(y||0),0)}function round(v,d=2){return Number(Number(v||0).toFixed(d))}function fmt(v){return Number.isFinite(Number(v))?Number(v).toLocaleString(undefined,{maximumFractionDigits:2}):"--"}function pct(v){return`${fmt(v)}%`}function pips(v){return`${Number(v)>=0?"+":""}${fmt(v)}pips`}function signed(v){return`${Number(v)>=0?"+":""}${fmt(v)}`}function formatDateTime(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`}function pad(v){return String(v).padStart(2,"0")}function setStatus(t){document.getElementById("status").textContent=t}function breathe(){return new Promise(r=>setTimeout(r,0))}function escapeHtml(v){return String(v??"").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]))}
+    function emptyMetric(){return{count:0,winRate:0,pf:0,expectancy:0,totalPips:0,maxLosingStreak:0,maxDrawdown:0,exitMethod:"--",spread:"--"}}function emptyResult(name){return{conditionName:name,count:0,winRate:0,pf:0,expectancy:0,totalPips:0,maxLosingStreak:0,maxDrawdown:0,recommendedExit:"--",adoption:"D：不採用",exitRows:[]}}function normalizeHeader(v){return String(v||"").trim().toLowerCase().replace(/\s+/g,"_")}function findHeader(headers,names){for(const name of names){const i=headers.indexOf(String(name).toLowerCase());if(i>=0)return i}return-1}function parseDate(value){const raw=String(value||"").trim().replace(/\./g,"-").replace("T"," ");const m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);if(m)return new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),Number(m[6]||0));const d=new Date(raw);return Number.isFinite(d.getTime())?d:null}function toNumber(v){const n=Number(String(v??"").replace(/,/g,"").trim());return Number.isFinite(n)?n:NaN}function average(a){return a.length?sum(a)/a.length:0}function sum(a){return a.reduce((x,y)=>x+Number(y||0),0)}function round(v,d=2){return Number(Number(v||0).toFixed(d))}function fmt(v){return Number.isFinite(Number(v))?Number(v).toLocaleString(undefined,{maximumFractionDigits:2}):"--"}function pct(v){return`${fmt(v)}%`}function pips(v){return`${Number(v)>=0?"+":""}${fmt(v)}pips`}function signed(v){return`${Number(v)>=0?"+":""}${fmt(v)}`}function formatDateTime(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`}function pad(v){return String(v).padStart(2,"0")}function setStatus(t){document.getElementById("status").textContent=t}function breathe(){return new Promise(r=>setTimeout(r,0))}function escapeHtml(v){return String(v??"").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]))}
   </script>
 </body>
 </html>
