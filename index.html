@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v6.3</title>
+  <title>ScalpLayer Research v7.0</title>
   <style>
     :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#263852;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b}
     *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07111f,#0b1423 44%,#07111f);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
@@ -21,15 +21,15 @@
 <body>
 <main>
   <section class="hero">
-    <h1>ScalpLayer Research v6.3</h1>
-    <p class="sub">Core Rule E/T/L/Nの入口を固定し、XM極み口座スプレッド0.8pips込みで最適エグジットを研究します。</p>
+    <h1>ScalpLayer Research v7.0</h1>
+    <p class="sub">Core Rule Eが未来でも通用するかを、Forward Test / Rolling Walk Forward / Monte Carlo / 資金曲線で検証します。</p>
   </section>
 
   <section class="card">
     <h2>1. CSV読み込み</h2>
     <input id="csvFile" type="file" accept=".csv,text/csv">
     <button id="loadBtn" type="button">CSVを読み込む</button>
-    <button id="runBtn" type="button" disabled>v6.3分析を実行</button>
+    <button id="runBtn" type="button" disabled>v7.0分析を実行</button>
     <p id="status" class="small">USDJPY M1 CSVを選択してください。</p>
     <div class="kpi">
       <div class="pill"><b>読み込み本数</b><span id="loadedRows">--</span></div>
@@ -40,48 +40,59 @@
   </section>
 
   <section class="card">
-    <h2>2. 研究条件</h2>
-    <p class="note">損益は全て <b>生pips - 0.8pips</b> で計算します。入口はCore Rule Eと、v6.2方式で抽出した東京版T・ロンドン版L・NY前半版Nの最良候補を固定します。</p>
+    <h2>2. 固定ルール</h2>
+    <p class="note">Core Rule E: <b>BUY / RSI&lt;25 / 直近3本&lt;=-10pips / NY後半前半 / 安値更新あり / 安値更新直後</b><br>決済: <b>+10到達後 -5戻し</b>。XM極み口座想定で、全損益から <b>0.8pips</b> を差し引きます。</p>
     <progress id="progressBar" value="0" max="100"></progress>
     <p id="progressText" class="small">待機中</p>
     <div class="kpi">
-      <div class="pill"><b>スプレッド</b><span>0.8pips</span></div>
-      <div class="pill"><b>対象ルール数</b><span id="ruleCount">--</span></div>
-      <div class="pill"><b>出口テスト数</b><span id="exitCount">--</span></div>
-      <div class="pill"><b>最良PF</b><span id="bestPf">--</span></div>
+      <div class="pill"><b>検出件数</b><span id="tradeCount">--</span></div>
+      <div class="pill"><b>PF</b><span id="basePf">--</span></div>
+      <div class="pill"><b>期待値</b><span id="baseExp">--</span></div>
+      <div class="pill"><b>最終判定</b><span id="judgementView">--</span></div>
     </div>
   </section>
 
-  <section class="card">
-    <h2>3. 最適出口ランキング</h2>
-    <div class="table-wrap"><table><thead><tr><th>順位</th><th>ルール名</th><th>利確/出口</th><th>損切</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th><th>平均保有</th></tr></thead><tbody id="rankingBody"><tr><td colspan="12" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
-  </section>
-
   <section class="grid">
     <section class="card">
-      <h2>4. MFE / MAE分析</h2>
-      <div class="table-wrap"><table><thead><tr><th>ルール</th><th>件数</th><th>MFE平均</th><th>MFE中央値</th><th>MFE最大</th><th>MAE平均</th><th>MAE中央値</th><th>MAE最大</th></tr></thead><tbody id="mfeBody"></tbody></table></div>
+      <h2>3. Forward Test</h2>
+      <div class="table-wrap"><table><thead><tr><th>区分</th><th>期間</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th></tr></thead><tbody id="forwardBody"></tbody></table></div>
     </section>
     <section class="card">
-      <h2>5. Walk Forward 70% / 30%</h2>
-      <div class="table-wrap"><table><thead><tr><th>候補</th><th>前半PF</th><th>後半PF</th><th>前半期待値</th><th>後半期待値</th><th>劣化率</th></tr></thead><tbody id="walkBody"></tbody></table></div>
+      <h2>4. Rolling Walk Forward</h2>
+      <div class="table-wrap"><table><thead><tr><th>学習</th><th>検証</th><th>検証件数</th><th>検証PF</th><th>検証期待値</th><th>判定</th></tr></thead><tbody id="rollingBody"></tbody></table></div>
     </section>
   </section>
 
   <section class="grid">
     <section class="card">
-      <h2>6. ScalpLayer実装案</h2>
-      <div id="planBox" class="small">分析結果から推奨利確・損切・トレーリング・時間決済を生成します。</div>
+      <h2>5. Monte Carlo 1000回</h2>
+      <div class="table-wrap"><table><thead><tr><th>項目</th><th>平均</th><th>中央値</th><th>最悪ケース</th><th>最高ケース</th></tr></thead><tbody id="mcBody"></tbody></table></div>
     </section>
     <section class="card">
-      <h2>7. JSON出力</h2>
-      <button id="downloadBtn" type="button" disabled>research_v6_3_results.json をダウンロード</button>
-      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv6.3の分析結果を確認できます。</p>
+      <h2>6. 破産確率 / 推奨ロット</h2>
+      <div class="table-wrap"><table><thead><tr><th>ロット</th><th>破産確率</th><th>想定最大DD</th><th>評価</th></tr></thead><tbody id="ruinBody"></tbody></table></div>
     </section>
   </section>
 
   <section class="card">
-    <h2>8. Debug Console</h2>
+    <h2>7. 資金曲線</h2>
+    <div class="table-wrap"><table><thead><tr><th>初期資金</th><th>0.01lot</th><th>0.02lot</th><th>0.03lot</th><th>0.05lot</th></tr></thead><tbody id="equityBody"></tbody></table></div>
+  </section>
+
+  <section class="grid">
+    <section class="card">
+      <h2>8. 将来期待値 / 今後1年予測</h2>
+      <div id="futureBox" class="small">分析実行後に表示します。</div>
+    </section>
+    <section class="card">
+      <h2>9. JSON出力</h2>
+      <button id="downloadBtn" type="button" disabled>research_v7_0_results.json をダウンロード</button>
+      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv7.0の分析結果を確認できます。</p>
+    </section>
+  </section>
+
+  <section class="card">
+    <h2>10. Debug Console</h2>
     <pre id="debugLog">Debug Consoleはここに表示されます。</pre>
   </section>
 </main>
@@ -103,310 +114,75 @@ document.getElementById("loadBtn").addEventListener("click", loadCsvOnly);
 document.getElementById("runBtn").addEventListener("click", runResearch);
 document.getElementById("downloadBtn").addEventListener("click", downloadJson);
 
-function createDebugState() { return { loadedRows: 0, validBars: 0, rsiCount: 0, ruleCount: 0, exitCount: 0, errorCount: 0, lastRun: "--", errors: [] }; }
+function createDebugState(){return{loadedRows:0,validBars:0,rsiCount:0,tradeCount:0,errorCount:0,lastRun:"--",errors:[]}}
 
-async function loadCsvOnly() {
-  const file = document.getElementById("csvFile").files[0];
-  if (!file) { alert("USDJPY M1 CSVを選択してください。"); return; }
-  setStatus("CSVを読み込み中...");
-  setProgress("CSVを読み込み中", 0, 100);
-  researchResults = null;
-  document.getElementById("downloadBtn").disabled = true;
-  document.getElementById("runBtn").disabled = true;
-  debugState = createDebugState();
-  try {
-    const text = await file.text();
-    const parsed = parseCsvBars(text);
-    loadedState = { fileName: file.name, bars: parsed.bars, loadedRows: parsed.loadedRows, missingRows: parsed.missingRows, startTime: parsed.bars.length ? fmtDate(parsed.bars[0].time) : "--", endTime: parsed.bars.length ? fmtDate(parsed.bars[parsed.bars.length - 1].time) : "--" };
-    debugState.loadedRows = parsed.loadedRows;
-    debugState.validBars = parsed.bars.length;
-    updateLoadSummary();
-    updateDebugConsole();
-    setProgress("CSV読み込み完了", 100, 100);
-    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v6.3分析を実行できます。`);
-    document.getElementById("runBtn").disabled = !parsed.bars.length;
-  } catch (error) {
-    logError("loadCsvOnly", "--", error);
-    setStatus("CSV読み込みでエラーが発生しました。Debug Consoleを確認してください。");
-    updateDebugConsole();
-  }
+async function loadCsvOnly(){
+  const file=document.getElementById("csvFile").files[0];
+  if(!file){alert("USDJPY M1 CSVを選択してください。");return}
+  setStatus("CSVを読み込み中...");setProgress("CSVを読み込み中",0,100);researchResults=null;document.getElementById("downloadBtn").disabled=true;document.getElementById("runBtn").disabled=true;debugState=createDebugState();
+  try{const text=await file.text();const parsed=parseCsvBars(text);loadedState={fileName:file.name,bars:parsed.bars,loadedRows:parsed.loadedRows,missingRows:parsed.missingRows,startTime:parsed.bars.length?fmtDate(parsed.bars[0].time):"--",endTime:parsed.bars.length?fmtDate(parsed.bars[parsed.bars.length-1].time):"--"};debugState.loadedRows=parsed.loadedRows;debugState.validBars=parsed.bars.length;updateLoadSummary();updateDebugConsole();setProgress("CSV読み込み完了",100,100);setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v7.0分析を実行できます。`);document.getElementById("runBtn").disabled=!parsed.bars.length}catch(error){logError("loadCsvOnly","--",error);setStatus("CSV読み込みでエラーが発生しました。Debug Consoleを確認してください。");updateDebugConsole()}
 }
 
-async function runResearch() {
-  const bars = loadedState.bars;
-  if (!bars.length) { alert("先にCSVを読み込んでください。"); return; }
-  debugState = createDebugState();
-  debugState.loadedRows = loadedState.loadedRows;
-  debugState.validBars = bars.length;
-  debugState.lastRun = fmtDate(new Date());
-  document.getElementById("runBtn").disabled = true;
-  document.getElementById("downloadBtn").disabled = true;
-  clearTables();
-  try {
+async function runResearch(){
+  const bars=loadedState.bars;if(!bars.length){alert("先にCSVを読み込んでください。");return}
+  debugState=createDebugState();debugState.loadedRows=loadedState.loadedRows;debugState.validBars=bars.length;debugState.lastRun=fmtDate(new Date());document.getElementById("runBtn").disabled=true;document.getElementById("downloadBtn").disabled=true;clearTables();
+  try{
     await enrichBarsChunked(bars);
-    const entryRules = await buildEntryRules(bars);
-    const mfeMae = entryRules.map(rule => buildMfeMae(rule, bars));
-    const exitDefs = buildExitDefs();
-    const exitResults = [];
-    for (let ri = 0; ri < entryRules.length; ri++) {
-      const rule = entryRules[ri];
-      for (let ei = 0; ei < exitDefs.length; ei++) {
-        const def = exitDefs[ei];
-        const row = evaluateExit(rule, def, bars);
-        exitResults.push(row);
-        debugState.exitCount++;
-      }
-      setProgress(`出口検証中 ${ri + 1} / ${entryRules.length}`, ri + 1, entryRules.length || 1);
-      await yieldToBrowser();
-    }
-    const ranking = exitResults.slice().sort(resultSort);
-    const walkForward = buildWalkForward(ranking.slice(0, 10), bars.length);
-    const implementationPlan = buildImplementationPlan(ranking, walkForward);
-    researchResults = {
-      meta: { version: "research-v6.3", sourceFileName: loadedState.fileName, generatedAt: new Date().toISOString(), spreadPips: SPREAD, loadedRows: loadedState.loadedRows, validBars: bars.length },
-      entryRules: entryRules.map(stripEntries),
-      exitResults: exitResults.map(stripTrades),
-      ranking: ranking.slice(0, 50).map(stripTrades),
-      mfeMae,
-      walkForward,
-      implementationPlan,
-      debug: debugState
-    };
-    renderAll(researchResults);
-    document.getElementById("downloadBtn").disabled = false;
-    setProgress("分析完了", 100, 100);
-    setStatus("分析完了。research_v6_3_results.json を出力できます。");
-  } catch (error) {
-    logError("runResearch", "--", error);
-    setStatus("分析中にエラーが発生しました。Debug Consoleを確認してください。");
-  } finally {
-    document.getElementById("runBtn").disabled = false;
-    updateDebugConsole();
-  }
+    const trades=await buildTradesChunked(bars);
+    const base=calcMetrics(trades.map(t=>t.pips));
+    const forward=buildForwardTest(trades);
+    const rolling=buildRollingWalkForward(trades);
+    const monteCarlo=runMonteCarlo(trades.map(t=>t.pips),1000);
+    const streak=maxLosingStreak(trades.map(t=>t.pips));
+    const ruin=buildRuinTable(trades.map(t=>t.pips),monteCarlo);
+    const equity=buildEquityTable(trades.map(t=>t.pips));
+    const future=buildFutureProjection(trades,base,monteCarlo,streak);
+    const judgement=buildJudgement(forward,monteCarlo,base);
+    researchResults={meta:{version:"research-v7.0",sourceFileName:loadedState.fileName,generatedAt:new Date().toISOString(),spreadPips:SPREAD,loadedRows:loadedState.loadedRows,validBars:bars.length},fixedRule:{entry:"Core Rule E",exit:"+10到達後 -5戻し",spreadPips:SPREAD},baseMetrics:base,forwardTest:forward,rollingWalkForward:rolling,monteCarlo,losingStreak:{maxObserved:streak,projectedMax:future.projectedMaxLosingStreak},ruinProbability:ruin,equityCurves:equity,futureProjection:future,finalJudgement:judgement,debug:debugState};
+    renderAll(researchResults);document.getElementById("downloadBtn").disabled=false;setProgress("分析完了",100,100);setStatus("分析完了。research_v7_0_results.json を出力できます。")
+  }catch(error){logError("runResearch","--",error);setStatus("分析中にエラーが発生しました。Debug Consoleを確認してください。")}finally{document.getElementById("runBtn").disabled=false;updateDebugConsole()}
 }
 
-async function enrichBarsChunked(bars) {
-  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0;
-  for (let start = 1; start < bars.length; start += CHUNK_SIZE) {
-    const end = Math.min(bars.length, start + CHUNK_SIZE);
-    for (let i = start; i < end; i++) {
-      try {
-        const bar = bars[i], prev = bars[i - 1];
-        if (!validBar(bar) || !validBar(prev)) continue;
-        const diff = bar.close - prev.close;
-        const gain = Math.max(0, diff), loss = Math.max(0, -diff);
-        if (i <= 14) {
-          gainSum += gain; lossSum += loss;
-          if (i === 14) { avgGain = gainSum / 14; avgLoss = lossSum / 14; bar.rsi = calcRsi(avgGain, avgLoss); debugState.rsiCount++; }
-        } else if (avgGain != null && avgLoss != null) {
-          avgGain = ((avgGain * 13) + gain) / 14;
-          avgLoss = ((avgLoss * 13) + loss) / 14;
-          bar.rsi = calcRsi(avgGain, avgLoss);
-          debugState.rsiCount++;
-        }
-        bar.sessionPart = getSessionPart(bar.time);
-        bar.recent3 = calcRecentPips(bars, i, 3);
-        bar.lowBreak3 = isLowBreak(bars, i, 3);
-        bar.lowBreak5 = isLowBreak(bars, i, 5);
-        bar.lowBreak10 = isLowBreak(bars, i, 10);
-        bar.lowUpdate = bar.lowBreak3 || bar.lowBreak5 || bar.lowBreak10;
-      } catch (error) {
-        logError("enrichBarsChunked", i, error);
-      }
-    }
-    setProgress(`指標計算中 ${end.toLocaleString()} / ${bars.length.toLocaleString()}`, end, bars.length);
-    updateDebugConsole();
-    await yieldToBrowser();
-  }
+async function enrichBarsChunked(bars){
+  let avgGain=null,avgLoss=null,gainSum=0,lossSum=0;
+  for(let start=1;start<bars.length;start+=CHUNK_SIZE){const end=Math.min(bars.length,start+CHUNK_SIZE);for(let i=start;i<end;i++){try{const b=bars[i],p=bars[i-1];if(!validBar(b)||!validBar(p))continue;const diff=b.close-p.close,gain=Math.max(0,diff),loss=Math.max(0,-diff);if(i<=14){gainSum+=gain;lossSum+=loss;if(i===14){avgGain=gainSum/14;avgLoss=lossSum/14;b.rsi=calcRsi(avgGain,avgLoss);debugState.rsiCount++}}else if(avgGain!=null&&avgLoss!=null){avgGain=((avgGain*13)+gain)/14;avgLoss=((avgLoss*13)+loss)/14;b.rsi=calcRsi(avgGain,avgLoss);debugState.rsiCount++}b.sessionPart=getSessionPart(b.time);b.recent3=calcRecentPips(bars,i,3);b.lowUpdate=isLowBreak(bars,i,3)||isLowBreak(bars,i,5)||isLowBreak(bars,i,10)}catch(error){logError("enrichBarsChunked",i,error)}}setProgress(`指標計算中 ${end.toLocaleString()} / ${bars.length.toLocaleString()}`,end,bars.length);updateDebugConsole();await yieldToBrowser()}
 }
 
-async function buildEntryRules(bars) {
-  const rules = [];
-  rules.push(makeRule("Core Rule E", "NY後半前半", "RSI<25 / 直近3本<=-10 / 安値更新あり", b => b.sessionPart === "NY後半前半" && b.rsi < 25 && b.recent3 <= -10 && b.lowUpdate, bars));
-  const discovered = await discoverSisterRules(bars);
-  rules.push(...discovered);
-  debugState.ruleCount = rules.length;
-  return rules.filter(r => r.entries.length > 0);
+async function buildTradesChunked(bars){
+  const trades=[];const endIndex=Math.max(MIN_REQUIRED_BARS,bars.length-MAX_HOLD-1);
+  for(let start=MIN_REQUIRED_BARS;start<endIndex;start+=CHUNK_SIZE){const end=Math.min(endIndex,start+CHUNK_SIZE);for(let i=start;i<end;i++){try{const b=bars[i];if(!validBar(b)||!Number.isFinite(b.rsi)||!Number.isFinite(b.recent3))continue;if(b.rsi<25&&b.recent3<=-10&&b.sessionPart==="NY後半前半"&&b.lowUpdate){const x=simulateTrail(bars,i,10,5);if(x)trades.push({index:i,datetime:fmtDate(b.time),date:b.time,pips:x.pips-SPREAD})}}catch(error){logError("buildTradesChunked",i,error)}}debugState.tradeCount=trades.length;setProgress(`Core Rule E検出中 ${end.toLocaleString()} / ${endIndex.toLocaleString()}`,end,endIndex);await yieldToBrowser()}
+  return trades;
 }
 
-async function discoverSisterRules(bars) {
-  const groups = [
-    { name: "Core Rule T", sessions: ["東京前半", "東京後半"] },
-    { name: "Core Rule L", sessions: ["ロンドン前半", "ロンドン後半"] },
-    { name: "Core Rule N", sessions: ["NY前半前半", "NY前半後半"] }
-  ];
-  const rsiSet = [15, 20, 25, 30], dropSet = [-6, -8, -10, -12], lowSet = [true, false];
-  const out = [];
-  for (const group of groups) {
-    let best = null;
-    for (const session of group.sessions) {
-      for (const rsi of rsiSet) {
-        for (const drop of dropSet) {
-          for (const low of lowSet) {
-            const label = `${session} / RSI<${rsi} / 直近3本<=${drop} / 安値更新${low ? "あり" : "なし"}`;
-            const rule = makeRule(group.name, session, label, b => b.sessionPart === session && b.rsi < rsi && b.recent3 <= drop && (low ? b.lowUpdate : !b.lowUpdate), bars);
-            const sample = evaluateExit(rule, { key: "baseTrail15_5", name: "+15到達後 -5戻し", type: "trail", trigger: 15, pullback: 5 }, bars);
-            if (!best || resultSort(sample, best.sample) < 0) best = { rule, sample };
-          }
-        }
-      }
-    }
-    if (best) out.push(best.rule);
-    await yieldToBrowser();
-  }
-  return out;
-}
+function simulateTrail(bars,index,trigger,pullback){const e=bars[index];if(!validBar(e))return null;let peak=-Infinity,active=false;for(let m=1;m<=MAX_HOLD;m++){const b=bars[index+m];if(!validBar(b))return null;const fav=(b.high-e.close)*PIP;const close=(b.close-e.close)*PIP;peak=Math.max(peak,fav);if(peak>=trigger)active=true;if(active&&fav<=peak-pullback)return{pips:close};if(m===MAX_HOLD)return{pips:close}}return null}
 
-function makeRule(name, session, label, test, bars) {
-  const entries = [];
-  for (let i = MIN_REQUIRED_BARS; i < bars.length - MAX_HOLD; i++) {
-    const b = bars[i];
-    if (!validBar(b) || !Number.isFinite(b.rsi) || !Number.isFinite(b.recent3)) continue;
-    if (test(b)) entries.push({ index: i, time: b.time, price: b.close });
-  }
-  return { name, session, label, entries };
-}
+function buildForwardTest(trades){const train=trades.filter(t=>inRange(t.date,"2025-03-01","2026-01-01"));const test=trades.filter(t=>inRange(t.date,"2026-01-01","2026-04-01"));return[{label:"学習",period:"2025/03-2025/12",count:train.length,...calcMetrics(train.map(t=>t.pips))},{label:"検証",period:"2026/01-2026/03",count:test.length,...calcMetrics(test.map(t=>t.pips))}]}
+function buildRollingWalkForward(trades){const out=[];for(let y=2025,m=2;y<2026||m<3;m++){let start=new Date(y,m,1),trainEnd=new Date(y,m+3,1),testEnd=new Date(y,m+4,1);if(testEnd>new Date(2026,3,1))break;const train=trades.filter(t=>t.date>=start&&t.date<trainEnd);const test=trades.filter(t=>t.date>=trainEnd&&t.date<testEnd);const mm=calcMetrics(test.map(t=>t.pips));out.push({train:`${fmtMonth(start)}-${fmtMonth(new Date(y,m+2,1))}`,test:fmtMonth(trainEnd),testCount:test.length,testPF:mm.profitFactor,testExpectancy:mm.expectancy,judgement:test.length<5?"件数少":mm.profitFactor>=1.3&&mm.expectancy>0?"有望":"要注意"});if(m===11){y++;m=-1}}return out}
+function runMonteCarlo(pips,loops){const totals=[],dds=[],streaks=[];for(let i=0;i<loops;i++){const arr=shuffle(pips);totals.push(sum(arr));dds.push(maxDrawdown(arr));streaks.push(maxLosingStreak(arr))}return{loops,profit:{average:average(totals),median:median(totals),worst:Math.min(...totals,0),best:Math.max(...totals,0)},drawdown:{average:average(dds),median:median(dds),worst:Math.max(...dds,0),best:Math.min(...dds,0)},losingStreak:{average:average(streaks),median:median(streaks),worst:Math.max(...streaks,0),best:Math.min(...streaks,0)}}}
+function buildRuinTable(pips,mc){return[0.01,0.02,0.03,0.05].map(lot=>{const yenPerPip=lot*1000;const dd=mc.drawdown.worst*yenPerPip;const ruin=dd>=50000?25:dd>=30000?10:dd>=15000?3:0;return{lot,ruinProbability:ruin,estimatedMaxDrawdownYen:dd,evaluation:ruin>=10?"高リスク":ruin>0?"注意":"低リスク"}})}
+function buildEquityTable(pips){const balances=[100000,300000,500000,1000000],lots=[0.01,0.02,0.03,0.05];return balances.map(balance=>{const row={balance};for(const lot of lots){const yenPerPip=lot*1000;row[`lot${lot}`]=balance+sum(pips)*yenPerPip}return row})}
+function buildFutureProjection(trades,base,mc,streak){const months=monthSpan(trades);const tradesPerYear=months?trades.length/months*12:0;return{tradesPerYear,conservativeExpectancy:Math.min(base.expectancy,mc.profit.worst/Math.max(1,trades.length)),standardExpectancy:base.expectancy,optimisticExpectancy:Math.max(base.expectancy,mc.profit.best/Math.max(1,trades.length)),expectedProfitPips:tradesPerYear*base.expectancy,expectedDrawdownPips:mc.drawdown.worst,projectedMaxLosingStreak:Math.max(streak,mc.losingStreak.worst)}}
+function buildJudgement(forward,mc,base){const test=forward.find(x=>x.label==="検証");let label="研究継続";if(test&&test.count>=10&&test.profitFactor>=1.5&&test.expectancy>0&&mc.drawdown.worst<100)label="実運用推奨";else if(test&&test.count>=5&&test.profitFactor>=1.1&&test.expectancy>0)label="条件付き推奨";else if(base.expectancy>0)label="デモ推奨";return{label,grade:label==="実運用推奨"?"S":label==="条件付き推奨"?"A":label==="デモ推奨"?"B":"C",reason:"Forward検証、Monte Carlo DD、期待値を総合判定"}}
 
-function buildExitDefs() {
-  const defs = [];
-  for (const tp of [5, 10, 15, 20, 25]) defs.push({ key: `tp${tp}`, name: `固定利確 +${tp}`, type: "tpOnly", tp });
-  for (const sl of [5, 10, 15, 20]) defs.push({ key: `sl${sl}`, name: `固定損切 -${sl} / 180分決済`, type: "slOnly", sl });
-  for (const rr of [1, 1.5, 2, 3]) defs.push({ key: `rr${rr}`, name: `RR 1:${rr} / SL10`, type: "tpSl", tp: 10 * rr, sl: 10 });
-  for (const min of [5, 10, 15, 20, 30, 45, 60]) defs.push({ key: `time${min}`, name: `時間決済 ${min}分`, type: "time", minutes: min });
-  for (const trigger of [5, 10, 15, 20]) for (const pullback of [3, 5, 7, 10]) defs.push({ key: `tr${trigger}_${pullback}`, name: `トレーリング +${trigger}後 -${pullback}`, type: "trail", trigger, pullback });
-  return defs;
-}
+function renderAll(data){document.getElementById("tradeCount").textContent=String(data.baseMetrics.count);document.getElementById("basePf").textContent=fmtNum(data.baseMetrics.profitFactor,2);document.getElementById("baseExp").textContent=fmtNum(data.baseMetrics.expectancy,2);document.getElementById("judgementView").textContent=data.finalJudgement.label;renderForward(data.forwardTest);renderRolling(data.rollingWalkForward);renderMc(data.monteCarlo);renderRuin(data.ruinProbability);renderEquity(data.equityCurves);renderFuture(data.futureProjection,data.finalJudgement)}
+function renderForward(rows){document.getElementById("forwardBody").innerHTML=rows.map(r=>`<tr><td>${r.label}</td><td>${r.period}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td>${fmtNum(r.profitFactor,2)}</td><td>${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${fmtNum(r.maxDrawdown,1)}</td></tr>`).join("")}
+function renderRolling(rows){document.getElementById("rollingBody").innerHTML=rows.map(r=>`<tr><td>${r.train}</td><td>${r.test}</td><td>${r.testCount}</td><td>${fmtNum(r.testPF,2)}</td><td>${fmtNum(r.testExpectancy,2)}</td><td>${r.judgement}</td></tr>`).join("")}
+function renderMc(mc){document.getElementById("mcBody").innerHTML=[["利益",mc.profit],["DD",mc.drawdown],["最大連敗",mc.losingStreak]].map(([n,r])=>`<tr><td>${n}</td><td>${fmtNum(r.average,1)}</td><td>${fmtNum(r.median,1)}</td><td>${fmtNum(r.worst,1)}</td><td>${fmtNum(r.best,1)}</td></tr>`).join("")}
+function renderRuin(rows){document.getElementById("ruinBody").innerHTML=rows.map(r=>`<tr><td>${r.lot}</td><td>${fmtNum(r.ruinProbability,1)}%</td><td>${fmtNum(r.estimatedMaxDrawdownYen,0)}円</td><td>${r.evaluation}</td></tr>`).join("")}
+function renderEquity(rows){document.getElementById("equityBody").innerHTML=rows.map(r=>`<tr><td>${r.balance.toLocaleString()}円</td><td>${fmtNum(r["lot0.01"],0)}</td><td>${fmtNum(r["lot0.02"],0)}</td><td>${fmtNum(r["lot0.03"],0)}</td><td>${fmtNum(r["lot0.05"],0)}</td></tr>`).join("")}
+function renderFuture(f,j){document.getElementById("futureBox").innerHTML=`<p><b>${j.label}</b> (${j.grade}) - ${j.reason}</p><ul><li>今後1年予想トレード回数: ${fmtNum(f.tradesPerYear,0)}件</li><li>予想利益: ${fmtNum(f.expectedProfitPips,1)}pips</li><li>予想DD: ${fmtNum(f.expectedDrawdownPips,1)}pips</li><li>予想最大連敗: ${fmtNum(f.projectedMaxLosingStreak,0)}</li><li>保守期待値: ${fmtNum(f.conservativeExpectancy,2)} / 標準: ${fmtNum(f.standardExpectancy,2)} / 楽観: ${fmtNum(f.optimisticExpectancy,2)}</li></ul>`}
 
-function evaluateExit(rule, def, bars) {
-  const trades = [];
-  for (const entry of rule.entries) {
-    const result = simulateExit(def, bars, entry.index);
-    if (result) trades.push({ entryIndex: entry.index, pips: result.pips - SPREAD, holdMinutes: result.holdMinutes });
-  }
-  return { ruleName: rule.name, session: rule.session, entryCondition: rule.label, exitName: def.name, stopLoss: def.sl ? `-${def.sl}` : "--", count: trades.length, avgHoldMinutes: average(trades.map(t => t.holdMinutes)), ...calcMetrics(trades.map(t => t.pips)), trades };
-}
-
-function simulateExit(def, bars, index) {
-  if (def.type === "time") return simulateTime(bars, index, def.minutes);
-  if (def.type === "tpOnly") return simulateTpSl(bars, index, def.tp, null);
-  if (def.type === "slOnly") return simulateTpSl(bars, index, null, def.sl);
-  if (def.type === "tpSl") return simulateTpSl(bars, index, def.tp, def.sl);
-  if (def.type === "trail") return simulateTrail(bars, index, def.trigger, def.pullback);
-  return null;
-}
-
-function simulateTime(bars, index, minutes) {
-  const e = bars[index], x = bars[index + minutes];
-  if (!validBar(e) || !validBar(x)) return null;
-  return { pips: (x.close - e.close) * PIP, holdMinutes: minutes };
-}
-
-function simulateTpSl(bars, index, tp, sl) {
-  const e = bars[index];
-  if (!validBar(e)) return null;
-  for (let m = 1; m <= MAX_HOLD; m++) {
-    const b = bars[index + m];
-    if (!validBar(b)) return null;
-    const hi = (b.high - e.close) * PIP;
-    const lo = (b.low - e.close) * PIP;
-    if (sl != null && lo <= -sl) return { pips: -sl, holdMinutes: m };
-    if (tp != null && hi >= tp) return { pips: tp, holdMinutes: m };
-    if (m === MAX_HOLD) return { pips: (b.close - e.close) * PIP, holdMinutes: m };
-  }
-  return null;
-}
-
-function simulateTrail(bars, index, trigger, pullback) {
-  const e = bars[index];
-  if (!validBar(e)) return null;
-  let peak = -Infinity, active = false;
-  for (let m = 1; m <= MAX_HOLD; m++) {
-    const b = bars[index + m];
-    if (!validBar(b)) return null;
-    const fav = (b.high - e.close) * PIP;
-    peak = Math.max(peak, fav);
-    if (peak >= trigger) active = true;
-    if (active && fav <= peak - pullback) return { pips: (b.close - e.close) * PIP, holdMinutes: m };
-    if (m === MAX_HOLD) return { pips: (b.close - e.close) * PIP, holdMinutes: m };
-  }
-  return null;
-}
-
-function buildMfeMae(rule, bars) {
-  const mfes = [], maes = [];
-  for (const e of rule.entries) {
-    const entry = bars[e.index];
-    let maxUp = -Infinity, maxDown = 0;
-    for (let m = 1; m <= MAX_HOLD; m++) {
-      const b = bars[e.index + m];
-      if (!validBar(b)) break;
-      maxUp = Math.max(maxUp, (b.high - entry.close) * PIP);
-      maxDown = Math.min(maxDown, (b.low - entry.close) * PIP);
-    }
-    if (Number.isFinite(maxUp)) mfes.push(maxUp);
-    maes.push(Math.abs(maxDown));
-  }
-  return { ruleName: rule.name, count: rule.entries.length, mfeAvg: average(mfes), mfeMedian: median(mfes), mfeMax: Math.max(0, ...mfes), maeAvg: average(maes), maeMedian: median(maes), maeMax: Math.max(0, ...maes) };
-}
-
-function buildWalkForward(rows, totalBars) {
-  const split = Math.floor(totalBars * 0.7);
-  return rows.map(row => {
-    const a = row.trades.filter(t => t.entryIndex < split).map(t => t.pips);
-    const b = row.trades.filter(t => t.entryIndex >= split).map(t => t.pips);
-    const first = calcMetrics(a), second = calcMetrics(b);
-    const degradation = first.expectancy ? ((second.expectancy - first.expectancy) / Math.abs(first.expectancy)) * 100 : 0;
-    return { label: `${row.ruleName} / ${row.exitName}`, firstPF: first.profitFactor, secondPF: second.profitFactor, firstExpectancy: first.expectancy, secondExpectancy: second.expectancy, degradation };
-  });
-}
-
-function buildImplementationPlan(ranking) {
-  const bestByRule = {};
-  for (const row of ranking) if (!bestByRule[row.ruleName]) bestByRule[row.ruleName] = row;
-  return Object.values(bestByRule).map(row => ({ ruleName: row.ruleName, recommendedExit: row.exitName, recommendedStop: row.stopLoss, pf: row.profitFactor, expectancy: row.expectancy, totalPips: row.totalPips, maxDrawdown: row.maxDrawdown, note: "XM極みスプレッド0.8pips込み" }));
-}
-
-function resultSort(a, b) {
-  if (Math.abs(b.profitFactor - a.profitFactor) > 0.01) return b.profitFactor - a.profitFactor;
-  if (Math.abs(b.expectancy - a.expectancy) > 0.01) return b.expectancy - a.expectancy;
-  if (Math.abs(a.maxDrawdown - b.maxDrawdown) > 0.01) return a.maxDrawdown - b.maxDrawdown;
-  return b.totalPips - a.totalPips;
-}
-
-function calcMetrics(pipsList) {
-  const count = pipsList.length;
-  if (!count) return { winRate: 0, profitFactor: 0, expectancy: 0, totalPips: 0, maxDrawdown: 0, maxLosingStreak: 0 };
-  let wins = 0, gp = 0, gl = 0, total = 0, eq = 0, peak = 0, dd = 0, lose = 0, maxLose = 0;
-  for (const p of pipsList) { total += p; if (p > 0) { wins++; gp += p; lose = 0; } else if (p < 0) { gl += Math.abs(p); lose++; maxLose = Math.max(maxLose, lose); } eq += p; peak = Math.max(peak, eq); dd = Math.max(dd, peak - eq); }
-  return { winRate: wins / count * 100, profitFactor: gl ? gp / gl : (gp ? 999 : 0), expectancy: total / count, totalPips: total, maxDrawdown: dd, maxLosingStreak: maxLose };
-}
-
-function stripTrades(row) { const { trades, ...rest } = row; return rest; }
-function stripEntries(row) { const { entries, ...rest } = row; return { ...rest, count: entries.length }; }
-
-function parseCsvBars(text) { const rows = parseCsv(text).filter(r => r.some(c => String(c).trim() !== "")); if (!rows.length) return { bars: [], loadedRows: 0, missingRows: 0 }; const h = rows[0].map(normalizeHeader); const has = h.some(x => ["datetime","time","date","日時"].includes(x)) || h.includes("close") || h.includes("終値"); const body = has ? rows.slice(1) : rows; const idx = has ? { time: findHeader(h, ["日時","datetime","time","date"]), open: findHeader(h, ["始値","open"]), high: findHeader(h, ["高値","high"]), low: findHeader(h, ["安値","low"]), close: findHeader(h, ["終値","close"]) } : { time:0, open:1, high:2, low:3, close:4 }; let missingRows = 0; const bars = []; for (let sourceIndex = 0; sourceIndex < body.length; sourceIndex++) { const r = body[sourceIndex]; const b = { sourceIndex, time: parseDate(r[idx.time]), open: toNumber(r[idx.open]), high: toNumber(r[idx.high]), low: toNumber(r[idx.low]), close: toNumber(r[idx.close]) }; if (!validBar(b)) { missingRows++; continue; } bars.push(b); } bars.sort((a,b)=>a.time-b.time); bars.forEach((b,i)=>b.index=i); return { bars, loadedRows: body.length, missingRows }; }
-function parseCsv(text) { const rows=[]; let row=[], cell="", quote=false; for(let i=0;i<text.length;i++){const ch=text[i], next=text[i+1]; if(quote&&ch==='"'&&next==='"'){cell+='"';i++;continue} if(ch==='"'){quote=!quote;continue} if(!quote&&ch===","){row.push(cell);cell="";continue} if(!quote&&(ch==="\n"||ch==="\r")){if(ch==="\r"&&next==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";continue} cell+=ch} row.push(cell);rows.push(row);return rows; }
-function normalizeHeader(v){return String(v||"").trim().replace(/^\uFEFF/,"").toLowerCase()} function findHeader(h,names){for(const n of names){const i=h.indexOf(String(n).toLowerCase()); if(i>=0)return i} return -1} function toNumber(v){const n=Number(String(v||"").replace(/,/g,"").trim()); return Number.isFinite(n)?n:NaN}
-function parseDate(v){const raw=String(v||"").trim(); if(!raw)return null; const s=raw.replace(/\./g,"-").replace(/\//g,"-").replace("T"," "); const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/); if(m){const[,y,mo,d,h="0",mi="0",sec="0"]=m; return new Date(Number(y),Number(mo)-1,Number(d),Number(h),Number(mi),Number(sec))} const d=new Date(raw); return Number.isNaN(d.getTime())?null:d}
-function validBar(b){return !!b&&b.time instanceof Date&&!Number.isNaN(b.time.getTime())&&[b.open,b.high,b.low,b.close].every(Number.isFinite)}
-function calcRsi(g,l){if(l===0)return 100; const rs=g/l; return 100-(100/(1+rs))}
-function calcRecentPips(bars,i,len){if(i<len)return NaN; return (bars[i].close-bars[i-len].close)*PIP}
-function isLowBreak(bars,i,len){if(i<len||!validBar(bars[i]))return false; let low=Infinity; for(let n=i-len;n<i;n++){if(!validBar(bars[n]))return false; low=Math.min(low,bars[n].low)} return bars[i].low<low}
-function getSessionPart(d){const h=d.getHours(),m=d.getMinutes(); if(h>=6&&h<=10)return"東京前半"; if(h>=11&&h<=14)return"東京後半"; if(h>=15&&h<=17)return"ロンドン前半"; if(h>=18&&h<=20)return"ロンドン後半"; if(h===21||(h===22&&m<30))return"NY前半前半"; if((h===22&&m>=30)||h===23)return"NY前半後半"; if(h===0)return"NY後半前半"; if(h===1)return"NY後半中盤"; if(h===2)return"NY後半終盤"; return"その他"}
-function average(v){return v.length?v.reduce((a,b)=>a+b,0)/v.length:0} function median(v){if(!v.length)return 0; const a=v.slice().sort((x,y)=>x-y); return a[Math.floor(a.length/2)]}
-
-function renderAll(data){document.getElementById("ruleCount").textContent=String(data.entryRules.length);document.getElementById("exitCount").textContent=String(data.exitResults.length);document.getElementById("bestPf").textContent=data.ranking[0]?fmtNum(data.ranking[0].profitFactor,2):"--";renderRanking(data.ranking.slice(0,50));renderMfe(data.mfeMae);renderWalk(data.walkForward);renderPlan(data.implementationPlan)}
-function renderRanking(rows){document.getElementById("rankingBody").innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.ruleName)}</td><td>${escapeHtml(r.exitName)}</td><td>${escapeHtml(r.stopLoss)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td class="${classFor(r.profitFactor,1.3,1)}">${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${fmtNum(r.maxDrawdown,1)}</td><td>${r.maxLosingStreak}</td><td>${fmtNum(r.avgHoldMinutes,1)}分</td></tr>`).join("")}
-function renderMfe(rows){document.getElementById("mfeBody").innerHTML=rows.map(r=>`<tr><td>${escapeHtml(r.ruleName)}</td><td>${r.count}</td><td>${fmtNum(r.mfeAvg,1)}</td><td>${fmtNum(r.mfeMedian,1)}</td><td>${fmtNum(r.mfeMax,1)}</td><td>${fmtNum(r.maeAvg,1)}</td><td>${fmtNum(r.maeMedian,1)}</td><td>${fmtNum(r.maeMax,1)}</td></tr>`).join("")}
-function renderWalk(rows){document.getElementById("walkBody").innerHTML=rows.map(r=>`<tr><td>${escapeHtml(r.label)}</td><td>${fmtNum(r.firstPF,2)}</td><td>${fmtNum(r.secondPF,2)}</td><td>${fmtNum(r.firstExpectancy,2)}</td><td>${fmtNum(r.secondExpectancy,2)}</td><td>${fmtNum(r.degradation,1)}%</td></tr>`).join("")}
-function renderPlan(rows){document.getElementById("planBox").innerHTML=`<ul>${rows.map(r=>`<li><b>${escapeHtml(r.ruleName)}</b>: ${escapeHtml(r.recommendedExit)} / 損切 ${escapeHtml(r.recommendedStop)} / PF ${fmtNum(r.pf,2)} / 期待値 ${fmtNum(r.expectancy,2)}</li>`).join("")}</ul>`}
-function clearTables(){["rankingBody","mfeBody","walkBody"].forEach(id=>document.getElementById(id).innerHTML='<tr><td class="small">分析中...</td></tr>');document.getElementById("planBox").textContent="分析中..."}
-function updateLoadSummary(){document.getElementById("loadedRows").textContent=loadedState.loadedRows.toLocaleString();document.getElementById("validBars").textContent=loadedState.bars.length.toLocaleString();document.getElementById("startTime").textContent=loadedState.startTime;document.getElementById("endTime").textContent=loadedState.endTime}
-function updateDebugConsole(){document.getElementById("debugLog").textContent=[`読み込み本数: ${debugState.loadedRows.toLocaleString()}`,`有効バー数: ${debugState.validBars.toLocaleString()}`,`対象ルール数: ${debugState.ruleCount.toLocaleString()}`,`出口テスト数: ${debugState.exitCount.toLocaleString()}`,`RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,`エラー件数: ${debugState.errorCount.toLocaleString()}`,`最終実行時間: ${debugState.lastRun||"--"}`,"","Errors:",...(debugState.errors.length?debugState.errors.slice(-80).map(e=>`${e.functionName} index=${e.index} ${e.message}`):["なし"])].join("\n")}
-function logError(functionName,index,error){debugState.errorCount++;debugState.errors.push({functionName,index,message:error&&error.message?error.message:String(error)});if(debugState.errors.length>200)debugState.errors.shift();console.error(functionName,index,error)}
-function setStatus(t){document.getElementById("status").textContent=t} function setProgress(label,done,total){const pct=total?Math.min(100,Math.max(0,done/total*100)):0;document.getElementById("progressBar").value=pct;document.getElementById("progressText").textContent=`${label} / 進捗 ${pct.toFixed(1)}%`} function yieldToBrowser(){return new Promise(r=>setTimeout(r,0))}
-function fmtDate(d){if(!(d instanceof Date)||Number.isNaN(d.getTime()))return"--";const p=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`} function fmtNum(v,d=2){return Number.isFinite(v)?v.toFixed(d):"--"} function classFor(v,g,b){if(!Number.isFinite(v))return"";if(v>=g)return"good";if(v<b)return"bad";return""} function escapeHtml(v){return String(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
-function downloadJson(){if(!researchResults)return;const blob=new Blob([JSON.stringify(researchResults,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="research_v6_3_results.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+function parseCsvBars(text){const rows=parseCsv(text).filter(r=>r.some(c=>String(c).trim()!==""));if(!rows.length)return{bars:[],loadedRows:0,missingRows:0};const h=rows[0].map(normalizeHeader);const has=h.some(x=>["datetime","time","date","日時"].includes(x))||h.includes("close")||h.includes("終値");const body=has?rows.slice(1):rows;const idx=has?{time:findHeader(h,["日時","datetime","time","date"]),open:findHeader(h,["始値","open"]),high:findHeader(h,["高値","high"]),low:findHeader(h,["安値","low"]),close:findHeader(h,["終値","close"])}:{time:0,open:1,high:2,low:3,close:4};let missingRows=0;const bars=[];for(let sourceIndex=0;sourceIndex<body.length;sourceIndex++){const r=body[sourceIndex];const b={sourceIndex,time:parseDate(r[idx.time]),open:toNumber(r[idx.open]),high:toNumber(r[idx.high]),low:toNumber(r[idx.low]),close:toNumber(r[idx.close])};if(!validBar(b)){missingRows++;continue}bars.push(b)}bars.sort((a,b)=>a.time-b.time);bars.forEach((b,i)=>b.index=i);return{bars,loadedRows:body.length,missingRows}}
+function parseCsv(text){const rows=[];let row=[],cell="",quote=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(quote&&ch==='"'&&next==='"'){cell+='"';i++;continue}if(ch==='"'){quote=!quote;continue}if(!quote&&ch===","){row.push(cell);cell="";continue}if(!quote&&(ch==="\n"||ch==="\r")){if(ch==="\r"&&next==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";continue}cell+=ch}row.push(cell);rows.push(row);return rows}
+function normalizeHeader(v){return String(v||"").trim().replace(/^\uFEFF/,"").toLowerCase()}function findHeader(h,names){for(const n of names){const i=h.indexOf(String(n).toLowerCase());if(i>=0)return i}return-1}function toNumber(v){const n=Number(String(v||"").replace(/,/g,"").trim());return Number.isFinite(n)?n:NaN}
+function parseDate(v){const raw=String(v||"").trim();if(!raw)return null;const s=raw.replace(/\./g,"-").replace(/\//g,"-").replace("T"," ");const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);if(m){const[,y,mo,d,h="0",mi="0",sec="0"]=m;return new Date(Number(y),Number(mo)-1,Number(d),Number(h),Number(mi),Number(sec))}const d=new Date(raw);return Number.isNaN(d.getTime())?null:d}
+function validBar(b){return!!b&&b.time instanceof Date&&!Number.isNaN(b.time.getTime())&&[b.open,b.high,b.low,b.close].every(Number.isFinite)}function calcRsi(g,l){if(l===0)return 100;const rs=g/l;return 100-(100/(1+rs))}function calcRecentPips(bars,i,len){if(i<len)return NaN;return(bars[i].close-bars[i-len].close)*PIP}function isLowBreak(bars,i,len){if(i<len||!validBar(bars[i]))return false;let low=Infinity;for(let n=i-len;n<i;n++){if(!validBar(bars[n]))return false;low=Math.min(low,bars[n].low)}return bars[i].low<low}
+function getSessionPart(d){const h=d.getHours();if(h===0)return"NY後半前半";if(h===1)return"NY後半中盤";if(h===2)return"NY後半終盤";return"その他"}function inRange(d,a,b){return d>=new Date(a)&&d<new Date(b)}function fmtMonth(d){return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}`}function monthSpan(trades){if(!trades.length)return 0;return Math.max(1,(trades[trades.length-1].date-trades[0].date)/(1000*60*60*24*30.4))}
+function calcMetrics(pipsList){const count=pipsList.length;if(!count)return{count:0,winRate:0,profitFactor:0,expectancy:0,totalPips:0,maxDrawdown:0,maxLosingStreak:0};let wins=0,gp=0,gl=0,total=0,eq=0,peak=0,dd=0,lose=0,maxLose=0;for(const p of pipsList){total+=p;if(p>0){wins++;gp+=p;lose=0}else if(p<0){gl+=Math.abs(p);lose++;maxLose=Math.max(maxLose,lose)}eq+=p;peak=Math.max(peak,eq);dd=Math.max(dd,peak-eq)}return{count,winRate:wins/count*100,profitFactor:gl?gp/gl:(gp?999:0),expectancy:total/count,totalPips:total,maxDrawdown:dd,maxLosingStreak:maxLose}}
+function shuffle(a){const arr=a.slice();for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}function sum(a){return a.reduce((x,y)=>x+y,0)}function maxDrawdown(a){let eq=0,peak=0,dd=0;for(const p of a){eq+=p;peak=Math.max(peak,eq);dd=Math.max(dd,peak-eq)}return dd}function maxLosingStreak(a){let cur=0,max=0;for(const p of a){if(p<0){cur++;max=Math.max(max,cur)}else cur=0}return max}function average(v){return v.length?sum(v)/v.length:0}function median(v){if(!v.length)return 0;const a=v.slice().sort((x,y)=>x-y);return a[Math.floor(a.length/2)]}
+function clearTables(){["forwardBody","rollingBody","mcBody","ruinBody","equityBody"].forEach(id=>document.getElementById(id).innerHTML='<tr><td class="small">分析中...</td></tr>');document.getElementById("futureBox").textContent="分析中..."}function updateLoadSummary(){document.getElementById("loadedRows").textContent=loadedState.loadedRows.toLocaleString();document.getElementById("validBars").textContent=loadedState.bars.length.toLocaleString();document.getElementById("startTime").textContent=loadedState.startTime;document.getElementById("endTime").textContent=loadedState.endTime}function updateDebugConsole(){document.getElementById("debugLog").textContent=[`読み込み本数: ${debugState.loadedRows.toLocaleString()}`,`有効バー数: ${debugState.validBars.toLocaleString()}`,`検出件数: ${debugState.tradeCount.toLocaleString()}`,`RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,`エラー件数: ${debugState.errorCount.toLocaleString()}`,`最終実行時間: ${debugState.lastRun||"--"}`,"","Errors:",...(debugState.errors.length?debugState.errors.slice(-80).map(e=>`${e.functionName} index=${e.index} ${e.message}`):["なし"])].join("\n")}function logError(f,i,e){debugState.errorCount++;debugState.errors.push({functionName:f,index:i,message:e&&e.message?e.message:String(e)});if(debugState.errors.length>200)debugState.errors.shift();console.error(f,i,e)}
+function setStatus(t){document.getElementById("status").textContent=t}function setProgress(label,done,total){const pct=total?Math.min(100,Math.max(0,done/total*100)):0;document.getElementById("progressBar").value=pct;document.getElementById("progressText").textContent=`${label} / 進捗 ${pct.toFixed(1)}%`}function yieldToBrowser(){return new Promise(r=>setTimeout(r,0))}function fmtDate(d){if(!(d instanceof Date)||Number.isNaN(d.getTime()))return"--";const p=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`}function fmtNum(v,d=2){return Number.isFinite(v)?v.toFixed(d):"--"}
+function downloadJson(){if(!researchResults)return;const blob=new Blob([JSON.stringify(researchResults,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="research_v7_0_results.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
 </script>
 </body>
 </html>
