@@ -3,33 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v6.0</title>
+  <title>ScalpLayer Research v6.2</title>
   <style>
-    :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#263852;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b;--yellow:#ffd166}
+    :root{--bg:#07111f;--panel:#101b2c;--panel2:#0c1726;--line:#263852;--gold:#d7b75a;--text:#f5f7fb;--muted:#a9b6cb;--green:#60d394;--red:#ff6b6b}
     *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07111f,#0b1423 44%,#07111f);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
     main{width:min(1220px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}.hero{padding:26px 0 12px}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);color:var(--gold);letter-spacing:0}.sub{margin:0;color:var(--muted)}
     .card{background:rgba(16,27,44,.94);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0;box-shadow:0 18px 44px rgba(0,0,0,.24)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
     h2{margin:0 0 12px;font-size:19px}.small{font-size:13px;color:var(--muted)}.note{border-left:4px solid var(--gold);padding:10px 12px;background:rgba(215,183,90,.08);border-radius:6px;color:#f8edc4}
     input[type=file]{width:100%;padding:12px;border:1px dashed #4a5d7a;border-radius:8px;background:#0b1524;color:var(--text);margin:8px 0 12px}
     button{appearance:none;border:0;border-radius:8px;background:var(--gold);color:#101010;font-weight:800;padding:11px 16px;cursor:pointer;margin:4px 8px 4px 0}button:disabled{opacity:.45;cursor:not-allowed}
-    progress{width:100%;height:16px;accent-color:var(--gold)}.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pill{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px}.pill b{display:block;color:var(--gold);font-size:13px}.pill span{font-size:18px}
+    progress{width:100%;height:16px;accent-color:var(--gold)}.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pill{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px}.pill b{display:block;color:var(--gold);font-size:13px}.pill span{font-size:18px;font-weight:800}
     table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}th:first-child,td:first-child{text-align:left}th{color:#f8edc4;background:#0b1524;position:sticky;top:0}.table-wrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:8px}
     .good{color:var(--green)}.bad{color:var(--red)}pre{white-space:pre-wrap;word-break:break-word;background:#050b14;border:1px solid var(--line);border-radius:8px;padding:12px;max-height:360px;overflow:auto;font-size:12px}
-    @media(max-width:760px){main{width:min(100% - 18px,1220px);padding-top:18px}.grid,.kpi{grid-template-columns:1fr}.card{padding:14px;margin:12px 0}table{font-size:12px}th,td{padding:8px 6px}button{width:100%;margin-right:0}}
+    @media(max-width:760px){main{width:min(100% - 18px,1220px);padding-top:18px}.grid,.kpi{grid-template-columns:1fr}.card{padding:14px;margin:12px 0}button{width:100%;margin-right:0}table{font-size:12px}th,td{padding:8px 6px}}
   </style>
 </head>
 <body>
 <main>
   <section class="hero">
-    <h1>ScalpLayer Research v6.0</h1>
-    <p class="sub">v5.5で見つけた有利条件・危険条件を固定スコア化し、PF向上が可能かを検証します。</p>
+    <h1>ScalpLayer Research v6.2</h1>
+    <p class="sub">Core Rule Eと同じ「急落 → RSI低下 → 安値更新 → 反発」が東京・ロンドン・NY前半にも存在するかを検証します。</p>
   </section>
 
   <section class="card">
     <h2>1. CSV読み込み</h2>
     <input id="csvFile" type="file" accept=".csv,text/csv">
     <button id="loadBtn" type="button">CSVを読み込む</button>
-    <button id="runBtn" type="button" disabled>v6.0分析を実行</button>
+    <button id="runBtn" type="button" disabled>v6.2分析を実行</button>
     <p id="status" class="small">USDJPY M1 CSVを選択してください。</p>
     <div class="kpi">
       <div class="pill"><b>読み込み本数</b><span id="loadedRows">--</span></div>
@@ -40,50 +40,52 @@
   </section>
 
   <section class="card">
-    <h2>2. 固定スコア式</h2>
-    <p class="note"><b>Core Rule E:</b> BUY / RSI&lt;25 / 直近3本&lt;=-10pips / NY後半前半 / 安値更新あり / +15到達後-5戻し<br>
-      <b>BUYスコア:</b> 月曜日+3、高ボラ+3、ATR上位25%+3、強下降+2、RSI&lt;20+1<br>
-      <b>危険スコア:</b> 木曜日+3、中ボラ+3、ATR中位50%+3、弱下降+1<br>
-      <b>総合スコア = BUYスコア - 危険スコア</b></p>
+    <h2>2. 研究条件</h2>
+    <p class="note">対象時間帯: 東京前半/後半、ロンドン前半/後半、NY前半前半/後半。RSI閾値 15/20/25/30、直近3本下落 -6/-8/-10/-12、安値更新あり/なしを総当たりします。決済はCore Rule Eと同じ <b>+15到達後 -5戻し</b> です。</p>
     <progress id="progressBar" value="0" max="100"></progress>
     <p id="progressText" class="small">待機中</p>
     <div class="kpi">
-      <div class="pill"><b>Core Rule件数</b><span id="tradeCount">--</span></div>
-      <div class="pill"><b>全体PF</b><span id="basePf">--</span></div>
-      <div class="pill"><b>全体期待値</b><span id="baseExp">--</span></div>
-      <div class="pill"><b>総利益</b><span id="baseTotal">--</span></div>
+      <div class="pill"><b>検証条件数</b><span id="comboCount">--</span></div>
+      <div class="pill"><b>候補数</b><span id="candidateCount">--</span></div>
+      <div class="pill"><b>Core Rule E PF</b><span id="coreEPf">--</span></div>
+      <div class="pill"><b>最有力候補</b><span id="bestCandidate">--</span></div>
     </div>
   </section>
 
   <section class="card">
-    <h2>3. スコア帯別比較</h2>
-    <div class="table-wrap"><table><thead><tr><th>スコア帯</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>最大連敗</th></tr></thead><tbody id="scoreBody"><tr><td colspan="8" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
+    <h2>3. 時間帯別ランキング</h2>
+    <div class="table-wrap"><table><thead><tr><th>順位</th><th>時間帯</th><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th></tr></thead><tbody id="rankingBody"><tr><td colspan="9" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
   </section>
 
   <section class="card">
-    <h2>4. 最適スコア閾値ランキング</h2>
-    <div class="table-wrap"><table><thead><tr><th>順位</th><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th><th>DD</th><th>判定</th></tr></thead><tbody id="rankingBody"><tr><td colspan="9" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
+    <h2>4. Core Rule候補</h2>
+    <div class="table-wrap"><table><thead><tr><th>候補</th><th>時間帯</th><th>条件</th><th>件数</th><th>PF</th><th>期待値</th><th>総利益</th><th>採用評価</th></tr></thead><tbody id="candidateBody"><tr><td colspan="8" class="small">条件: 件数50以上 / PF2以上 / 期待値プラス。</td></tr></tbody></table></div>
   </section>
 
   <section class="card">
-    <h2>5. Walk Forward 70% / 30%</h2>
-    <div class="table-wrap"><table><thead><tr><th>条件</th><th>前半PF</th><th>後半PF</th><th>前半期待値</th><th>後半期待値</th><th>劣化率</th><th>判定</th></tr></thead><tbody id="walkBody"><tr><td colspan="7" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
+    <h2>5. Core Rule E 比較表</h2>
+    <div class="table-wrap"><table><thead><tr><th>ルール</th><th>時間帯</th><th>条件</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総利益</th></tr></thead><tbody id="compareBody"></tbody></table></div>
+  </section>
+
+  <section class="card">
+    <h2>6. Walk Forward 70% / 30%</h2>
+    <div class="table-wrap"><table><thead><tr><th>候補</th><th>前半PF</th><th>後半PF</th><th>前半期待値</th><th>後半期待値</th><th>劣化率</th><th>判定</th></tr></thead><tbody id="walkBody"><tr><td colspan="7" class="small">分析実行後に表示します。</td></tr></tbody></table></div>
   </section>
 
   <section class="grid">
     <div class="card">
-      <h2>6. ScalpLayer実装案</h2>
-      <div id="planBox" class="small">分析結果から最適閾値とスコア表示案を提案します。</div>
+      <h2>7. ScalpLayer実装案</h2>
+      <div id="planBox" class="small">東京版 / ロンドン版 / NY前半版の追加可否を評価します。</div>
     </div>
     <div class="card">
-      <h2>7. JSON出力</h2>
-      <button id="downloadBtn" type="button" disabled>research_v6_0_results.json をダウンロード</button>
-      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv6.0の分析結果を確認できます。</p>
+      <h2>8. JSON出力</h2>
+      <button id="downloadBtn" type="button" disabled>research_v6_2_results.json をダウンロード</button>
+      <p class="small">ChatGPTへ渡す場合は、このJSONだけでv6.2の分析結果を確認できます。</p>
     </div>
   </section>
 
   <section class="card">
-    <h2>8. Debug Console</h2>
+    <h2>9. Debug Console</h2>
     <pre id="debugLog">Debug Consoleはここに表示されます。</pre>
   </section>
 </main>
@@ -95,6 +97,10 @@ const PIP = 100;
 const MIN_REQUIRED_BARS = 80;
 const MAX_HOLD = 180;
 const CHUNK_SIZE = 1000;
+const RSI_THRESHOLDS = [15, 20, 25, 30];
+const DROP_THRESHOLDS = [-6, -8, -10, -12];
+const LOW_UPDATE_OPTIONS = [true, false];
+const TARGET_SESSIONS = ["東京前半","東京後半","ロンドン前半","ロンドン後半","NY前半前半","NY前半後半"];
 
 let loadedState = { fileName: "", bars: [], loadedRows: 0, missingRows: 0, startTime: "--", endTime: "--" };
 let researchResults = null;
@@ -104,9 +110,7 @@ document.getElementById("loadBtn").addEventListener("click", loadCsvOnly);
 document.getElementById("runBtn").addEventListener("click", runResearch);
 document.getElementById("downloadBtn").addEventListener("click", downloadJson);
 
-function createDebugState() {
-  return { loadedRows: 0, validBars: 0, rsiCount: 0, atrCount: 0, emaCount: 0, tradeCount: 0, errorCount: 0, lastRun: "--", errors: [] };
-}
+function createDebugState() { return { loadedRows: 0, validBars: 0, rsiCount: 0, comboCount: 0, errorCount: 0, lastRun: "--", errors: [] }; }
 
 async function loadCsvOnly() {
   const file = document.getElementById("csvFile").files[0];
@@ -120,20 +124,13 @@ async function loadCsvOnly() {
   try {
     const text = await file.text();
     const parsed = parseCsvBars(text);
-    loadedState = {
-      fileName: file.name,
-      bars: parsed.bars,
-      loadedRows: parsed.loadedRows,
-      missingRows: parsed.missingRows,
-      startTime: parsed.bars.length ? fmtDate(parsed.bars[0].time) : "--",
-      endTime: parsed.bars.length ? fmtDate(parsed.bars[parsed.bars.length - 1].time) : "--"
-    };
+    loadedState = { fileName: file.name, bars: parsed.bars, loadedRows: parsed.loadedRows, missingRows: parsed.missingRows, startTime: parsed.bars.length ? fmtDate(parsed.bars[0].time) : "--", endTime: parsed.bars.length ? fmtDate(parsed.bars[parsed.bars.length - 1].time) : "--" };
     debugState.loadedRows = parsed.loadedRows;
     debugState.validBars = parsed.bars.length;
     updateLoadSummary();
     updateDebugConsole();
     setProgress("CSV読み込み完了", 100, 100);
-    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v6.0分析を実行できます。`);
+    setStatus(`CSV読み込み完了: 有効バー ${parsed.bars.length.toLocaleString()} 本。v6.2分析を実行できます。`);
     document.getElementById("runBtn").disabled = !parsed.bars.length;
   } catch (error) {
     logError("loadCsvOnly", "--", error);
@@ -152,45 +149,32 @@ async function runResearch() {
   document.getElementById("runBtn").disabled = true;
   document.getElementById("downloadBtn").disabled = true;
   clearTables();
-  setStatus("v6.0分析を開始しました。");
+  setStatus("v6.2分析を開始しました。");
   try {
     await enrichBarsChunked(bars);
-    const trades = await buildCoreTradesChunked(bars);
-    assignQuantileBuckets(trades, "atrPips", "atrBucket");
-    assignQuantileBuckets(trades, "volatilityPips", "volatilityBucket");
-    for (const t of trades) applyScores(t);
-    const baseMetrics = calcMetrics(trades.map(t => t.pips));
-    const scoreBuckets = buildScoreBuckets(trades);
-    const thresholdRanking = buildThresholdRanking(trades);
-    const walkForward = buildWalkForward(trades, thresholdRanking, bars.length);
-    const implementationPlan = buildImplementationPlan(thresholdRanking);
+    const combos = buildCombos();
+    const results = await evaluateCombos(combos, bars);
+    const coreE = await evaluateCoreE(bars);
+    const ranking = results.slice().sort(rankSort);
+    const candidates = buildCandidates(ranking);
+    const walkForward = buildWalkForward(candidates, bars.length);
+    const comparison = buildComparison(coreE, candidates);
+    const implementationPlan = buildImplementationPlan(candidates, coreE);
     researchResults = {
-      meta: {
-        version: "research-v6.0",
-        sourceFileName: loadedState.fileName,
-        generatedAt: new Date().toISOString(),
-        loadedRows: loadedState.loadedRows,
-        validBars: bars.length,
-        startTime: loadedState.startTime,
-        endTime: loadedState.endTime
-      },
-      baseRule: "Core Rule E",
-      scoreRules: {
-        buyScore: ["月曜日 +3", "高ボラ +3", "ATR上位25% +3", "強下降 +2", "RSI<20 +1"],
-        dangerScore: ["木曜日 +3", "中ボラ +3", "ATR中位50% +3", "弱下降 +1"],
-        total: "BUYスコア - 危険スコア"
-      },
-      baseMetrics,
-      scoreBuckets,
-      thresholdRanking,
+      meta: { version: "research-v6.2", sourceFileName: loadedState.fileName, generatedAt: new Date().toISOString(), loadedRows: loadedState.loadedRows, validBars: bars.length, startTime: loadedState.startTime, endTime: loadedState.endTime },
+      purpose: "Core Rule E sister rule discovery for Tokyo/London/NY early",
+      coreE,
+      ranking,
+      candidates,
       walkForward,
+      comparison,
       implementationPlan,
       debug: debugState
     };
     renderAll(researchResults);
     document.getElementById("downloadBtn").disabled = false;
     setProgress("分析完了", 100, 100);
-    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v6_0_results.json を出力できます。");
+    setStatus(debugState.errorCount ? `分析完了。ただしエラー${debugState.errorCount}件。Debug Consoleを確認してください。` : "分析完了。research_v6_2_results.json を出力できます。");
   } catch (error) {
     logError("runResearch", "--", error);
     setStatus("分析中にエラーが発生しました。Debug Consoleを確認してください。");
@@ -201,7 +185,7 @@ async function runResearch() {
 }
 
 async function enrichBarsChunked(bars) {
-  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0, atr = null, trSum = 0, ema = null;
+  let avgGain = null, avgLoss = null, gainSum = 0, lossSum = 0;
   for (let start = 1; start < bars.length; start += CHUNK_SIZE) {
     const end = Math.min(bars.length, start + CHUNK_SIZE);
     for (let i = start; i < end; i++) {
@@ -219,27 +203,8 @@ async function enrichBarsChunked(bars) {
           bar.rsi = calcRsi(avgGain, avgLoss);
           debugState.rsiCount++;
         }
-        const tr = Math.max(bar.high - bar.low, Math.abs(bar.high - prev.close), Math.abs(bar.low - prev.close));
-        if (i <= 14) {
-          trSum += tr;
-          if (i === 14) { atr = trSum / 14; bar.atrPips = atr * PIP; debugState.atrCount++; }
-        } else if (atr != null) {
-          atr = ((atr * 13) + tr) / 14;
-          bar.atrPips = atr * PIP;
-          debugState.atrCount++;
-        }
-        if (i < 20) {
-          const sum = bars.slice(0, i + 1).reduce((acc, b) => acc + (validBar(b) ? b.close : 0), 0);
-          if (i === 19) ema = sum / 20;
-        } else if (ema != null) {
-          ema = bar.close * (2 / 21) + ema * (1 - 2 / 21);
-          bar.ema20 = ema;
-          bar.emaDistance = (bar.close - ema) * PIP;
-          debugState.emaCount++;
-        }
-        bar.nyLatePart = getNyLatePart(bar.time);
+        bar.sessionPart = getSessionPart(bar.time);
         bar.recent3 = calcRecentPips(bars, i, 3);
-        bar.recent30 = calcRecentPips(bars, i, 30);
         bar.lowBreak3 = isLowBreak(bars, i, 3);
         bar.lowBreak5 = isLowBreak(bars, i, 5);
         bar.lowBreak10 = isLowBreak(bars, i, 10);
@@ -254,144 +219,97 @@ async function enrichBarsChunked(bars) {
   }
 }
 
-async function buildCoreTradesChunked(bars) {
-  const trades = [];
-  const endIndex = Math.max(MIN_REQUIRED_BARS, bars.length - MAX_HOLD - 1);
-  for (let start = MIN_REQUIRED_BARS; start < endIndex; start += CHUNK_SIZE) {
-    const end = Math.min(endIndex, start + CHUNK_SIZE);
-    for (let i = start; i < end; i++) {
-      try {
-        const bar = bars[i];
-        if (!validBar(bar) || !Number.isFinite(bar.rsi) || !Number.isFinite(bar.recent3)) continue;
-        const ok = bar.rsi < 25 && bar.recent3 <= -10 && bar.nyLatePart === "NY後半前半" && bar.lowUpdate;
-        if (!ok) continue;
-        const exit = simulateTrailingExit(bars, i, 15, 5);
-        if (!exit) continue;
-        trades.push(makeTrade(bars, i, exit));
-      } catch (error) {
-        logError("buildCoreTradesChunked", i, error);
+function buildCombos() {
+  const out = [];
+  for (const session of TARGET_SESSIONS) {
+    for (const rsi of RSI_THRESHOLDS) {
+      for (const drop of DROP_THRESHOLDS) {
+        for (const lowUpdate of LOW_UPDATE_OPTIONS) {
+          out.push({ session, rsi, drop, lowUpdate, label: `RSI<${rsi} / 直近3本<=${drop} / 安値更新${lowUpdate ? "あり" : "なし"}` });
+        }
       }
     }
-    debugState.tradeCount = trades.length;
-    setProgress(`Core Rule抽出中 ${end.toLocaleString()} / ${endIndex.toLocaleString()}`, end, endIndex);
-    updateDebugConsole();
-    await yieldToBrowser();
   }
-  return trades;
+  debugState.comboCount = out.length;
+  return out;
 }
 
-function makeTrade(bars, index, exit) {
-  const bar = bars[index];
-  return {
-    index,
-    datetime: fmtDate(bar.time),
-    weekday: weekdayLabel(bar.time),
-    entryPrice: bar.close,
-    pips: exit.pips,
-    atrPips: Number.isFinite(bar.atrPips) ? bar.atrPips : 0,
-    volatilityPips: calcVolatility(bars, index, 30),
-    trendState: classifyTrend(bar.recent30),
-    rsi: bar.rsi
-  };
+async function evaluateCombos(combos, bars) {
+  const rows = [];
+  for (let ci = 0; ci < combos.length; ci++) {
+    const combo = combos[ci];
+    const trades = [];
+    for (let i = MIN_REQUIRED_BARS; i < bars.length - MAX_HOLD; i++) {
+      try {
+        const b = bars[i];
+        if (!validBar(b) || !Number.isFinite(b.rsi) || !Number.isFinite(b.recent3)) continue;
+        if (b.sessionPart !== combo.session) continue;
+        if (!(b.rsi < combo.rsi)) continue;
+        if (!(b.recent3 <= combo.drop)) continue;
+        if (combo.lowUpdate && !b.lowUpdate) continue;
+        if (!combo.lowUpdate && b.lowUpdate) continue;
+        const exit = simulateTrailingExit(bars, i, 15, 5);
+        if (exit) trades.push({ index: i, pips: exit.pips });
+      } catch (error) {
+        logError("evaluateCombos", i, error);
+      }
+    }
+    rows.push({ ...combo, count: trades.length, ...calcMetrics(trades.map(t => t.pips)), trades });
+    setProgress(`条件検証中 ${ci + 1} / ${combos.length}`, ci + 1, combos.length);
+    if (ci % 4 === 0) await yieldToBrowser();
+  }
+  return rows;
 }
 
-function applyScores(t) {
-  let buyScore = 0, dangerScore = 0;
-  const buyReasons = [], dangerReasons = [];
-  if (t.weekday === "月") { buyScore += 3; buyReasons.push("月曜日+3"); }
-  if (t.volatilityBucket === "高") { buyScore += 3; buyReasons.push("高ボラ+3"); }
-  if (t.atrBucket === "高") { buyScore += 3; buyReasons.push("ATR上位25%+3"); }
-  if (t.trendState === "強下降") { buyScore += 2; buyReasons.push("強下降+2"); }
-  if (t.rsi < 20) { buyScore += 1; buyReasons.push("RSI<20+1"); }
-  if (t.weekday === "木") { dangerScore += 3; dangerReasons.push("木曜日+3"); }
-  if (t.volatilityBucket === "中") { dangerScore += 3; dangerReasons.push("中ボラ+3"); }
-  if (t.atrBucket === "中") { dangerScore += 3; dangerReasons.push("ATR中位50%+3"); }
-  if (t.trendState === "弱下降") { dangerScore += 1; dangerReasons.push("弱下降+1"); }
-  t.buyScore = buyScore;
-  t.dangerScore = dangerScore;
-  t.totalScore = buyScore - dangerScore;
-  t.buyReasons = buyReasons;
-  t.dangerReasons = dangerReasons;
+async function evaluateCoreE(bars) {
+  const trades = [];
+  for (let i = MIN_REQUIRED_BARS; i < bars.length - MAX_HOLD; i++) {
+    const b = bars[i];
+    if (!validBar(b) || !Number.isFinite(b.rsi) || !Number.isFinite(b.recent3)) continue;
+    if (b.rsi < 25 && b.recent3 <= -10 && b.sessionPart === "NY後半前半" && b.lowUpdate) {
+      const exit = simulateTrailingExit(bars, i, 15, 5);
+      if (exit) trades.push({ index: i, pips: exit.pips });
+    }
+  }
+  return { rule: "Core Rule E", session: "NY後半前半", label: "RSI<25 / 直近3本<=-10 / 安値更新あり", count: trades.length, ...calcMetrics(trades.map(t => t.pips)), trades };
 }
 
-function buildScoreBuckets(trades) {
-  const defs = [
-    { label: "スコア0以下", test: t => t.totalScore <= 0 },
-    { label: "スコア1〜2", test: t => t.totalScore >= 1 && t.totalScore <= 2 },
-    { label: "スコア3〜4", test: t => t.totalScore >= 3 && t.totalScore <= 4 },
-    { label: "スコア5以上", test: t => t.totalScore >= 5 }
-  ];
-  return defs.map(def => {
-    const rows = trades.filter(def.test);
-    return { label: def.label, count: rows.length, ...calcMetrics(rows.map(t => t.pips)) };
+function buildCandidates(ranking) {
+  const byType = { "東京版 Core Rule T": ["東京前半","東京後半"], "ロンドン版 Core Rule L": ["ロンドン前半","ロンドン後半"], "NY前半版 Core Rule N": ["NY前半前半","NY前半後半"] };
+  const out = [];
+  for (const [name, sessions] of Object.entries(byType)) {
+    const best = ranking.find(r => sessions.includes(r.session) && r.count >= 50 && r.profitFactor >= 2 && r.expectancy > 0);
+    if (best) out.push({ candidateName: name, ...stripTrades(best), evaluation: "追加候補" });
+    else {
+      const fallback = ranking.find(r => sessions.includes(r.session));
+      if (fallback) out.push({ candidateName: name, ...stripTrades(fallback), evaluation: "条件未達" });
+    }
+  }
+  return out;
+}
+
+function buildWalkForward(candidates, totalBars) {
+  return candidates.map(c => {
+    const trades = c.trades || [];
+    const split = Math.floor(totalBars * 0.7);
+    const first = trades.filter(t => t.index < split).map(t => t.pips);
+    const second = trades.filter(t => t.index >= split).map(t => t.pips);
+    const a = calcMetrics(first), b = calcMetrics(second);
+    const degradation = a.expectancy ? ((b.expectancy - a.expectancy) / Math.abs(a.expectancy)) * 100 : 0;
+    return { candidateName: c.candidateName, firstPF: a.profitFactor, secondPF: b.profitFactor, firstExpectancy: a.expectancy, secondExpectancy: b.expectancy, degradation, judgement: second.length < 30 ? "サンプル不足" : b.profitFactor >= 1.5 && b.expectancy > 0 ? "有望" : "追加検証" };
   });
 }
 
-function buildThresholdRanking(trades) {
-  const defs = [
-    { label: "全件", test: () => true },
-    { label: "スコア>=1", test: t => t.totalScore >= 1 },
-    { label: "スコア>=2", test: t => t.totalScore >= 2 },
-    { label: "スコア>=3", test: t => t.totalScore >= 3 },
-    { label: "スコア>=4", test: t => t.totalScore >= 4 },
-    { label: "スコア>=5", test: t => t.totalScore >= 5 },
-    { label: "スコア>=6", test: t => t.totalScore >= 6 }
-  ];
-  return defs.map(def => {
-    const rows = trades.filter(def.test);
-    const m = calcMetrics(rows.map(t => t.pips));
-    return { condition: def.label, count: rows.length, ...m, judgement: judgeThreshold(rows.length, m) };
-  }).filter(r => r.count > 0).sort((a, b) => b.profitFactor - a.profitFactor || b.expectancy - a.expectancy || b.totalPips - a.totalPips);
+function buildComparison(coreE, candidates) {
+  return [stripTrades(coreE), ...candidates.map(stripTrades)];
 }
 
-function judgeThreshold(count, m) {
-  if (count < 30) return "サンプル不足";
-  if (m.profitFactor >= 2 && m.expectancy > 0) return "有望";
-  if (m.profitFactor >= 1.3 && m.expectancy > 0) return "追加検証";
-  return "見送り";
-}
-
-function buildWalkForward(trades, ranking, totalBars) {
-  const top = ranking[0];
-  if (!top) return [];
-  const test = makeThresholdTest(top.condition);
-  const selected = trades.filter(test);
-  const split = Math.floor(totalBars * 0.7);
-  const first = selected.filter(t => t.index < split);
-  const second = selected.filter(t => t.index >= split);
-  const a = calcMetrics(first.map(t => t.pips));
-  const b = calcMetrics(second.map(t => t.pips));
-  const degradation = a.expectancy ? ((b.expectancy - a.expectancy) / Math.abs(a.expectancy)) * 100 : 0;
-  return [{
-    condition: top.condition,
-    firstCount: first.length,
-    secondCount: second.length,
-    firstPF: a.profitFactor,
-    secondPF: b.profitFactor,
-    firstExpectancy: a.expectancy,
-    secondExpectancy: b.expectancy,
-    degradation,
-    judgement: judgeThreshold(second.length, b)
-  }];
-}
-
-function makeThresholdTest(label) {
-  if (label === "全件") return () => true;
-  const m = label.match(/>=(-?\d+)/);
-  const threshold = m ? Number(m[1]) : 0;
-  return t => t.totalScore >= threshold;
-}
-
-function buildImplementationPlan(ranking) {
-  const best = ranking[0] || null;
-  if (!best) return { bestThreshold: "候補なし", note: "有効なスコア閾値がありません。" };
-  return {
-    bestThreshold: best.condition,
-    pf: best.profitFactor,
-    expectancy: best.expectancy,
-    count: best.count,
-    note: `ScalpLayer本体ではCore Rule E成立時に総合スコアを表示し、${best.condition}を実戦候補の目安にする案です。`
-  };
+function buildImplementationPlan(candidates, coreE) {
+  const lines = candidates.map(c => {
+    const ok = c.count >= 50 && c.profitFactor >= 2 && c.expectancy > 0;
+    return { candidateName: c.candidateName, addable: ok, reason: ok ? `PF${fmtNum(c.profitFactor,2)} / 期待値${fmtNum(c.expectancy,2)}で追加検証候補` : "件数・PF・期待値の条件未達" };
+  });
+  return { coreE: stripTrades(coreE), candidates: lines, note: "Core Rule Eとは別枠の姉妹ルールとして表示候補にする案です。" };
 }
 
 function simulateTrailingExit(bars, entryIndex, trigger, pullback) {
@@ -427,26 +345,15 @@ function calcMetrics(pipsList) {
   return { winRate: wins / count * 100, profitFactor: grossLoss ? grossProfit / grossLoss : (grossProfit ? 999 : 0), expectancy: total / count, totalPips: total, maxDrawdown: maxDd, maxLosingStreak: maxLosing };
 }
 
-function assignQuantileBuckets(trades, key, outKey) {
-  const values = trades.map(t => t[key]).filter(Number.isFinite).sort((a, b) => a - b);
-  if (!values.length) return;
-  const q1 = values[Math.floor(values.length * 0.25)];
-  const q3 = values[Math.floor(values.length * 0.75)];
-  for (const t of trades) {
-    const v = t[key];
-    t[outKey] = v <= q1 ? "低" : v >= q3 ? "高" : "中";
-  }
+function rankSort(a, b) {
+  if ((b.profitFactor >= 2) !== (a.profitFactor >= 2)) return b.profitFactor - a.profitFactor;
+  if (Math.abs(b.expectancy - a.expectancy) > 0.01) return b.expectancy - a.expectancy;
+  return b.totalPips - a.totalPips;
 }
 
-function calcVolatility(bars, index, length) {
-  if (index < length) return 0;
-  let sum = 0, count = 0;
-  for (let i = index - length + 1; i <= index; i++) {
-    if (!validBar(bars[i])) continue;
-    sum += (bars[i].high - bars[i].low) * PIP;
-    count++;
-  }
-  return count ? sum / count : 0;
+function stripTrades(row) {
+  const { trades, ...rest } = row;
+  return rest;
 }
 
 function parseCsvBars(text) {
@@ -492,36 +399,48 @@ function validBar(bar) { return !!bar && bar.time instanceof Date && !Number.isN
 function calcRsi(avgGain, avgLoss) { if (avgLoss === 0) return 100; const rs = avgGain / avgLoss; return 100 - (100 / (1 + rs)); }
 function calcRecentPips(bars, index, length) { if (index < length) return NaN; const now = bars[index], prev = bars[index - length]; if (!validBar(now) || !validBar(prev)) return NaN; return (now.close - prev.close) * PIP; }
 function isLowBreak(bars, index, length) { const bar = bars[index]; if (!validBar(bar) || index < length) return false; let prevLow = Infinity; for (let i = index - length; i < index; i++) { if (!validBar(bars[i])) return false; prevLow = Math.min(prevLow, bars[i].low); } return Number.isFinite(prevLow) && bar.low < prevLow; }
-function classifyTrend(pips) { if (pips >= 12) return "強上昇"; if (pips >= 4) return "弱上昇"; if (pips <= -12) return "強下降"; if (pips <= -4) return "弱下降"; return "レンジ"; }
-function getNyLatePart(date) { const h = date.getHours(); if (h === 0) return "NY後半前半"; if (h === 1) return "NY後半中盤"; if (h === 2) return "NY後半終盤"; return ""; }
-function weekdayLabel(date) { return ["日","月","火","水","木","金","土"][date.getDay()]; }
+
+function getSessionPart(date) {
+  const h = date.getHours(), m = date.getMinutes();
+  if (h >= 6 && h <= 10) return "東京前半";
+  if (h >= 11 && h <= 14) return "東京後半";
+  if (h >= 15 && h <= 17) return "ロンドン前半";
+  if (h >= 18 && h <= 20) return "ロンドン後半";
+  if (h === 21 || (h === 22 && m < 30)) return "NY前半前半";
+  if ((h === 22 && m >= 30) || h === 23) return "NY前半後半";
+  if (h === 0) return "NY後半前半";
+  if (h === 1) return "NY後半中盤";
+  if (h === 2) return "NY後半終盤";
+  return "その他";
+}
 
 function renderAll(data) {
-  const b = data.baseMetrics;
-  document.getElementById("tradeCount").textContent = data.debug.tradeCount.toLocaleString();
-  document.getElementById("basePf").textContent = fmtNum(b.profitFactor, 2);
-  document.getElementById("baseExp").textContent = fmtNum(b.expectancy, 2);
-  document.getElementById("baseTotal").textContent = fmtNum(b.totalPips, 1);
-  renderScoreBuckets(data.scoreBuckets);
-  renderRanking(data.thresholdRanking);
+  document.getElementById("comboCount").textContent = String(data.debug.comboCount);
+  document.getElementById("candidateCount").textContent = String(data.candidates.filter(c => c.evaluation === "追加候補").length);
+  document.getElementById("coreEPf").textContent = fmtNum(data.coreE.profitFactor, 2);
+  document.getElementById("bestCandidate").textContent = data.ranking[0] ? data.ranking[0].session : "--";
+  renderRanking(data.ranking.slice(0, 50));
+  renderCandidates(data.candidates);
+  renderComparison(data.comparison);
   renderWalk(data.walkForward);
   renderPlan(data.implementationPlan);
 }
 
-function renderScoreBuckets(rows) { document.getElementById("scoreBody").innerHTML = rows.map(r=>`<tr><td>${escapeHtml(r.label)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td class="${classFor(r.profitFactor,1.3,1)}">${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td class="${classFor(r.totalPips,0,0)}">${fmtNum(r.totalPips,1)}</td><td>${fmtNum(r.maxDrawdown,1)}</td><td>${r.maxLosingStreak}</td></tr>`).join(""); }
-function renderRanking(rows) { document.getElementById("rankingBody").innerHTML = rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.condition)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td class="${classFor(r.profitFactor,1.3,1)}">${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${fmtNum(r.maxDrawdown,1)}</td><td>${escapeHtml(r.judgement)}</td></tr>`).join(""); }
-function renderWalk(rows) { document.getElementById("walkBody").innerHTML = rows.map(r=>`<tr><td>${escapeHtml(r.condition)}</td><td>${fmtNum(r.firstPF,2)}</td><td class="${classFor(r.secondPF,1.3,1)}">${fmtNum(r.secondPF,2)}</td><td>${fmtNum(r.firstExpectancy,2)}</td><td class="${classFor(r.secondExpectancy,0,0)}">${fmtNum(r.secondExpectancy,2)}</td><td>${fmtNum(r.degradation,1)}%</td><td>${escapeHtml(r.judgement)}</td></tr>`).join(""); }
-function renderPlan(plan) { document.getElementById("planBox").innerHTML = `<p><b>最適閾値:</b> ${escapeHtml(plan.bestThreshold)}</p><p>PF ${fmtNum(plan.pf,2)} / 期待値 ${fmtNum(plan.expectancy,2)} / 件数 ${plan.count}</p><p>${escapeHtml(plan.note)}</p>`; }
-function clearTables() { ["scoreBody","rankingBody","walkBody"].forEach(id=>{document.getElementById(id).innerHTML='<tr><td class="small">分析中...</td></tr>';}); document.getElementById("planBox").textContent = "分析中..."; }
+function renderRanking(rows) { document.getElementById("rankingBody").innerHTML = rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.session)}</td><td>${escapeHtml(r.label)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td class="${classFor(r.profitFactor,2,1)}">${fmtNum(r.profitFactor,2)}</td><td class="${classFor(r.expectancy,0,0)}">${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${fmtNum(r.maxDrawdown,1)}</td></tr>`).join(""); }
+function renderCandidates(rows) { document.getElementById("candidateBody").innerHTML = rows.map(r=>`<tr><td>${escapeHtml(r.candidateName)}</td><td>${escapeHtml(r.session)}</td><td>${escapeHtml(r.label)}</td><td>${r.count}</td><td>${fmtNum(r.profitFactor,2)}</td><td>${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td><td>${escapeHtml(r.evaluation)}</td></tr>`).join("") || '<tr><td colspan="8" class="small">候補なし</td></tr>'; }
+function renderComparison(rows) { document.getElementById("compareBody").innerHTML = rows.map(r=>`<tr><td>${escapeHtml(r.rule || r.candidateName || "候補")}</td><td>${escapeHtml(r.session)}</td><td>${escapeHtml(r.label)}</td><td>${r.count}</td><td>${fmtNum(r.winRate,1)}%</td><td>${fmtNum(r.profitFactor,2)}</td><td>${fmtNum(r.expectancy,2)}</td><td>${fmtNum(r.totalPips,1)}</td></tr>`).join(""); }
+function renderWalk(rows) { document.getElementById("walkBody").innerHTML = rows.map(r=>`<tr><td>${escapeHtml(r.candidateName)}</td><td>${fmtNum(r.firstPF,2)}</td><td class="${classFor(r.secondPF,1.3,1)}">${fmtNum(r.secondPF,2)}</td><td>${fmtNum(r.firstExpectancy,2)}</td><td class="${classFor(r.secondExpectancy,0,0)}">${fmtNum(r.secondExpectancy,2)}</td><td>${fmtNum(r.degradation,1)}%</td><td>${escapeHtml(r.judgement)}</td></tr>`).join("") || '<tr><td colspan="7" class="small">候補なし</td></tr>'; }
+function renderPlan(plan) { document.getElementById("planBox").innerHTML = `<p>${escapeHtml(plan.note)}</p><ul>${plan.candidates.map(c=>`<li>${escapeHtml(c.candidateName)}: ${c.addable ? "追加検証候補" : "現時点では見送り"} - ${escapeHtml(c.reason)}</li>`).join("")}</ul>`; }
+function clearTables() { ["rankingBody","candidateBody","compareBody","walkBody"].forEach(id=>{document.getElementById(id).innerHTML='<tr><td class="small">分析中...</td></tr>';}); document.getElementById("planBox").textContent = "分析中..."; }
 function updateLoadSummary() { document.getElementById("loadedRows").textContent = loadedState.loadedRows.toLocaleString(); document.getElementById("validBars").textContent = loadedState.bars.length.toLocaleString(); document.getElementById("startTime").textContent = loadedState.startTime; document.getElementById("endTime").textContent = loadedState.endTime; }
-function updateDebugConsole() { document.getElementById("debugLog").textContent = [`読み込み本数: ${debugState.loadedRows.toLocaleString()}`,`有効バー数: ${debugState.validBars.toLocaleString()}`,`Core Rule件数: ${debugState.tradeCount.toLocaleString()}`,`RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,`ATR計算件数: ${debugState.atrCount.toLocaleString()}`,`EMA計算件数: ${debugState.emaCount.toLocaleString()}`,`エラー件数: ${debugState.errorCount.toLocaleString()}`,`最終実行時間: ${debugState.lastRun || "--"}`,"","Errors:",...(debugState.errors.length ? debugState.errors.slice(-80).map(e => `${e.functionName} index=${e.index} ${e.message}`) : ["なし"])].join("\n"); }
+function updateDebugConsole() { document.getElementById("debugLog").textContent = [`読み込み本数: ${debugState.loadedRows.toLocaleString()}`,`有効バー数: ${debugState.validBars.toLocaleString()}`,`検証条件数: ${debugState.comboCount.toLocaleString()}`,`RSI計算件数: ${debugState.rsiCount.toLocaleString()}`,`エラー件数: ${debugState.errorCount.toLocaleString()}`,`最終実行時間: ${debugState.lastRun || "--"}`,"","Errors:",...(debugState.errors.length ? debugState.errors.slice(-80).map(e => `${e.functionName} index=${e.index} ${e.message}`) : ["なし"])].join("\n"); }
 function logError(functionName, index, error) { debugState.errorCount++; debugState.errors.push({ functionName, index, message: error && error.message ? error.message : String(error) }); if (debugState.errors.length > 200) debugState.errors.shift(); console.error(functionName, index, error); }
 function setStatus(text) { document.getElementById("status").textContent = text; }
 function setProgress(label, done, total) { const pct = total ? Math.min(100, Math.max(0, done / total * 100)) : 0; document.getElementById("progressBar").value = pct; document.getElementById("progressText").textContent = `${label} / 進捗 ${pct.toFixed(1)}%`; }
 function yieldToBrowser() { return new Promise(resolve => setTimeout(resolve, 0)); }
 function fmtDate(date) { if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "--"; const p = n => String(n).padStart(2, "0"); return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())} ${p(date.getHours())}:${p(date.getMinutes())}`; }
 function fmtNum(value, digits = 2) { return Number.isFinite(value) ? value.toFixed(digits) : "--"; }
-function classFor(value, good, bad) { if (!Number.isFinite(value)) return ""; if (value > good) return "good"; if (value < bad) return "bad"; return ""; }
+function classFor(value, good, bad) { if (!Number.isFinite(value)) return ""; if (value >= good) return "good"; if (value < bad) return "bad"; return ""; }
 function escapeHtml(value) { return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch])); }
 
 function downloadJson() {
@@ -530,7 +449,7 @@ function downloadJson() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "research_v6_0_results.json";
+  a.download = "research_v6_2_results.json";
   document.body.appendChild(a);
   a.click();
   a.remove();
