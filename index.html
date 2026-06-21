@@ -133,8 +133,8 @@ async function loadCsvFiles(){
       const text = await files[i].text();
       const parsed = parseCsvBars(text, files[i].name);
       debug.loadedRows += parsed.loadedRows;
-      debug.errors.push(...parsed.errors);
-      merged.push(...parsed.bars);
+      for(const error of parsed.errors) debug.errors.push(error);
+      for(const bar of parsed.bars) merged.push(bar);
       setStatus(`CSV読み込み中 ${i+1}/${files.length}: ${files[i].name}`);
       await waitFrame();
     }
@@ -419,13 +419,20 @@ function renderSummary(){
     metric("開始日時", bars[0] ? fmtDate(bars[0].time) : "--"),
     metric("終了日時", bars.at(-1) ? fmtDate(bars.at(-1).time) : "--"),
     metric("RSI計算件数", debug.rsiCount.toLocaleString()),
-    metric("対象年", [...new Set(bars.map(b=>b.time.getFullYear()))].sort().join(", ") || "--"),
+    metric("対象年", collectYears(bars).join(", ") || "--"),
     metric("Spread控除", (Number(document.getElementById("spreadInput").value)||0).toFixed(1)+"pips")
   ].join("");
 }
 function metric(label, value){ return `<div class="metric"><div class="label">${escapeHtml(label)}</div><div class="value">${escapeHtml(String(value))}</div></div>`; }
 function renderComparison(rows){ document.getElementById("comparison").innerHTML = tableHtml(rows); }
 function renderYearly(rows){ document.getElementById("yearly").innerHTML = tableHtml(rows); }
+function collectYears(data){
+  const seen = new Set();
+  for(const b of data){
+    if(b && b.time instanceof Date) seen.add(b.time.getFullYear());
+  }
+  return [...seen].sort((a,b)=>a-b);
+}
 function tableHtml(rows){
   if(!rows.length) return `<p class="note">データなし</p>`;
   return `<table><thead><tr><th>Rule</th><th>Year</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総pips</th><th>最大DD</th><th>平均保有</th></tr></thead><tbody>${
