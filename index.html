@@ -45,12 +45,13 @@
   </section>
 
   <section class="card"><h2>2. データ概要</h2><div id="summary" class="summary"></div></section>
-  <section class="card"><h2>3. London BUY Top10</h2><div id="londonBuyTop" class="tablewrap"></div></section>
-  <section class="card"><h2>4. London SELL Top10</h2><div id="londonSellTop" class="tablewrap"></div></section>
-  <section class="card"><h2>5. 15:00-21:00 Top20</h2><div id="windowTop" class="tablewrap"></div></section>
-  <section class="card"><h2>6. 実運用候補 Top5</h2><div id="liveTop" class="tablewrap"></div></section>
-  <section class="card"><h2>7. 24時間統合EA構成案</h2><div id="integratedPlan" class="tablewrap"></div></section>
-  <section class="card"><h2>8. 候補ランキング</h2><div id="ranking" class="tablewrap"></div></section>
+  <section class="card"><h2>3. London BUY Top20</h2><div id="londonBuyTop" class="tablewrap"></div></section>
+  <section class="card"><h2>4. London SELL Top20</h2><div id="londonSellTop" class="tablewrap"></div></section>
+  <section class="card"><h2>5. 15:00-21:00 総合 Top20</h2><div id="windowTop" class="tablewrap"></div></section>
+  <section class="card"><h2>6. 実運用候補 Top10</h2><div id="liveTop" class="tablewrap"></div></section>
+  <section class="card"><h2>7. 採用候補 A〜E</h2><div id="finalCandidates" class="tablewrap"></div></section>
+  <section class="card"><h2>8. 24時間統合EA構成案</h2><div id="integratedPlan" class="tablewrap"></div></section>
+  <section class="card"><h2>9. 候補ランキング</h2><div id="ranking" class="tablewrap"></div></section>
   <section class="card"><h2>Debug Console</h2><pre id="debugLog">未実行</pre></section>
 </main>
 
@@ -87,14 +88,26 @@ const SPECIAL_RULES = [
   {
     name: "London順張り検証 BUY",
     direction: "BUY",
-    conditionText: ["EMA=Up", "RSI>55", "Rise>4"],
-    test: b => b.emaDirection === "Up" && b.rsi > 55 && b.recent3 > 4
+    conditionText: ["EMA=Up", "RSI>55", "Rise>4", "BullStreak>=2"],
+    test: b => b.emaDirection === "Up" && b.rsi > 55 && b.recent3 > 4 && b.bullStreak >= 2
   },
   {
     name: "London逆張り検証 SELL",
     direction: "SELL",
-    conditionText: ["RSI>70", "Rise>6"],
-    test: b => b.rsi > 70 && b.recent3 > 6
+    conditionText: ["RSI>70", "Rise>6", "HighUpdate=true"],
+    test: b => b.rsi > 70 && b.recent3 > 6 && b.highUpdate3 === true
+  },
+  {
+    name: "押し目BUY",
+    direction: "BUY",
+    conditionText: ["Drop<=-6", "RSI<35", "LowUpdate=true"],
+    test: b => b.recent3 <= -6 && b.rsi < 35 && b.lowUpdate3 === true
+  },
+  {
+    name: "戻りSELL",
+    direction: "SELL",
+    conditionText: ["Rise>=6", "RSI>65", "HighUpdate=true"],
+    test: b => b.recent3 >= 6 && b.rsi > 65 && b.highUpdate3 === true
   }
 ];
 
@@ -206,8 +219,8 @@ async function runResearch() {
           for (const sr of SPECIAL_RULES) {
             const pips = exits[sr.direction + "|" + ex.id];
             if (pips == null || !sr.test(b)) continue;
-            const [c1, c2, c3 = ""] = sr.conditionText;
-            addTrade(agg, makeKey(sr.direction, w.label, c1, c2, c3, "", "", "", ex.label, sr.name), pips, b.time, w.groups);
+            const [c1 = "", c2 = "", c3 = "", c4 = ""] = sr.conditionText;
+            addTrade(agg, makeKey(sr.direction, w.label, c1, c2, c3, c4, "", "", ex.label, sr.name), pips, b.time, w.groups);
           }
         }
       }
@@ -215,13 +228,14 @@ async function runResearch() {
 
     const rows = finalizeAgg(agg);
     const ranked = rows.filter(r => r.count >= 30 && r.expectancy > 0 && r.profitFactor > 1).sort((a, b) => score(b) - score(a));
-    const londonBuyTop = ranked.filter(r => r.direction === "BUY").slice(0, 10).map((r, i) => ({ ...r, ruleName: `London BUY ${i + 1}` }));
-    const londonSellTop = ranked.filter(r => r.direction === "SELL").slice(0, 10).map((r, i) => ({ ...r, ruleName: `London SELL ${i + 1}` }));
+    const londonBuyTop = ranked.filter(r => r.direction === "BUY").slice(0, 20).map((r, i) => ({ ...r, ruleName: `London BUY ${i + 1}` }));
+    const londonSellTop = ranked.filter(r => r.direction === "SELL").slice(0, 20).map((r, i) => ({ ...r, ruleName: `London SELL ${i + 1}` }));
     const windowTop = ranked.slice(0, 20).map((r, i) => ({ ...r, ruleName: `15-21 Rule ${i + 1}` }));
-    const liveTop = ranked.filter(r => r.status === "accept").slice(0, 5).map((r, i) => ({ ...r, ruleName: `London Live ${i + 1}` }));
+    const liveTop = ranked.filter(r => r.status === "accept").slice(0, 10).map((r, i) => ({ ...r, ruleName: `London Live ${i + 1}` }));
+    const finalCandidates = ranked.filter(r => r.status === "accept").slice(0, 5).map((r, i) => ({ ...r, ruleName: `採用候補${String.fromCharCode(65 + i)}` }));
     const ranking = ranked.slice(0, 100);
     const dangerous = rows.filter(r => r.count >= 50 && r.expectancy < 0).sort((a, b) => a.expectancy - b.expectancy).slice(0, 20);
-    const bestLondon = liveTop[0] || windowTop[0] || null;
+    const bestLondon = finalCandidates[0] || liveTop[0] || windowTop[0] || null;
     const integratedPlan = buildIntegratedPlan(bestLondon);
 
     results = {
@@ -246,11 +260,12 @@ async function runResearch() {
         exits: EXITS,
         specialRules: SPECIAL_RULES.map(r => ({ name: r.name, direction: r.direction, conditions: r.conditionText }))
       },
-      londonBuyTop10: londonBuyTop,
-      londonSellTop10: londonSellTop,
+      londonBuyTop20: londonBuyTop,
+      londonSellTop20: londonSellTop,
       window15to21Top20: windowTop,
-      liveCandidateTop5: liveTop,
-      finalOneCandidate: bestLondon,
+      liveCandidateTop10: liveTop,
+      finalCandidatesAtoE: finalCandidates,
+      selectedCandidateFor15to21: bestLondon,
       integratedEaPlan: integratedPlan,
       ranking,
       dangerousConditions: dangerous,
@@ -261,6 +276,7 @@ async function runResearch() {
     renderTable("londonSellTop", londonSellTop);
     renderTable("windowTop", windowTop);
     renderTable("liveTop", liveTop);
+    renderTable("finalCandidates", finalCandidates);
     renderIntegratedPlan(integratedPlan);
     renderTable("ranking", ranking);
     debug.candidates = rows.length;
@@ -613,7 +629,7 @@ function reset() {
   bars = [];
   results = null;
   Object.assign(debug, { files: 0, loadedRows: 0, validBars: 0, rsiCount: 0, candidates: 0, errors: [], lastRun: "--" });
-  for (const id of ["summary","londonBuyTop","londonSellTop","windowTop","liveTop","integratedPlan","ranking"]) document.getElementById(id).innerHTML = "";
+  for (const id of ["summary","londonBuyTop","londonSellTop","windowTop","liveTop","finalCandidates","integratedPlan","ranking"]) document.getElementById(id).innerHTML = "";
   document.getElementById("downloadBtn").disabled = true;
   setProgress(0, 100);
   updateDebug();
