@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer USDJPY Research v17</title>
+  <title>ScalpLayer Research v18</title>
   <style>
     :root{--bg:#08111f;--panel:#101b2c;--panel2:#0b1423;--line:#26364d;--text:#edf4ff;--muted:#a7b7d2;--gold:#d7b34c;--green:#39d889;--red:#ff6470;--yellow:#f6c951}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
@@ -11,11 +11,13 @@
     .sub,.note{color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
     .card{grid-column:span 12;background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:10px;padding:16px}
     .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}input[type=file]{max-width:100%;color:var(--muted)}
+    input[type=number]{width:88px;background:#07101d;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px}
     button{background:var(--gold);border:0;border-radius:8px;color:#111;font-weight:800;padding:10px 14px;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+    .progress{height:10px;background:#07101d;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:10px}.bar{height:100%;width:0;background:var(--gold)}
     .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:#081323;border:1px solid var(--line);border-radius:8px;padding:10px}.label{font-size:12px;color:var(--muted)}.value{font-weight:800;font-size:19px}
     .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;font-size:12px}
-    th,td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:right;white-space:nowrap}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){text-align:left}
-    th{background:#0a1626;color:#fff;position:sticky;top:0}tr.ea{background:rgba(57,216,137,.10)}tr.watch{background:rgba(246,201,81,.08)}tr.reject{background:rgba(255,100,112,.07)}
+    th,td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:right;white-space:nowrap}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){text-align:left}
+    th{background:#0a1626;color:#fff;position:sticky;top:0}tr.best{background:rgba(57,216,137,.10)}tr.goodrow{background:rgba(246,201,81,.07)}
     .good{color:var(--green);font-weight:800}.bad{color:var(--red);font-weight:800}.warn{color:var(--yellow);font-weight:800}
     pre{white-space:pre-wrap;max-height:300px;overflow:auto;background:#07101d;border:1px solid var(--line);border-radius:8px;padding:12px;color:#cfe0ff}
     @media(max-width:760px){.summary{grid-template-columns:repeat(2,1fr)}.controls>*{width:100%}th,td{font-size:11px;padding:6px}}
@@ -23,239 +25,145 @@
 </head>
 <body>
 <header>
-  <h1>ScalpLayer USDJPY Research v17</h1>
-  <p class="sub">research_v16_results.json から、2026年相場でも生き残っている第2Core候補を抽出します。</p>
+  <h1>ScalpLayer Research v18</h1>
+  <p class="sub">本命9のみを対象に、2023〜2026年を分離し、Recent5Rise × RSI の最安定条件を探索します。</p>
 </header>
 
 <main class="grid">
   <section class="card">
-    <h2>1. research_v16_results.json 読み込み</h2>
+    <h2>1. CSV読み込み</h2>
+    <p class="note">本命9想定：SELL / JST 21:00〜24:00 / BB=MiddleUpper / ATR=High / Vol=High / 180分決済。Recent5Rise と RSI のみ総当たりします。</p>
     <div class="controls">
-      <input id="jsonFile" type="file" accept=".json">
-      <button id="loadBtn" type="button">JSONを読み込む</button>
-      <button id="downloadBtn" type="button" disabled>research_v17_results.json</button>
+      <input id="csvFiles" type="file" accept=".csv,.txt" multiple>
+      <label class="note">Spread控除 <input id="spreadInput" type="number" value="0.8" step="0.1"> pips</label>
+      <button id="loadBtn" type="button">CSVを読み込む</button>
+      <button id="runBtn" type="button" disabled>Research v18を実行</button>
+      <button id="downloadBtn" type="button" disabled>research_v18_best_rule.json</button>
     </div>
-    <p id="status" class="note">research_v16_results.json を選択してください。</p>
+    <div class="progress"><div id="progressBar" class="bar"></div></div>
+    <p id="status" class="note">CSVを選択してください。</p>
   </section>
 
-  <section class="card"><h2>2. 概要</h2><div id="summary" class="summary"></div></section>
-  <section class="card"><h2>3. 2026年 PF順 上位20件</h2><div id="top20" class="tablewrap"></div></section>
-  <section class="card"><h2>4. 指定ルール A / B 詳細</h2><div id="abDetail" class="tablewrap"></div></section>
-  <section class="card"><h2>5. 月別成績</h2><div id="monthly" class="tablewrap"></div></section>
-  <section class="card"><h2>6. 最終評価</h2><div id="judgement" class="tablewrap"></div></section>
+  <section class="card"><h2>2. データ概要</h2><div id="summary" class="summary"></div></section>
+  <section class="card"><h2>3. 最安定ルール</h2><div id="bestRule" class="tablewrap"></div></section>
+  <section class="card"><h2>4. 総当たり比較</h2><div id="gridTable" class="tablewrap"></div></section>
+  <section class="card"><h2>5. 年別詳細</h2><div id="yearTable" class="tablewrap"></div></section>
   <section class="card"><h2>Debug Console</h2><pre id="debugLog">未実行</pre></section>
 </main>
 
 <script>
-let source = null;
-let results = null;
-const debug = { errors: [], loaded: false, candidateCount: 0, filteredCount: 0 };
+const PIP=100, RSI_PERIOD=14, BB_PERIOD=20, ATR_PERIOD=14, MAX_HOLD=180;
+const RSI_LEVELS=[60,65,70,75];
+const RISE_LEVELS=[4,5,6,7,8];
+const YEARS=[2023,2024,2025,2026];
+let bars=[],results=null;
+const debug={files:0,loadedRows:0,validBars:0,rsiCount:0,matchedBars:0,errors:[],lastRun:"--"};
+document.getElementById("loadBtn").addEventListener("click",loadCsvFiles);
+document.getElementById("runBtn").addEventListener("click",runResearch);
+document.getElementById("downloadBtn").addEventListener("click",downloadJson);
 
-document.getElementById("loadBtn").addEventListener("click", loadJson);
-document.getElementById("downloadBtn").addEventListener("click", downloadJson);
+function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}
+function setProgress(done,total){document.getElementById("progressBar").style.width=(total?Math.min(100,Math.round(done/total*100)):0)+"%";}
+function appendMany(target,source,chunkSize=10000){for(let i=0;i<source.length;i+=chunkSize){const end=Math.min(i+chunkSize,source.length);for(let j=i;j<end;j++)target.push(source[j]);}}
+const waitFrame=()=>new Promise(r=>setTimeout(r,0));
 
-async function loadJson(){
-  const file = document.getElementById("jsonFile").files[0];
-  if(!file){setStatus("research_v16_results.json を選択してください。", true);return;}
+async function loadCsvFiles(){
+  const files=[...document.getElementById("csvFiles").files];
+  if(!files.length){setStatus("CSVファイルを選択してください。",true);return;}
+  reset();
   try{
-    source = JSON.parse(await file.text());
-    results = analyze(source, file.name);
-    renderAll(results);
-    document.getElementById("downloadBtn").disabled = false;
-    setStatus("Research v17分析完了。");
-  }catch(e){
-    debug.errors.push({scope:"loadJson",message:e.message,stack:e.stack});
-    updateDebug();
-    setStatus("JSON読み込み失敗: "+e.message, true);
-  }
-}
-
-function analyze(data, fileName){
-  const candidates = collectCandidates(data);
-  debug.loaded = true;
-  debug.candidateCount = candidates.length;
-  const enriched = candidates.map((r, i) => enrichCandidate(r, i + 1));
-  const filtered = enriched
-    .filter(r => r.y2026.count >= 30 && r.y2026.profitFactor >= 1.5 && r.y2026.expectancy > 0)
-    .sort((a,b) => b.y2026.profitFactor - a.y2026.profitFactor)
-    .slice(0,20)
-    .map((r,i)=>({...r, rank:i+1}));
-  debug.filteredCount = filtered.length;
-  const ruleA = findRule(enriched, { name:"A", move:"Recent3Rise>=4" });
-  const ruleB = findRule(enriched, { name:"B", move:"Recent3Rise>=6" });
-  const ab = [ruleA, ruleB].filter(Boolean);
-  const monthly = buildMonthlyRows(ab);
-  const finalJudgement = buildFinalJudgement(filtered, ab);
-  return {
-    meta: {
-      version: "research-v17",
-      generatedAt: new Date().toISOString(),
-      sourceFileName: fileName,
-      sourceVersion: data?.meta?.version || "",
-      note: "v16 JSONに月別トレード明細がない場合、月別成績・最大連勝・最大連敗は未計算として表示します。"
-    },
-    criteria: { year: 2026, minPf: 1.5, minCount: 30, minExpectancy: 0 },
-    top20By2026Pf: filtered,
-    ruleDetails: ab,
-    monthlyStats: monthly,
-    finalJudgement
-  };
-}
-
-function collectCandidates(data){
-  const pools = [
-    data?.ranking,
-    data?.top3Candidates,
-    data?.priorityACandidates,
-    data?.priorityBCandidates,
-    data?.superCandidates,
-    data?.mainCandidates
-  ].filter(Array.isArray);
-  const map = new Map();
-  for(const pool of pools){
-    for(const r of pool){
-      const key = JSON.stringify([r.timeWindow,r.direction,r.rsi,r.move,r.update,r.bb,r.ema,r.atr,r.vol,r.exit]);
-      if(!map.has(key)) map.set(key, r);
+    const merged=[];
+    for(let i=0;i<files.length;i++){
+      setStatus(`CSV読み込み中 ${i+1}/${files.length}: ${files[i].name}`);
+      setProgress(i,files.length);
+      const parsed=parseCsvBars(await files[i].text(),files[i].name);
+      debug.loadedRows+=parsed.loadedRows;
+      appendMany(debug.errors,parsed.errors);
+      appendMany(merged,parsed.bars);
+      await waitFrame();
     }
-  }
-  return [...map.values()];
+    bars=dedupeAndSortBars(merged);
+    debug.files=files.length;debug.validBars=bars.length;
+    enrichBars(bars);
+    renderSummary();updateDebug();setProgress(100,100);
+    document.getElementById("runBtn").disabled=!bars.length;
+    setStatus("CSV読み込み完了。Research v18を実行できます。");
+  }catch(e){debug.errors.push({scope:"loadCsvFiles",message:e.message});updateDebug();setStatus("CSV読み込み失敗: "+e.message,true);}
 }
 
-function enrichCandidate(r, sourceRank){
-  const y2026 = normalizeMetrics(r?.yearStats?.[2026]);
-  return {
-    sourceRank,
-    ruleName: r.ruleName || "",
-    timeWindow: r.timeWindow || "",
-    direction: r.direction || "",
-    conditions: [r.rsi,r.move,r.update,r.bb,r.ema,r.atr,r.vol,r.exit].filter(Boolean).join(" / "),
-    rsi: r.rsi, move: r.move, update: r.update, bb: r.bb, ema: r.ema, atr: r.atr, vol: r.vol, exit: r.exit,
-    allPeriod: normalizeMetrics(r),
-    y2026,
-    maxWinStreak2026: streakUnavailable(r),
-    maxLossStreak2026: streakUnavailable(r),
-    maxDrawdown2026: y2026.maxDrawdown,
-    monthlyStats: Array.isArray(r.monthlyStats2026) ? r.monthlyStats2026 : [],
-    judgement: judgeCandidate(y2026)
-  };
-}
-
-function normalizeMetrics(m){
-  return {
-    count: Number(m?.count || 0),
-    winRate: Number(m?.winRate || 0),
-    profitFactor: Number(m?.profitFactor || 0),
-    totalPips: Number(m?.totalPips || 0),
-    expectancy: Number(m?.expectancy || 0),
-    maxDrawdown: Number(m?.maxDrawdown || 0)
-  };
-}
-
-function streakUnavailable(){ return "v16 JSONに取引順序明細なし"; }
-
-function judgeCandidate(m){
-  if(m.count >= 50 && m.profitFactor >= 2.0 && m.expectancy >= 2) return { label:"EA候補", className:"ea", reason:"2026年でもPF2.0以上、期待値+2以上、件数50以上" };
-  if(m.count >= 30 && m.profitFactor >= 1.5 && m.expectancy > 0) return { label:"要注意", className:"watch", reason:"抽出条件は満たすが、追加検証推奨" };
-  return { label:"除外候補", className:"reject", reason:"2026年基準未達" };
-}
-
-function findRule(rows, spec){
-  const matched = rows.filter(r =>
-    r.timeWindow === "21:00-24:00" &&
-    r.direction === "SELL" &&
-    r.rsi === "RSI>60" &&
-    r.move === spec.move &&
-    r.bb === "MiddleUpper" &&
-    r.atr === "ATR=High" &&
-    r.vol === "Vol=High" &&
-    r.exit === "180分決済"
-  ).sort((a,b)=>b.y2026.profitFactor-a.y2026.profitFactor)[0];
-  return matched ? { ...matched, ruleName: `Rule ${spec.name}` } : {
-    ruleName: `Rule ${spec.name}`,
-    timeWindow: "21:00-24:00",
-    direction: "SELL",
-    conditions: `RSI>60 / ${spec.move} / BB=MiddleUpper / ATR=High / Vol=High / 180分決済`,
-    y2026: normalizeMetrics(null),
-    allPeriod: normalizeMetrics(null),
-    maxWinStreak2026: "該当候補なし",
-    maxLossStreak2026: "該当候補なし",
-    monthlyStats: [],
-    judgement: { label:"除外候補", className:"reject", reason:"v16 JSON内に完全一致候補なし" }
-  };
-}
-
-function buildMonthlyRows(rules){
-  const rows = [];
-  for(const r of rules){
-    if(r.monthlyStats && r.monthlyStats.length){
-      for(const m of r.monthlyStats) rows.push({ ruleName:r.ruleName, ...m });
-    } else {
-      for(let month=1;month<=12;month++){
-        rows.push({ ruleName:r.ruleName, month:`2026-${String(month).padStart(2,"0")}`, count:"--", profitFactor:"--", totalPips:"--", expectancy:"--", note:"v16 JSONに月別明細なし" });
+async function runResearch(){
+  if(!bars.length){setStatus("先にCSVを読み込んでください。",true);return;}
+  document.getElementById("runBtn").disabled=true;document.getElementById("downloadBtn").disabled=true;
+  try{
+    const spread=Number(document.getElementById("spreadInput").value)||0;
+    const aggs=new Map();
+    for(const rsi of RSI_LEVELS)for(const rise of RISE_LEVELS)aggs.set(key(rsi,rise),newAgg(rsi,rise));
+    for(let i=60;i<bars.length-MAX_HOLD-1;i++){
+      if(i%10000===0){setProgress(i,bars.length);setStatus(`分析中 ${i.toLocaleString()} / ${bars.length.toLocaleString()}`);await waitFrame();}
+      const b=bars[i];if(!validFeatureBar(b))continue;
+      if(!isJstRange(b.time,21,24))continue;
+      if(b.bbPosition!=="MiddleUpper"||b.atrBand!=="High"||b.volBand!=="High")continue;
+      debug.matchedBars++;
+      const pips=simulateTimeSell(bars,i,180,spread);
+      if(pips==null)continue;
+      for(const rsi of RSI_LEVELS){
+        if(!(b.rsi>rsi))continue;
+        for(const rise of RISE_LEVELS){
+          if(b.recent5>=rise)addTrade(aggs.get(key(rsi,rise)),pips,b.time);
+        }
       }
     }
-  }
-  return rows;
+    const rows=[...aggs.values()].map(finalizeAgg).sort((a,b)=>stableScore(b)-stableScore(a));
+    const best=rows[0]||null;
+    const yearRows=best?YEARS.map(y=>({rule:best.ruleName,year:y,...best.yearStats[y]})):[];
+    results={
+      meta:{version:"research-v18",generatedAt:new Date().toISOString(),sourceFiles:[...document.getElementById("csvFiles").files].map(f=>f.name),validBars:bars.length,startTime:bars[0]?fmtDate(bars[0].time):null,endTime:bars.at(-1)?fmtDate(bars.at(-1).time):null,spreadPips:spread},
+      target:"Honmei 9",
+      fixedConditions:["SELL","JST 21:00-24:00","BB=MiddleUpper","ATR=High","Vol=High","180分決済"],
+      grid:{rsi:RSI_LEVELS,recent5Rise:RISE_LEVELS},
+      bestRule:best,
+      comparison:rows,
+      bestRuleYearStats:yearRows
+    };
+    renderTable("bestRule",best?[{...best,isBest:true}]:[]);
+    renderTable("gridTable",rows.map((r,i)=>({...r,rank:i+1,isBest:i===0})));
+    renderYearTable(yearRows);
+    debug.lastRun=fmtDate(new Date());updateDebug();document.getElementById("downloadBtn").disabled=false;setProgress(100,100);setStatus("Research v18分析完了。");
+  }catch(e){debug.errors.push({scope:"runResearch",message:e.message,stack:e.stack});updateDebug();setStatus("分析失敗: "+e.message,true);}
+  finally{document.getElementById("runBtn").disabled=false;}
 }
 
-function buildFinalJudgement(filtered, ab){
-  const ea = filtered.filter(r => r.judgement.label === "EA候補");
-  const watch = filtered.filter(r => r.judgement.label === "要注意");
-  const best = filtered[0] || null;
-  return {
-    summary: ea.length ? "2026年でもEA候補あり" : watch.length ? "2026年では要注意候補のみ" : "2026年基準を満たす候補なし",
-    bestCandidate: best,
-    eaCandidates: ea.length,
-    watchCandidates: watch.length,
-    excludedNote: "過去全期間よりも2026年PF・件数・期待値を優先して評価しています。",
-    ruleA: ab.find(r=>r.ruleName==="Rule A")?.judgement || null,
-    ruleB: ab.find(r=>r.ruleName==="Rule B")?.judgement || null
-  };
-}
+function key(rsi,rise){return `${rsi}|${rise}`;}
+function newAgg(rsi,rise){return{ruleName:`RSI>${rsi} / Recent5Rise>=${rise}`,rsi,rise,trades:[],years:new Map()};}
+function addTrade(a,pips,time){a.trades.push(pips);const y=time.getFullYear();if(!a.years.has(y))a.years.set(y,[]);a.years.get(y).push(pips);}
+function finalizeAgg(a){const m=calcMetrics(a.trades),yearStats={};for(const y of YEARS)yearStats[y]=calcMetrics(a.years.get(y)||[]);const minPf=Math.min(...YEARS.map(y=>yearStats[y].count?yearStats[y].profitFactor:0));const minExp=Math.min(...YEARS.map(y=>yearStats[y].count?yearStats[y].expectancy:-999));const totalCount=YEARS.reduce((s,y)=>s+yearStats[y].count,0);return{ruleName:a.ruleName,rsi:a.rsi,recent5Rise:a.rise,...m,yearStats,minYearPf:minPf,minYearExpectancy:minExp,totalYearCount:totalCount,stableScore:stableScoreRaw(m,yearStats)};}
+function stableScore(r){return r.stableScore;}
+function stableScoreRaw(m,ys){const minPf=Math.min(...YEARS.map(y=>ys[y].count?ys[y].profitFactor:0));const pfStability=minPf*60;const expAvg=YEARS.reduce((s,y)=>s+(ys[y].expectancy||0),0)/YEARS.length;const countPenalty=YEARS.some(y=>ys[y].count<10)?-80:0;return pfStability+expAvg*20+Math.min(m.profitFactor,5)*15+Math.log(Math.max(1,m.count))*8-m.maxDrawdown*0.05+countPenalty;}
+function simulateTimeSell(data,i,hold,spread){const entry=data[i]?.close,exit=data[Math.min(data.length-1,i+hold)]?.close;if(!Number.isFinite(entry)||!Number.isFinite(exit))return null;return(entry-exit)*PIP-spread;}
 
-function renderAll(res){
-  document.getElementById("summary").innerHTML = [
-    metric("Source", res.meta.sourceFileName),
-    metric("候補総数", debug.candidateCount),
-    metric("2026抽出候補", debug.filteredCount),
-    metric("最終判定", res.finalJudgement.summary)
-  ].join("");
-  renderTable("top20", res.top20By2026Pf);
-  renderTable("abDetail", res.ruleDetails);
-  renderMonthly(res.monthlyStats);
-  renderJudgement(res.finalJudgement);
-  updateDebug();
-}
+function enrichBars(data){let gains=0,losses=0,atr=null;const volValues=[];for(let i=1;i<data.length;i++){const b=data[i],p=data[i-1],diff=b.close-p.close;if(i<=RSI_PERIOD){if(diff>=0)gains+=diff;else losses-=diff;}if(i===RSI_PERIOD){b.avgGain=gains/RSI_PERIOD;b.avgLoss=losses/RSI_PERIOD;b.rsi=rsiFrom(b.avgGain,b.avgLoss);debug.rsiCount++;}else if(i>RSI_PERIOD){const g=Math.max(diff,0),l=Math.max(-diff,0);b.avgGain=(p.avgGain*(RSI_PERIOD-1)+g)/RSI_PERIOD;b.avgLoss=(p.avgLoss*(RSI_PERIOD-1)+l)/RSI_PERIOD;b.rsi=rsiFrom(b.avgGain,b.avgLoss);debug.rsiCount++;}const tr=Math.max(b.high-b.low,Math.abs(b.high-p.close),Math.abs(b.low-p.close))*PIP;if(i===ATR_PERIOD){atr=avg(data.slice(1,ATR_PERIOD+1).map((x,k)=>{const prev=data[k];return Math.max(x.high-x.low,Math.abs(x.high-prev.close),Math.abs(x.low-prev.close))*PIP;}));b.atr14=atr;}else if(i>ATR_PERIOD){atr=(atr*(ATR_PERIOD-1)+tr)/ATR_PERIOD;b.atr14=atr;}if(i>=5)b.recent5=(b.close-data[i-5].close)*PIP;if(i>=BB_PERIOD){const closes=data.slice(i-BB_PERIOD+1,i+1).map(x=>x.close),mid=avg(closes),sd=std(closes,mid),upper=mid+2*sd,lower=mid-2*sd;b.bbPosition=bbLabel(b.close,upper,mid,lower);}b.volatility=(b.high-b.low)*PIP;volValues.push(b.volatility);}const sortedVol=[...volValues].sort((a,b)=>a-b),q1=quantile(sortedVol,.33),q2=quantile(sortedVol,.66);const atrVals=data.map(b=>b.atr14).filter(Number.isFinite).sort((a,b)=>a-b),a1=quantile(atrVals,.33),a2=quantile(atrVals,.66);for(const b of data){if(Number.isFinite(b.volatility))b.volBand=b.volatility<=q1?"Low":b.volatility<=q2?"Mid":"High";if(Number.isFinite(b.atr14))b.atrBand=b.atr14<=a1?"Low":b.atr14<=a2?"Mid":"High";}}
+function bbLabel(c,upper,mid,lower){if(c>=upper)return"Upper";if(c>=mid)return"MiddleUpper";if(c>lower)return"MiddleLower";return"Lower";}
+function rsiFrom(g,l){if(l===0)return 100;const rs=g/l;return 100-100/(1+rs);}
+function avg(a){return a.reduce((x,y)=>x+y,0)/a.length;}function std(a,m){return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/a.length);}function quantile(a,q){if(!a.length)return NaN;return a[Math.min(a.length-1,Math.max(0,Math.floor((a.length-1)*q)))];}
+function calcMetrics(values){const c=values.length,wins=values.filter(x=>x>0),losses=values.filter(x=>x<0),grossProfit=sum(wins),grossLoss=Math.abs(sum(losses)),total=sum(values);return{count:c,winRate:c?wins.length/c*100:0,profitFactor:grossLoss>0?grossProfit/grossLoss:(grossProfit>0?999:0),expectancy:c?total/c:0,totalPips:total,maxDrawdown:maxDrawdown(values)};}
+function maxDrawdown(values){let equity=0,peak=0,dd=0;for(const x of values){equity+=x;if(equity>peak)peak=equity;dd=Math.max(dd,peak-equity);}return dd;}function sum(a){return a.reduce((x,y)=>x+y,0);}
+function validFeatureBar(b){return validBar(b)&&Number.isFinite(b.rsi)&&Number.isFinite(b.recent5)&&b.bbPosition&&b.atrBand&&b.volBand;}
 
-function renderTable(id, rows){
-  if(!rows.length){document.getElementById(id).innerHTML = `<p class="note">該当候補なし</p>`;return;}
-  document.getElementById(id).innerHTML = `<table><thead><tr><th>Rank</th><th>Rule</th><th>Time</th><th>Direction</th><th>Conditions</th><th>2026 Count</th><th>2026 WinRate</th><th>2026 PF</th><th>2026 Total</th><th>2026 Avg</th><th>2026 MaxDD</th><th>最大連勝</th><th>最大連敗</th><th>評価</th><th>理由</th></tr></thead><tbody>${rows.map(r=>`<tr class="${esc(r.judgement?.className||"reject")}"><td>${esc(r.rank||"")}</td><td>${esc(r.ruleName||"")}</td><td>${esc(r.timeWindow)}</td><td>${esc(r.direction)}</td><td>${esc(r.conditions)}</td><td>${fmtInt(r.y2026.count)}</td><td>${fmt(r.y2026.winRate)}%</td><td>${fmtPf(r.y2026.profitFactor)}</td><td>${sign(r.y2026.totalPips)}</td><td>${sign(r.y2026.expectancy)}</td><td>${fmt(r.y2026.maxDrawdown)}</td><td>${esc(r.maxWinStreak2026)}</td><td>${esc(r.maxLossStreak2026)}</td><td>${esc(r.judgement?.label)}</td><td>${esc(r.judgement?.reason)}</td></tr>`).join("")}</tbody></table>`;
-}
-
-function renderMonthly(rows){
-  document.getElementById("monthly").innerHTML = `<table><thead><tr><th>Rule</th><th>Month</th><th>Count</th><th>PF</th><th>TotalPips</th><th>AvgPips</th><th>Note</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.ruleName)}</td><td>${esc(r.month)}</td><td>${esc(r.count)}</td><td>${esc(r.profitFactor)}</td><td>${esc(r.totalPips)}</td><td>${esc(r.expectancy)}</td><td>${esc(r.note||"")}</td></tr>`).join("")}</tbody></table>`;
-}
-
-function renderJudgement(j){
-  document.getElementById("judgement").innerHTML = `<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>
-    <tr><td>総括</td><td>${esc(j.summary)}</td></tr>
-    <tr><td>EA候補数</td><td>${fmtInt(j.eaCandidates)}</td></tr>
-    <tr><td>要注意候補数</td><td>${fmtInt(j.watchCandidates)}</td></tr>
-    <tr><td>評価方針</td><td>${esc(j.excludedNote)}</td></tr>
-    <tr><td>Best</td><td>${esc(j.bestCandidate ? `${j.bestCandidate.timeWindow} ${j.bestCandidate.direction} ${j.bestCandidate.conditions}` : "なし")}</td></tr>
-  </tbody></table>`;
-}
-
+function parseCsvBars(text,fileName){const rows=parseCsv(text).filter(r=>r.some(c=>String(c).trim()!==""));if(!rows.length)return{bars:[],loadedRows:0,errors:[]};const header=rows[0].map(h=>String(h).trim().toLowerCase()),idx=detectColumns(header),start=idx.hasHeader?1:0,out=[],errors=[];for(let r=start;r<rows.length;r++){const row=rows[r],b={sourceFile:fileName,time:parseDate(row[idx.time]),open:toNumber(row[idx.open]),high:toNumber(row[idx.high]),low:toNumber(row[idx.low]),close:toNumber(row[idx.close])};if(validBar(b))out.push(b);else if(errors.length<20)errors.push({fileName,row:r+1,message:"invalid row"});}return{bars:out,loadedRows:Math.max(0,rows.length-start),errors};}
+function detectColumns(h){const hasHeader=h.some(x=>/(time|date|datetime|日時|日付)/i.test(x));if(!hasHeader)return{hasHeader:false,time:0,open:1,high:2,low:3,close:4};const find=patterns=>h.findIndex(x=>patterns.some(p=>p.test(x)));const idx={hasHeader:true,time:find([/datetime/,/time/,/date/,/日時/,/日付/]),open:find([/^open$/,/始値/]),high:find([/^high$/,/高値/]),low:find([/^low$/,/安値/]),close:find([/^close$/,/終値/])};for(const k of["time","open","high","low","close"])if(idx[k]<0)idx[k]={time:0,open:1,high:2,low:3,close:4}[k];return idx;}
+function parseCsv(text){const rows=[];let row=[],cell="",quote=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(quote&&ch==='"'&&next==='"'){cell+='"';i++;continue;}if(ch==='"'){quote=!quote;continue;}if(!quote&&ch===","){row.push(cell);cell="";continue;}if(!quote&&(ch==="\n"||ch==="\r")){if(ch==="\r"&&next==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";continue;}cell+=ch;}row.push(cell);rows.push(row);return rows;}
+function parseDate(v){const raw=String(v||"").trim();if(!raw)return null;const s=raw.replace(/\./g,"-").replace(/\//g,"-").replace("T"," ");const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);if(m){const[,y,mo,d,h="0",mi="0",sec="0"]=m;return new Date(+y,+mo-1,+d,+h,+mi,+sec);}const d=new Date(raw);return Number.isNaN(d.getTime())?null:d;}
+function toNumber(v){const n=Number(String(v??"").trim().replace(/,/g,""));return Number.isFinite(n)?n:NaN;}function validBar(b){return b&&b.time instanceof Date&&!Number.isNaN(b.time.getTime())&&[b.open,b.high,b.low,b.close].every(Number.isFinite);}
+function dedupeAndSortBars(data){const map=new Map();for(const b of data)map.set(b.time.getTime(),b);return[...map.values()].sort((a,b)=>a.time-b.time);}function isJstRange(d,start,end){const h=d.getHours();return start<end?h>=start&&h<end:h>=start||h<end;}
+function renderSummary(){document.getElementById("summary").innerHTML=[metric("ファイル数",debug.files),metric("読み込み行数",debug.loadedRows.toLocaleString()),metric("有効バー数",bars.length.toLocaleString()),metric("開始日時",bars[0]?fmtDate(bars[0].time):"--"),metric("終了日時",bars.at(-1)?fmtDate(bars.at(-1).time):"--"),metric("対象年",collectYears(bars).join(", ")||"--"),metric("Spread控除",(Number(document.getElementById("spreadInput").value)||0).toFixed(1)+"pips"),metric("RSI計算件数",debug.rsiCount.toLocaleString())].join("");}
 function metric(label,value){return`<div class="metric"><div class="label">${esc(label)}</div><div class="value">${esc(String(value))}</div></div>`;}
-function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}
-function downloadJson(){if(!results)return;download("research_v17_results.json",JSON.stringify(results,null,2),"application/json");}
-function download(name,text,type){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
-function updateDebug(){document.getElementById("debugLog").textContent=[`loaded: ${debug.loaded}`,`candidateCount: ${debug.candidateCount}`,`filteredCount: ${debug.filteredCount}`,"","Errors:",...(debug.errors.length?debug.errors.slice(-40).map(e=>JSON.stringify(e)):["なし"])].join("\n");}
-function fmt(n){return Number.isFinite(Number(n))?Number(n).toFixed(2):"--";}
-function fmtPf(n){return Number(n)>=999?"∞":fmt(n);}
-function sign(n){return Number.isFinite(Number(n))?(Number(n)>=0?"+":"")+Number(n).toFixed(2):"--";}
-function fmtInt(n){return Number.isFinite(Number(n))?Number(n).toLocaleString():"--";}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function renderTable(id,rows){document.getElementById(id).innerHTML=tableHtml(rows);}
+function tableHtml(rows){if(!rows.length)return`<p class="note">該当なし</p>`;return`<table><thead><tr><th>Rank</th><th>Rule</th><th>PF</th><th>期待値</th><th>DD</th><th>件数</th><th>勝率</th><th>総pips</th><th>2023 PF/EV/DD/N</th><th>2024 PF/EV/DD/N</th><th>2025 PF/EV/DD/N</th><th>2026 PF/EV/DD/N</th><th>安定Score</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.isBest||i===0?"best":i<5?"goodrow":""}"><td>${i+1}</td><td>${esc(r.ruleName)}</td><td>${fmtPf(r.profitFactor)}</td><td>${sign(r.expectancy)}</td><td>${fmt(r.maxDrawdown)}</td><td>${fmtInt(r.count)}</td><td>${fmt(r.winRate)}%</td><td>${sign(r.totalPips)}</td>${YEARS.map(y=>`<td>${fmtPf(r.yearStats[y].profitFactor)} / ${sign(r.yearStats[y].expectancy)} / ${fmt(r.yearStats[y].maxDrawdown)} / ${fmtInt(r.yearStats[y].count)}</td>`).join("")}<td>${fmt(r.stableScore)}</td></tr>`).join("")}</tbody></table>`;}
+function renderYearTable(rows){document.getElementById("yearTable").innerHTML=`<table><thead><tr><th>Year</th><th>PF</th><th>期待値</th><th>DD</th><th>件数</th><th>勝率</th><th>総pips</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.year}</td><td>${fmtPf(r.profitFactor)}</td><td>${sign(r.expectancy)}</td><td>${fmt(r.maxDrawdown)}</td><td>${fmtInt(r.count)}</td><td>${fmt(r.winRate)}%</td><td>${sign(r.totalPips)}</td></tr>`).join("")}</tbody></table>`;}
+function reset(){bars=[];results=null;Object.assign(debug,{files:0,loadedRows:0,validBars:0,rsiCount:0,matchedBars:0,errors:[],lastRun:"--"});for(const id of["summary","bestRule","gridTable","yearTable"])document.getElementById(id).innerHTML="";document.getElementById("downloadBtn").disabled=true;setProgress(0,100);updateDebug();}
+function downloadJson(){if(!results)return;const blob=new Blob([JSON.stringify(results,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="research_v18_best_rule.json";a.click();URL.revokeObjectURL(url);}
+function updateDebug(){document.getElementById("debugLog").textContent=[`ファイル数: ${debug.files}`,`読み込み行数: ${debug.loadedRows}`,`有効バー数: ${debug.validBars}`,`RSI計算件数: ${debug.rsiCount}`,`本命9固定条件一致バー: ${debug.matchedBars}`,`最終実行: ${debug.lastRun}`,"","Errors:",...(debug.errors.length?debug.errors.slice(-40).map(e=>JSON.stringify(e)):["なし"])].join("\n");}
+function collectYears(data){const s=new Set();for(const b of data)if(b?.time)s.add(b.time.getFullYear());return[...s].sort((a,b)=>a-b);}function fmtDate(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}function pad(n){return String(n).padStart(2,"0");}function fmt(n){return Number.isFinite(Number(n))?Number(n).toFixed(2):"--";}function fmtPf(n){return Number(n)>=999?"∞":fmt(n);}function sign(n){return Number.isFinite(Number(n))?(Number(n)>=0?"+":"")+Number(n).toFixed(2):"--";}function fmtInt(n){return Number.isFinite(Number(n))?Number(n).toLocaleString():"--";}function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
 updateDebug();
 </script>
 </body>
