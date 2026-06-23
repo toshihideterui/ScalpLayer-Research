@@ -81,6 +81,12 @@ document.getElementById("recBtn").addEventListener("click",()=>download("researc
 function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}
 function setProgress(done,total){document.getElementById("progressBar").style.width=(total?Math.min(100,Math.round(done/total*100)):0)+"%";}
 const waitFrame=()=>new Promise(r=>setTimeout(r,0));
+function appendMany(target,source,chunkSize=10000){
+  for(let i=0;i<source.length;i+=chunkSize){
+    const end=Math.min(i+chunkSize,source.length);
+    for(let j=i;j<end;j++)target.push(source[j]);
+  }
+}
 
 async function loadCsvFiles(){
   const files=[...document.getElementById("csvFiles").files];
@@ -93,8 +99,8 @@ async function loadCsvFiles(){
       setProgress(i,files.length);
       const parsed=parseCsvBars(await files[i].text(),files[i].name);
       debug.loadedRows+=parsed.loadedRows;
-      debug.errors.push(...parsed.errors);
-      merged.push(...parsed.bars);
+      appendMany(debug.errors,parsed.errors);
+      appendMany(merged,parsed.bars);
       await waitFrame();
     }
     bars=dedupeAndSortBars(merged);
