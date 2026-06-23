@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v23</title>
+  <title>ScalpLayer Research v24</title>
   <style>
     :root{--bg:#08111f;--panel:#101b2c;--panel2:#0b1423;--line:#26364d;--text:#edf4ff;--muted:#a7b7d2;--gold:#d7b34c;--green:#39d889;--red:#ff6470;--yellow:#f6c951}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
@@ -24,8 +24,8 @@
 </head>
 <body>
 <header>
-  <h1>ScalpLayer Research v23</h1>
-  <p class="sub">Candidate I が Core Rule E の補助EAとして使えるかを検証します。新ルール探索ではなく、固定条件の最終検証です。</p>
+  <h1>ScalpLayer Research v24</h1>
+  <p class="sub">Candidate I が Core Rule E の次の主力補助候補になれるかを検証します。新規ルール探索は禁止し、Candidate Iのみを研究対象にします。</p>
 </header>
 
 <main class="grid">
@@ -35,24 +35,24 @@
     <div class="controls">
       <input id="csvFiles" type="file" accept=".csv,.txt" multiple>
       <button id="loadBtn" type="button">CSVを読み込む</button>
-      <button id="runBtn" type="button" disabled>Research v23を実行</button>
-      <button id="jsonBtn" type="button" disabled>research_v23_results.json</button>
-      <button id="csvBtn" type="button" disabled>research_v23_candidate_i.csv</button>
-      <button id="recBtn" type="button" disabled>research_v23_recommendation.json</button>
+      <button id="runBtn" type="button" disabled>Research v24を実行</button>
+      <button id="jsonBtn" type="button" disabled>research_v24_results.json</button>
+      <button id="csvBtn" type="button" disabled>research_v24_filters.csv</button>
+      <button id="recBtn" type="button" disabled>research_v24_recommendation.json</button>
     </div>
     <div class="progress"><div id="progressBar" class="bar"></div></div>
     <p id="status" class="note">CSVを選択してください。</p>
   </section>
 
   <section class="card"><h2>2. データ概要</h2><div id="summary" class="summary"></div></section>
-  <section class="card"><h2>3. 年別成績</h2><div id="yearly" class="tablewrap"></div></section>
-  <section class="card"><h2>4. 月別成績</h2><div id="monthly" class="tablewrap"></div></section>
-  <section class="card"><h2>5. 2026年重点検証</h2><div id="focus2026" class="tablewrap"></div></section>
-  <section class="card"><h2>6. Candidate I 決済比較</h2><div id="exitCompare" class="tablewrap"></div></section>
-  <section class="card"><h2>7. 条件緩和・条件強化</h2><div id="variantCompare" class="tablewrap"></div></section>
-  <section class="card"><h2>8. Core Rule Eとの相関</h2><div id="correlation" class="tablewrap"></div></section>
+  <section class="card"><h2>3. 2026年重点分析</h2><div id="focus2026" class="tablewrap"></div></section>
+  <section class="card"><h2>4. 時間帯比較</h2><div id="hourly" class="tablewrap"></div></section>
+  <section class="card"><h2>5. 曜日フィルター</h2><div id="weekday" class="tablewrap"></div></section>
+  <section class="card"><h2>6. 改善候補検証</h2><div id="variantCompare" class="tablewrap"></div></section>
+  <section class="card"><h2>7. 2026年PF>=2 / EV>=5 / 件数>=20 条件</h2><div id="pass2026" class="tablewrap"></div></section>
+  <section class="card"><h2>8. Core Rule Eとの重複分析</h2><div id="correlation" class="tablewrap"></div></section>
   <section class="card"><h2>9. 資金シミュレーション</h2><div id="capital" class="tablewrap"></div></section>
-  <section class="card"><h2>10. 実運用判定</h2><div id="recommendation" class="tablewrap"></div></section>
+  <section class="card"><h2>10. 最終判定</h2><div id="recommendation" class="tablewrap"></div></section>
   <section class="card"><h2>Debug Console</h2><pre id="debugLog">未実行</pre></section>
 </main>
 
@@ -74,9 +74,9 @@ const debug={files:0,loadedRows:0,validBars:0,rsiCount:0,candidateTrades:0,coreT
 
 document.getElementById("loadBtn").addEventListener("click",loadCsvFiles);
 document.getElementById("runBtn").addEventListener("click",runResearch);
-document.getElementById("jsonBtn").addEventListener("click",()=>download("research_v23_results.json",JSON.stringify(results,null,2),"application/json"));
-document.getElementById("csvBtn").addEventListener("click",()=>download("research_v23_candidate_i.csv","\ufeff"+candidateCsv,"text/csv;charset=utf-8"));
-document.getElementById("recBtn").addEventListener("click",()=>download("research_v23_recommendation.json",JSON.stringify(recommendationJson,null,2),"application/json"));
+document.getElementById("jsonBtn").addEventListener("click",()=>download("research_v24_results.json",JSON.stringify(results,null,2),"application/json"));
+document.getElementById("csvBtn").addEventListener("click",()=>download("research_v24_filters.csv","\ufeff"+candidateCsv,"text/csv;charset=utf-8"));
+document.getElementById("recBtn").addEventListener("click",()=>download("research_v24_recommendation.json",JSON.stringify(recommendationJson,null,2),"application/json"));
 
 function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}
 function setProgress(done,total){document.getElementById("progressBar").style.width=(total?Math.min(100,Math.round(done/total*100)):0)+"%";}
@@ -108,7 +108,7 @@ async function loadCsvFiles(){
     enrichBars(bars);
     renderSummary();updateDebug();setProgress(100,100);
     document.getElementById("runBtn").disabled=!bars.length;
-    setStatus("CSV読み込み完了。Research v23を実行できます。");
+    setStatus("CSV読み込み完了。Research v24を実行できます。");
   }catch(e){debug.errors.push({scope:"loadCsvFiles",message:e.message});updateDebug();setStatus("CSV読み込み失敗: "+e.message,true);}
 }
 
@@ -139,18 +139,18 @@ async function runResearch(){
       }
     }
     debug.candidateTrades=candidateTrades.length;debug.coreTrades=coreTrades.length;
-    const yearly=buildYearly(candidateTrades,coreTrades);
-    const monthly=buildMonthly(candidateTrades);
     const focus2026=buildFocus2026(candidateTrades);
-    const exitComparison=EXITS.map(ex=>({exit:ex.label,...metrics(exitBuckets[ex.id])}));
+    const hourly=buildHourComparison(candidateTrades);
+    const weekday=buildWeekdayRanking(candidateTrades);
     const variants=variantDefs().map(v=>({variant:v.name,conditions:v.conditions,...metrics(variantBuckets[v.id]),annualTrades:annualTrades(variantBuckets[v.id].length),yearPFs:yearPFs(variantBuckets[v.id]),adoption:adoptVariant(variantBuckets[v.id])}));
+    const pass2026Rows=buildPass2026(variantBuckets);
     const correlation=buildCorrelation(candidateTrades,coreTrades);
     const capital=buildCapital(candidateTrades,coreTrades);
-    recommendationJson=buildRecommendation(candidateTrades,coreTrades,capital,correlation,variants,exitComparison);
-    results={meta:{version:"research-v23",generatedAt:new Date().toISOString(),sourceFiles:[...document.getElementById("csvFiles").files].map(f=>f.name),validBars:bars.length,startTime:bars[0]?fmtDate(bars[0].time):null,endTime:bars.at(-1)?fmtDate(bars.at(-1).time):null,spreadPips:SPREAD},candidateI:{conditions:["BUY","02:00-06:00","RSI<25","Recent3Drop<=-10","BearStreak>=3","BB=Lower","ATR=High","Vol=High"],exit:"+15 reached then -5 trailing",summary:metrics(candidateTrades)},coreRuleE:{conditions:["BUY","00:00-02:00","RSI<25","Recent3Drop<=-10","LowUpdate=true"],exit:"+10 reached then -5 trailing",summary:metrics(coreTrades)},yearly,monthly,focus2026,exitComparison,variantComparison:variants,correlation,capitalSimulation:capital,recommendation:recommendationJson};
-    candidateCsv=buildCandidateCsv(candidateTrades);
-    renderYearly(yearly);renderMonthly(monthly);renderFocus2026(focus2026);renderExitComparison(exitComparison);renderVariants(variants);renderCorrelation(correlation);renderCapital(capital);renderRecommendation(recommendationJson);
-    disableDownloads(false);debug.lastRun=fmtDate(new Date());updateDebug();renderSummary();setProgress(100,100);setStatus("Research v23分析完了。");
+    recommendationJson=buildRecommendation(candidateTrades,coreTrades,capital,correlation,variants,focus2026,pass2026Rows);
+    results={meta:{version:"research-v24",generatedAt:new Date().toISOString(),sourceFiles:[...document.getElementById("csvFiles").files].map(f=>f.name),validBars:bars.length,startTime:bars[0]?fmtDate(bars[0].time):null,endTime:bars.at(-1)?fmtDate(bars.at(-1).time):null,spreadPips:SPREAD},candidateI:{conditions:["BUY","02:00-06:00","RSI<25","Recent3Drop<=-10","BearStreak>=3","BB=Lower","ATR=High","Vol=High"],exit:"+15 reached then -5 trailing",summary:metrics(candidateTrades)},coreRuleE:{conditions:["BUY","00:00-02:00","RSI<25","Recent3Drop<=-10","LowUpdate=true"],exit:"+10 reached then -5 trailing",summary:metrics(coreTrades)},focus2026,hourComparison:hourly,weekdayRanking:weekday,variantComparison:variants,pass2026Criteria:pass2026Rows,correlation,capitalSimulation:capital,recommendation:recommendationJson};
+    candidateCsv=buildFiltersCsv(hourly,weekday,variants,pass2026Rows,capital);
+    renderFocus2026(focus2026);renderHourly(hourly);renderWeekday(weekday);renderVariants(variants);renderPass2026(pass2026Rows);renderCorrelation(correlation);renderCapital(capital);renderRecommendation(recommendationJson);
+    disableDownloads(false);debug.lastRun=fmtDate(new Date());updateDebug();renderSummary();setProgress(100,100);setStatus("Research v24分析完了。");
   }catch(e){debug.errors.push({scope:"runResearch",message:e.message,stack:e.stack});updateDebug();setStatus("分析失敗: "+e.message,true);}
   finally{document.getElementById("runBtn").disabled=false;}
 }
@@ -176,11 +176,14 @@ function adverseFromBest(dir,bar,best){return dir==="BUY"?(best-bar.low)*PIP:(ba
 function buildYearly(candidate,core){const rows=[];for(const y of [2023,2024,2025,2026]){rows.push({rule:"Candidate I",period:String(y),...metrics(candidate.filter(t=>t.year===y))});rows.push({rule:"Core Rule E",period:String(y),...metrics(core.filter(t=>t.year===y))});}rows.unshift({rule:"Candidate I",period:"All",...metrics(candidate)});rows.unshift({rule:"Core Rule E",period:"All",...metrics(core)});return rows;}
 function buildMonthly(trades){const months=[];if(!bars.length)return months;let d=new Date(bars[0].time.getFullYear(),bars[0].time.getMonth(),1),end=new Date(bars.at(-1).time.getFullYear(),bars.at(-1).time.getMonth(),1);while(d<=end){const m=`${d.getFullYear()}-${pad(d.getMonth()+1)}`;months.push({period:m,...metrics(trades.filter(t=>t.month===m))});d.setMonth(d.getMonth()+1);}return months;}
 function buildFocus2026(trades){const t2026=trades.filter(t=>t.year===2026);return{monthly:groupMetrics(t2026,t=>t.month),weekday:groupMetrics(t2026,t=>t.weekday),hour:groupMetrics(t2026,t=>`${pad(t.hour)}:00-${pad(t.hour+1)}:00`),summary:metrics(t2026),pfMaintained:metrics(t2026).profitFactor>=1.2};}
+function buildHourComparison(trades){return[2,3,4,5].map(h=>({period:`${pad(h)}:00-${pad(h+1)}:00`,...metrics(trades.filter(t=>t.hour===h))})).sort((a,b)=>b.profitFactor-a.profitFactor);}
+function buildWeekdayRanking(trades){return["月","火","水","木","金"].map(w=>({period:w,...metrics(trades.filter(t=>t.weekday===w))})).sort((a,b)=>b.profitFactor-a.profitFactor);}
+function buildPass2026(variantBuckets){return variantDefs().map(v=>{const ts=(variantBuckets[v.id]||[]).filter(t=>t.year===2026);return{variant:v.name,conditions:v.conditions,...metrics(ts)}}).filter(r=>r.count>=20&&r.profitFactor>=2&&r.expectancy>=5).sort((a,b)=>b.profitFactor-a.profitFactor);}
 function groupMetrics(trades,keyFn){const m=new Map();for(const t of trades){const k=keyFn(t);if(!m.has(k))m.set(k,[]);m.get(k).push(t);}return[...m.entries()].map(([period,ts])=>({period,...metrics(ts)})).sort((a,b)=>String(a.period).localeCompare(String(b.period)));}
 function buildCorrelation(candidate,core){const cDays=new Map(),eDays=new Map();for(const t of candidate){if(!cDays.has(t.date))cDays.set(t.date,[]);cDays.get(t.date).push(t);}for(const t of core){if(!eDays.has(t.date))eDays.set(t.date,[]);eDays.get(t.date).push(t);}let sameDay=0,coreBefore6h=0,candidateNearCore=0,bothWinDays=0,bothLossDays=0;for(const [d,cs] of cDays){const es=eDays.get(d)||[];if(es.length){sameDay++;const cWin=cs.some(t=>t.pips>0),cLoss=cs.some(t=>t.pips<0),eWin=es.some(t=>t.pips>0),eLoss=es.some(t=>t.pips<0);if(cWin&&eWin)bothWinDays++;if(cLoss&&eLoss)bothLossDays++;}for(const c of cs)for(const e of es){const diff=(c.time-e.time)/(3600*1000);if(diff>=0&&diff<=6)coreBefore6h++;if(Math.abs(diff)<=6)candidateNearCore++;}}return{candidateTradeCount:candidate.length,coreTradeCount:core.length,sameDayCount:sameDay,coreBeforeCandidateWithin6h:coreBefore6h,candidateAroundCoreWithin6h:candidateNearCore,bothWonDays:bothWinDays,bothLostDays:bothLossDays,diversificationComment:sameDay/cDays.size<0.25?"分散効果は比較的あり":"同日発生が多く相関に注意"};}
-function buildCapital(candidate,core){const combined=[...candidate.map(t=>({...t,ruleName:"Candidate I"})),...core.map(t=>({...t,ruleName:"Core Rule E"}))].sort((a,b)=>a.time-b.time);return[{name:"Candidate I単体",...capitalRow(candidate)},{name:"Core Rule E単体",...capitalRow(core)},{name:"Core Rule E + Candidate I",...capitalRow(combined)}];}
-function capitalRow(trades){const m=metrics(trades),monthly=groupMetrics(trades,t=>t.month);const years=(bars.at(-1).time-bars[0].time)/(365.25*24*3600*1000);const annualPips=years?m.totalPips/years:0;const worstMonth=Math.min(0,...monthly.map(x=>x.totalPips));const ddYen=Math.round(m.maxDrawdown*YEN_PER_PIP_01);return{tradeCount:m.count,annualProfitYen:Math.round(annualPips*YEN_PER_PIP_01),maxDrawdownYen:ddYen,maxLossStreak:m.maxLossStreak,monthlyAverageYen:Math.round((m.totalPips/Math.max(1,monthly.filter(x=>x.count>0).length))*YEN_PER_PIP_01),worstMonthYen:Math.round(worstMonth*YEN_PER_PIP_01),recommendedLot:m.maxDrawdown>200?"0.01〜0.03 lot推奨":m.maxDrawdown>130?"0.03〜0.05 lot推奨":"0.1 lot検証可",risk:ddYen>30000?"高リスク":"中リスク",...m};}
-function buildRecommendation(candidate,core,capital,correlation,variants,exits){const cm=metrics(candidate),corem=metrics(core),cap=capital[0];let grade="D",label="採用非推奨",choice="採用しない",reason="成績または件数が不足";if(cm.count>=250&&cm.profitFactor>=2&&cm.expectancy>4&&cm.maxDrawdown<=250&&cm.maxLossStreak<=5){grade="A";label="Core Rule E補助EAとして採用可能";choice="別EAとしてデモ検証する";reason="PFと件数は十分。Core Rule EよりDDは大きいため、まず別EAでデモ検証が妥当。";}else if(cm.count>=200&&cm.profitFactor>=1.5&&cm.expectancy>2){grade="B";label="デモ検証推奨";choice="0.01lot限定で検証する";reason="優位性はあるが、10万円0.1lotではDDが重い。";}else if(cm.expectancy>0){grade="C";label="小ロット限定";choice="0.01lot限定で検証する";reason="プラスだが安定性に不安。";}return{grade,label,finalChoice:choice,reason,candidateSummary:cm,coreRuleESummary:corem,capitalRisk:cap,correlationNote:correlation.diversificationComment,bestExit:[...exits].sort((a,b)=>practicalScore(b)-practicalScore(a))[0],bestVariant:[...variants].sort((a,b)=>practicalScore(b)-practicalScore(a))[0],note:"PFだけでなく、DD・連敗・Core Rule Eとの相関・10万円0.1lot耐性を優先して判定"};}
+function buildCapital(candidate,core){const combined=[...candidate.map(t=>({...t,ruleName:"Candidate I"})),...core.map(t=>({...t,ruleName:"Core Rule E"}))].sort((a,b)=>a.time-b.time);const sets=[{name:"Candidate I単体",trades:candidate},{name:"Core Rule E単体",trades:core},{name:"Core Rule E + Candidate I",trades:combined}];const lots=[0.01,0.03,0.05,0.10];const rows=[];for(const s of sets)for(const lot of lots)rows.push({name:s.name,lot,...capitalRow(s.trades,lot)});return rows;}
+function capitalRow(trades,lot){const m=metrics(trades),monthly=groupMetrics(trades,t=>t.month);const years=(bars.at(-1).time-bars[0].time)/(365.25*24*3600*1000);const annualPips=years?m.totalPips/years:0;const yenPerPip=YEN_PER_PIP_01*(lot/0.1);const worstMonth=Math.min(0,...monthly.map(x=>x.totalPips));const ddYen=Math.round(m.maxDrawdown*yenPerPip);const equity=100000;return{tradeCount:m.count,annualProfitYen:Math.round(annualPips*yenPerPip),maxDrawdownYen:ddYen,maxLossStreak:m.maxLossStreak,monthlyAverageYen:Math.round((m.totalPips/Math.max(1,monthly.filter(x=>x.count>0).length))*yenPerPip),worstMonthYen:Math.round(worstMonth*yenPerPip),ruinRisk:ddYen>equity*0.5?"高":ddYen>equity*0.25?"中":"低",...m};}
+function buildRecommendation(candidate,core,capital,correlation,variants,focus2026,pass2026){const cm=metrics(candidate),c2026=focus2026.summary;let grade="C",label="見送り",choice="追加研究",reason="2026年またはDD面で主力化には慎重判断";if(cm.count>=250&&cm.profitFactor>=2&&cm.expectancy>4&&c2026.count>=20&&c2026.profitFactor>=2&&c2026.expectancy>=5&&cm.maxDrawdown<=260){grade="A";label="即デモEA化";choice="別EAとしてデモ検証";reason="全期間と2026年の両方で採用水準を満たす。Core Rule E補助候補として検証価値あり。";}else if(cm.count>=250&&cm.profitFactor>=1.5&&cm.expectancy>3&&c2026.expectancy>0){grade="B";label="追加研究";choice="0.01〜0.03lotでデモ検証";reason="全期間では有望だが、2026年PFまたはDDに注意。";}return{grade,label,finalChoice:choice,reason,candidateSummary:cm,coreRuleESummary:metrics(core),candidate2026:c2026,capitalRows:capital.filter(r=>r.name==="Candidate I単体"),correlationNote:correlation.diversificationComment,bestVariant:[...variants].sort((a,b)=>practicalScore(b)-practicalScore(a))[0],pass2026Conditions:pass2026,note:"新規ルール探索ではなくCandidate Iの主力補助化可否のみを判定"};}
 
 function metrics(trades){const vals=trades.map(t=>typeof t==="number"?t:t.pips),c=vals.length,wins=vals.filter(x=>x>0),losses=vals.filter(x=>x<0),grossProfit=sum(wins),grossLoss=Math.abs(sum(losses)),total=sum(vals);return{count:c,winRate:c?wins.length/c*100:0,profitFactor:grossLoss>0?grossProfit/grossLoss:(grossProfit>0?999:0),expectancy:c?total/c:0,totalPips:total,maxDrawdown:maxDrawdown(vals),maxLossStreak:streak(vals,false),maxWinStreak:streak(vals,true),averageHoldMinutes:trades.length&&typeof trades[0]==="object"?avg(trades.map(t=>t.holdMinutes)):0};}
 function maxDrawdown(values){let equity=0,peak=0,dd=0;for(const x of values){equity+=x;if(equity>peak)peak=equity;dd=Math.max(dd,peak-equity);}return dd;}
@@ -207,17 +210,20 @@ function metric(label,value){return`<div class="metric"><div class="label">${esc
 function renderYearly(rows){document.getElementById("yearly").innerHTML=metricsTable(rows);}
 function renderMonthly(rows){document.getElementById("monthly").innerHTML=metricsTable(rows.map(r=>({rule:"Candidate I",period:r.period,...r})));}
 function renderFocus2026(f){document.getElementById("focus2026").innerHTML=`<p class="${f.pfMaintained?'good':'bad'}">2026年PF1.2維持: ${f.pfMaintained?'OK':'NG'} / PF ${fmtPf(f.summary.profitFactor)}</p><h3>月別</h3>${metricsTable(f.monthly.map(r=>({rule:"2026月別",...r})))}<h3>曜日別</h3>${metricsTable(f.weekday.map(r=>({rule:"2026曜日",...r})))}<h3>時間帯別</h3>${metricsTable(f.hour.map(r=>({rule:"2026時間",...r})))}`;}
-function renderExitComparison(rows){document.getElementById("exitCompare").innerHTML=metricsTable(rows.map(r=>({rule:r.exit,period:"Candidate I",...r})));}
+function renderHourly(rows){document.getElementById("hourly").innerHTML=metricsTable(rows.map(r=>({rule:"時間帯比較",...r})));}
+function renderWeekday(rows){document.getElementById("weekday").innerHTML=metricsTable(rows.map(r=>({rule:"曜日フィルター",...r})));}
 function renderVariants(rows){document.getElementById("variantCompare").innerHTML=`<table><thead><tr><th>Variant</th><th>条件</th><th>採用</th><th>件数</th><th>年回数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総pips</th><th>DD</th><th>2023PF</th><th>2024PF</th><th>2025PF</th><th>2026PF</th><th>MinYearPF</th></tr></thead><tbody>${rows.map(r=>{const yp=r.yearPFs, min=Math.min(...Object.values(yp).filter(Number.isFinite));return`<tr class="${String(r.adoption).toLowerCase()}"><td>${esc(r.variant)}</td><td>${esc(r.conditions)}</td><td>${esc(r.adoption)}</td><td>${fmtInt(r.count)}</td><td>${fmt(r.annualTrades)}</td><td>${fmt(r.winRate)}%</td><td>${fmtPf(r.profitFactor)}</td><td>${sign(r.expectancy)}</td><td>${sign(r.totalPips)}</td><td>${fmt(r.maxDrawdown)}</td><td>${fmtPf(yp[2023])}</td><td>${fmtPf(yp[2024])}</td><td>${fmtPf(yp[2025])}</td><td>${fmtPf(yp[2026])}</td><td>${fmtPf(min)}</td></tr>`}).join("")}</tbody></table>`;}
+function renderPass2026(rows){document.getElementById("pass2026").innerHTML=rows.length?metricsTable(rows.map(r=>({rule:r.variant,period:r.conditions,...r}))):`<p class="note">2026年のみで PF>=2.0 / 期待値>=5 / 件数>=20 を満たす条件はありません。</p>`;}
 function renderCorrelation(c){document.getElementById("correlation").innerHTML=`<table><tbody>${Object.entries(c).map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</tbody></table>`;}
-function renderCapital(rows){document.getElementById("capital").innerHTML=`<table><thead><tr><th>対象</th><th>件数</th><th>PF</th><th>期待値</th><th>年間想定利益</th><th>最大DD円</th><th>最大連敗</th><th>月間平均利益</th><th>最悪月損益</th><th>推奨ロット</th><th>リスク</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${fmtInt(r.count)}</td><td>${fmtPf(r.profitFactor)}</td><td>${sign(r.expectancy)}</td><td>${yen(r.annualProfitYen)}</td><td>${yen(r.maxDrawdownYen)}</td><td>${fmtInt(r.maxLossStreak)}</td><td>${yen(r.monthlyAverageYen)}</td><td>${yen(r.worstMonthYen)}</td><td>${esc(r.recommendedLot)}</td><td>${esc(r.risk)}</td></tr>`).join("")}</tbody></table>`;}
-function renderRecommendation(r){document.getElementById("recommendation").innerHTML=`<table><tbody><tr><th>評価</th><td>${esc(r.grade)}：${esc(r.label)}</td></tr><tr><th>最終提案</th><td>${esc(r.finalChoice)}</td></tr><tr><th>理由</th><td>${esc(r.reason)}</td></tr><tr><th>最良決済</th><td>${esc(r.bestExit?.exit||"")} / PF ${fmtPf(r.bestExit?.profitFactor)} / EV ${sign(r.bestExit?.expectancy)}</td></tr><tr><th>最良Variant</th><td>${esc(r.bestVariant?.variant||"")} / ${esc(r.bestVariant?.conditions||"")}</td></tr><tr><th>相関</th><td>${esc(r.correlationNote)}</td></tr><tr><th>注意</th><td>${esc(r.note)}</td></tr></tbody></table>`;}
+function renderCapital(rows){document.getElementById("capital").innerHTML=`<table><thead><tr><th>対象</th><th>Lot</th><th>件数</th><th>PF</th><th>期待値</th><th>年間想定利益</th><th>最大DD円</th><th>最大連敗</th><th>月間平均利益</th><th>最悪月損益</th><th>破綻リスク</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${fmt(r.lot)}</td><td>${fmtInt(r.count)}</td><td>${fmtPf(r.profitFactor)}</td><td>${sign(r.expectancy)}</td><td>${yen(r.annualProfitYen)}</td><td>${yen(r.maxDrawdownYen)}</td><td>${fmtInt(r.maxLossStreak)}</td><td>${yen(r.monthlyAverageYen)}</td><td>${yen(r.worstMonthYen)}</td><td>${esc(r.ruinRisk)}</td></tr>`).join("")}</tbody></table>`;}
+function renderRecommendation(r){document.getElementById("recommendation").innerHTML=`<table><tbody><tr><th>評価</th><td>${esc(r.grade)}：${esc(r.label)}</td></tr><tr><th>最終提案</th><td>${esc(r.finalChoice)}</td></tr><tr><th>理由</th><td>${esc(r.reason)}</td></tr><tr><th>Candidate I 2026</th><td>PF ${fmtPf(r.candidate2026?.profitFactor)} / EV ${sign(r.candidate2026?.expectancy)} / 件数 ${fmtInt(r.candidate2026?.count)}</td></tr><tr><th>最良Variant</th><td>${esc(r.bestVariant?.variant||"")} / ${esc(r.bestVariant?.conditions||"")}</td></tr><tr><th>相関</th><td>${esc(r.correlationNote)}</td></tr><tr><th>注意</th><td>${esc(r.note)}</td></tr></tbody></table>`;}
 function metricsTable(rows){if(!rows.length)return`<p class="note">該当なし</p>`;return`<table><thead><tr><th>Rule</th><th>Period</th><th>件数</th><th>勝率</th><th>PF</th><th>期待値</th><th>総pips</th><th>DD</th><th>最大連敗</th><th>平均保有</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.rule||"")}</td><td>${esc(r.period||"")}</td><td>${fmtInt(r.count)}</td><td>${fmt(r.winRate)}%</td><td>${fmtPf(r.profitFactor)}</td><td>${sign(r.expectancy)}</td><td>${sign(r.totalPips)}</td><td>${fmt(r.maxDrawdown)}</td><td>${fmtInt(r.maxLossStreak)}</td><td>${fmt(r.averageHoldMinutes)}</td></tr>`).join("")}</tbody></table>`;}
 function buildCandidateCsv(trades){const cols=["datetime","pips","holdMinutes","exit","rsi","recent3","bearStreak","bbPosition","atrBand","volBand","lowUpdate"];return[cols.join(","),...trades.map(t=>cols.map(c=>csvCell(t[c])).join(","))].join("\n");}
+function buildFiltersCsv(hourly,weekday,variants,pass2026,capital){const rows=[];const push=(section,r)=>rows.push({section,...r});hourly.forEach(r=>push("hourly",r));weekday.forEach(r=>push("weekday",r));variants.forEach(r=>push("variant",{period:r.variant,conditions:r.conditions,adoption:r.adoption,count:r.count,winRate:r.winRate,profitFactor:r.profitFactor,expectancy:r.expectancy,totalPips:r.totalPips,maxDrawdown:r.maxDrawdown}));pass2026.forEach(r=>push("pass2026",r));capital.forEach(r=>push("capital",{period:r.name,lot:r.lot,count:r.count,profitFactor:r.profitFactor,expectancy:r.expectancy,annualProfitYen:r.annualProfitYen,maxDrawdownYen:r.maxDrawdownYen,ruinRisk:r.ruinRisk}));const cols=["section","period","conditions","adoption","lot","count","winRate","profitFactor","expectancy","totalPips","maxDrawdown","annualProfitYen","maxDrawdownYen","ruinRisk"];return[cols.join(","),...rows.map(r=>cols.map(c=>csvCell(r[c])).join(","))].join("\n");}
 function csvCell(v){return`"${String(v??"").replace(/"/g,'""')}"`;}
 function disableDownloads(v){for(const id of["jsonBtn","csvBtn","recBtn"])document.getElementById(id).disabled=v;}
 function download(name,text,type){if(!text)return;const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
-function reset(){bars=[];results=null;candidateCsv="";recommendationJson=null;Object.assign(debug,{files:0,loadedRows:0,validBars:0,rsiCount:0,candidateTrades:0,coreTrades:0,errors:[],lastRun:"--"});for(const id of["summary","yearly","monthly","focus2026","exitCompare","variantCompare","correlation","capital","recommendation"])document.getElementById(id).innerHTML="";disableDownloads(true);setProgress(0,100);updateDebug();}
+function reset(){bars=[];results=null;candidateCsv="";recommendationJson=null;Object.assign(debug,{files:0,loadedRows:0,validBars:0,rsiCount:0,candidateTrades:0,coreTrades:0,errors:[],lastRun:"--"});for(const id of["summary","focus2026","hourly","weekday","variantCompare","pass2026","correlation","capital","recommendation"])document.getElementById(id).innerHTML="";disableDownloads(true);setProgress(0,100);updateDebug();}
 function updateDebug(){document.getElementById("debugLog").textContent=[`ファイル数: ${debug.files}`,`読み込み行数: ${debug.loadedRows}`,`有効バー数: ${debug.validBars}`,`RSI計算件数: ${debug.rsiCount}`,`Candidate I件数: ${debug.candidateTrades}`,`Core Rule E件数: ${debug.coreTrades}`,`最終実行: ${debug.lastRun}`,"","Errors:",...(debug.errors.length?debug.errors.slice(-40).map(e=>JSON.stringify(e)):["なし"])].join("\n");}
 function fmtDate(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}function ymd(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}function ym(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}`;}function weekdayName(d){return["日","月","火","水","木","金","土"][d.getDay()];}
 function pad(n){return String(n).padStart(2,"0");}function fmt(n){return Number.isFinite(Number(n))?Number(n).toFixed(2):"--";}function fmtPf(n){return Number(n)>=999?"∞":fmt(n);}function sign(n){return Number.isFinite(Number(n))?(Number(n)>=0?"+":"")+Number(n).toFixed(2):"--";}function fmtInt(n){return Number.isFinite(Number(n))?Number(n).toLocaleString():"--";}function yen(n){return Number.isFinite(Number(n))?`${Math.round(n).toLocaleString()}円`:"--";}function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
