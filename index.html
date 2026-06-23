@@ -174,8 +174,29 @@ function addSellCandidates(map,w,b,pips,ex,time){
 function buyMoveHits(b){const out=[];for(const p of PERIODS)for(const m of MOVES)if(b[`recent${p}`]<=-m)out.push(`Recent${p}Drop<=-${m}`);return out;}
 function sellMoveHits(b){const out=[];for(const p of PERIODS)for(const m of MOVES)if(b[`recent${p}`]>=m)out.push(`Recent${p}Rise>=${m}`);return out;}
 function makeKey(w,direction,rsi,move,update,streak,bb,ema,atr,vol,exit){return JSON.stringify({group:w.group,timeWindow:w.label,direction,rsi,move,update,streak,bb,ema,atr,vol,exit});}
-function addTrade(map,key,pips,time){let row=map.get(key);if(!row){row={key,trades:[],holds:[],years:new Map()};map.set(key,row);}row.trades.push(pips);const y=time.getFullYear();if(!row.years.has(y))row.years.set(y,[]);row.years.get(y).push(pips);}
-function finalizeAgg(map){const out=[];for(const raw of map.values()){const info=JSON.parse(raw.key),m=calcMetrics(raw.trades),yearStats={};for(const y of[2023,2024,2025,2026])yearStats[y]=calcMetrics(raw.years.get(y)||[]);const row={...info,...m,yearStats,annualTrades:annualTrades(m.count),averageHoldMinutes:holdFromExit(info.exit),minYearPF:minYearPf(yearStats)};row.adoption=adoption(row);row.rankClass=row.adoption.class;row.rejectReason=row.adoption.reason;out.push(row);}return out;}
+function addTrade(map,key,pips,time){
+  let row=map.get(key);
+  if(!row){row={key,stats:initStats(),years:{}};map.set(key,row);}
+  updateStats(row.stats,pips);
+  const y=time.getFullYear();
+  if(!row.years[y])row.years[y]=initStats();
+  updateStats(row.years[y],pips);
+}
+function initStats(){return{count:0,wins:0,grossProfit:0,grossLoss:0,totalPips:0,equity:0,peak:0,maxDrawdown:0};}
+function updateStats(s,pips){
+  s.count++;
+  if(pips>0){s.wins++;s.grossProfit+=pips;}else if(pips<0){s.grossLoss+=Math.abs(pips);}
+  s.totalPips+=pips;
+  s.equity+=pips;
+  if(s.equity>s.peak)s.peak=s.equity;
+  const dd=s.peak-s.equity;
+  if(dd>s.maxDrawdown)s.maxDrawdown=dd;
+}
+function metricsFromStats(s){
+  const c=s?.count||0,gp=s?.grossProfit||0,gl=s?.grossLoss||0,total=s?.totalPips||0;
+  return{count:c,winRate:c?(s.wins/c*100):0,profitFactor:gl>0?gp/gl:(gp>0?999:0),expectancy:c?total/c:0,totalPips:total,maxDrawdown:s?.maxDrawdown||0};
+}
+function finalizeAgg(map){const out=[];for(const raw of map.values()){const info=JSON.parse(raw.key),m=metricsFromStats(raw.stats),yearStats={};for(const y of[2023,2024,2025,2026])yearStats[y]=metricsFromStats(raw.years[y]);const row={...info,...m,yearStats,annualTrades:annualTrades(m.count),averageHoldMinutes:holdFromExit(info.exit),minYearPF:minYearPf(yearStats)};row.adoption=adoption(row);row.rankClass=row.adoption.class;row.rejectReason=row.adoption.reason;out.push(row);}return out;}
 function adoption(r){
   const allYearOk=[2023,2024,2025,2026].every(y=>(r.yearStats[y]?.count||0)<5 || (r.yearStats[y]?.profitFactor||0)>1);
   if(r.profitFactor>2&&r.expectancy>=3&&r.annualTrades>=100&&r.minYearPF>1.2&&r.maxDrawdown<600)return{class:"super",label:"超本命候補",reason:"PF>2 / EV+3以上 / 年100回以上 / MinYearPF>1.2"};
@@ -190,9 +211,9 @@ function nameLive(r,i){const names=["Morning Rule A","Morning Rule B","Tokyo Rul
 function buildFinalCandidates(liveTop,overall){return (liveTop.length?liveTop:overall.filter(r=>r.expectancy>0).slice(0,5)).slice(0,5).map((r,i)=>({...r,eaPriority:i+1,eaAdoption:i===0&&["super","main"].includes(r.rankClass)?"EA化優先":"デモ検証"}));}
 function buildRecommendation(finalCandidates,coreCompare){const best=finalCandidates[0]||null;let grade="D",label="有効候補なし",reason="採用候補が見つかりません";if(best){if(["super","main"].includes(best.rankClass)){grade="A";label="即EA化候補あり";reason="採用基準を満たす候補があります";}else if(best.rankClass==="min"){grade="B";label="デモ検証候補あり";reason="最低候補はありますが、まずデモ検証推奨です";}else{grade="C";label="研究継続";reason="期待値は残る候補がありますがEA化には弱いです";}}return{grade,label,reason,bestCandidate:best,coreComparison:coreCompare};}
 function buildCoreCompare(liveTop,overall){const best=(liveTop[0]||overall[0]||null);let summary="有効候補なし",grade="D",reason="Core Rule Eを補助できる候補なし";if(best){if(["super","main"].includes(best.rankClass)){grade="A";summary="補助EA候補あり";reason=`${best.timeWindow} ${best.direction} がPF ${fmtPf(best.profitFactor)} / EV ${sign(best.expectancy)}。Core Rule Eとは別時間帯なので補助価値あり。`;}else if(best.rankClass==="min"){grade="B";summary="デモ候補あり";reason="Core Rule Eほど強くないが、空白時間の検証候補としては有効。";}else{grade="C";summary="研究継続";reason="Core Rule Eの補助としてはまだ弱い。";}}return{grade,summary,reason,bestCandidate:best};}
-function addBiasTrade(map,w,dir,pips,time){const key=w.label+"|"+dir;let row=map.get(key);if(!row){row={timeWindow:w.label,direction:dir,trades:[],years:new Map()};map.set(key,row);}row.trades.push(pips);const y=time.getFullYear();if(!row.years.has(y))row.years.set(y,[]);row.years.get(y).push(pips);}
+function addBiasTrade(map,w,dir,pips,time){const key=w.label+"|"+dir;let row=map.get(key);if(!row){row={timeWindow:w.label,direction:dir,stats:initStats()};map.set(key,row);}updateStats(row.stats,pips);}
 function buildBiasRows(map){const rows=[];for(const w of FOCUS_WINDOWS){const buy=finalizeBias(map.get(w+"|BUY")),sell=finalizeBias(map.get(w+"|SELL"));const winner=!buy&&!sell?"--":(buy?.profitFactor||0)>(sell?.profitFactor||0)?"BUY":"SELL";rows.push({timeWindow:w,buyPF:buy?.profitFactor||0,buyExpectancy:buy?.expectancy||0,buyCount:buy?.count||0,sellPF:sell?.profitFactor||0,sellExpectancy:sell?.expectancy||0,sellCount:sell?.count||0,winner});}return rows;}
-function finalizeBias(row){return row?calcMetrics(row.trades):null;}
+function finalizeBias(row){return row?metricsFromStats(row.stats):null;}
 
 function simulateExit(data,i,dir,ex,spread){const entry=data[i]?.close;if(!Number.isFinite(entry))return null;const max=Math.min(data.length-1,i+(ex.max||180));let best=entry,worst=entry;for(let j=i+1;j<=max;j++){const b=data[j];if(!validBar(b))continue;if(dir==="BUY"){if(b.high>best)best=b.high;if(b.low<worst)worst=b.low;}else{if(b.low<best)best=b.low;if(b.high>worst)worst=b.high;}const favorable=Math.abs(best-entry)*PIP,adverse=Math.abs(worst-entry)*PIP;if(ex.type==="trail"&&favorable>=ex.start&&adverseFromBest(dir,b,best)>=ex.back){if(dir==="BUY"){const p=best-ex.back/PIP;return(p-entry)*PIP-spread;}const p=best+ex.back/PIP;return(entry-p)*PIP-spread;}if(ex.type==="tpsl"){if(favorable>=ex.tp)return ex.tp-spread;if(adverse>=ex.sl)return-ex.sl-spread;}}const close=data[max]?.close;if(!Number.isFinite(close))return null;return(dir==="BUY"?(close-entry):(entry-close))*PIP-spread;}
 function adverseFromBest(dir,bar,best){return dir==="BUY"?(best-bar.low)*PIP:(bar.high-best)*PIP;}
