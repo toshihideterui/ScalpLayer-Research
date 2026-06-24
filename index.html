@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v30</title>
+  <title>ScalpLayer Research v31 Triple Engine</title>
   <style>
     :root{--bg:#08111f;--panel:#101b2c;--panel2:#0b1423;--line:#26364d;--text:#edf4ff;--muted:#a7b7d2;--gold:#d7b34c;--green:#39d889;--red:#ff6470;--yellow:#f6c951}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
@@ -25,8 +25,8 @@
 </head>
 <body>
 <header>
-  <h1>ScalpLayer Research v30</h1>
-  <p class="sub">03:00〜06:00 JST の空白時間帯を埋めるEA候補を探索します。既存の Core Rule E / Candidate G / Morning Prime / Day Rule A / Evening Rule C / Honmei17 は変更しません。</p>
+  <h1>ScalpLayer Research v31 Triple Engine</h1>
+  <p class="sub">Core Rule Eの取引回数不足を補うため、Candidate G拡張 / Morning Prime / SELL Engine の新エンジン候補を探索します。勝率90%以上、PF3以上、年間300回以上をAランク基準にします。</p>
 </header>
 
 <main class="grid">
@@ -37,23 +37,23 @@
       <input id="csvFiles" type="file" accept=".csv,.txt" multiple>
       <label class="note">Spread控除 <input id="spreadInput" type="number" value="0.8" step="0.1"> pips</label>
       <button id="loadBtn" type="button">CSVを読み込む</button>
-      <button id="runBtn" type="button" disabled>Research v30を実行</button>
-      <button id="jsonBtn" type="button" disabled>research_v30_results.json</button>
-      <button id="csvBtn" type="button" disabled>research_v30_top_candidates.csv</button>
-      <button id="recBtn" type="button" disabled>research_v30_recommendation.json</button>
+      <button id="runBtn" type="button" disabled>Research v31を実行</button>
+      <button id="jsonBtn" type="button" disabled>research_v31_triple_engine_results.json</button>
+      <button id="csvBtn" type="button" disabled>research_v31_triple_engine_top_candidates.csv</button>
+      <button id="recBtn" type="button" disabled>research_v31_triple_engine_recommendation.json</button>
     </div>
     <div class="progress"><div id="progressBar" class="bar"></div></div>
     <p id="status" class="note">CSVを選択してください。</p>
   </section>
 
   <section class="card"><h2>2. データ概要</h2><div id="summary" class="summary"></div></section>
-  <section class="card"><h2>3. 03:00〜04:00 BUY候補 TOP20</h2><div id="earlyBuy" class="tablewrap"></div></section>
-  <section class="card"><h2>4. 03:00〜04:00 SELL候補 TOP20</h2><div id="earlySell" class="tablewrap"></div></section>
-  <section class="card"><h2>5. 04:00〜05:00 BUY候補 TOP20</h2><div id="tokyoFrontBuy" class="tablewrap"></div></section>
-  <section class="card"><h2>6. 04:00〜05:00 SELL候補 TOP20</h2><div id="tokyoFrontSell" class="tablewrap"></div></section>
-  <section class="card"><h2>7. 05:00〜06:00 BUY候補 TOP20</h2><div id="tokyoBackBuy" class="tablewrap"></div></section>
-  <section class="card"><h2>8. 05:00〜06:00 SELL候補 TOP20</h2><div id="tokyoBackSell" class="tablewrap"></div></section>
-  <section class="card"><h2>9. 03:00〜06:00 総合 TOP30</h2><div id="overall" class="tablewrap"></div></section>
+  <section class="card"><h2>3. Candidate G 拡張 BUY候補 TOP20</h2><div id="earlyBuy" class="tablewrap"></div></section>
+  <section class="card"><h2>4. Candidate G 拡張 SELL候補 TOP20</h2><div id="earlySell" class="tablewrap"></div></section>
+  <section class="card"><h2>5. Morning Prime BUY候補 TOP20</h2><div id="tokyoFrontBuy" class="tablewrap"></div></section>
+  <section class="card"><h2>6. Morning Prime SELL候補 TOP20</h2><div id="tokyoFrontSell" class="tablewrap"></div></section>
+  <section class="card"><h2>7. SELL Engine SELL候補 TOP20</h2><div id="tokyoBackBuy" class="tablewrap"></div></section>
+  <section class="card"><h2>8. SELL Engine BUY候補 TOP20</h2><div id="tokyoBackSell" class="tablewrap"></div></section>
+  <section class="card"><h2>9. Triple Engine 総合 TOP30</h2><div id="overall" class="tablewrap"></div></section>
   <section class="card"><h2>10. 実運用候補 TOP10</h2><div id="liveTop" class="tablewrap"></div></section>
   <section class="card"><h2>11. 却下条件 ワースト10</h2><div id="worst" class="tablewrap"></div></section>
   <section class="card"><h2>12. 時間帯別 BUY/SELL 優位判定</h2><div id="biasTable" class="tablewrap"></div></section>
@@ -65,14 +65,20 @@
 <script>
 const PIP=100, RSI_PERIOD=14, EMA_PERIOD=20, BB_PERIOD=20, ATR_PERIOD=14, MAX_HOLD=180;
 const WINDOWS=[
-  {id:"d0304",group:"early",label:"03:00-04:00",start:3,end:4},
-  {id:"d0405",group:"tokyoFront",label:"04:00-05:00",start:4,end:5},
-  {id:"d0506",group:"tokyoBack",label:"05:00-06:00",start:5,end:6},
-  {id:"d0305",group:"early",label:"03:00-05:00",start:3,end:5},
-  {id:"d0406",group:"tokyo",label:"04:00-06:00",start:4,end:6},
-  {id:"all0306",group:"all",label:"03:00-06:00",start:3,end:6}
+  {id:"cg0002",group:"candidateG",label:"00:00-02:00",start:0,end:2},
+  {id:"cg0203",group:"candidateG",label:"02:00-03:00",start:2,end:3},
+  {id:"cg0306",group:"candidateG",label:"03:00-06:00",start:3,end:6},
+  {id:"cg0006",group:"candidateG",label:"00:00-06:00",start:0,end:6},
+  {id:"mp0708",group:"morning",label:"07:00-08:00",start:7,end:8},
+  {id:"mp0809",group:"morning",label:"08:00-09:00",start:8,end:9},
+  {id:"mp0910",group:"morning",label:"09:00-10:00",start:9,end:10},
+  {id:"mp0710",group:"morning",label:"07:00-10:00",start:7,end:10},
+  {id:"sell1315",group:"sellEngine",label:"13:00-15:00",start:13,end:15},
+  {id:"sell1521",group:"sellEngine",label:"15:00-21:00",start:15,end:21},
+  {id:"sell2124",group:"sellEngine",label:"21:00-24:00",start:21,end:0},
+  {id:"sell1324",group:"sellEngine",label:"13:00-24:00",start:13,end:0}
 ];
-const FOCUS_WINDOWS=["03:00-04:00","04:00-05:00","05:00-06:00"];
+const FOCUS_WINDOWS=["00:00-06:00","07:00-10:00","13:00-24:00"];
 const RSI_BUY=[20,25,30,35,40], RSI_SELL=[60,65,70,75,80];
 const MOVES=[4,6,8,10], PERIODS=[3,5], STREAKS=[2,3,4,5], EMA_FILTERS=["Ignore","Up","Down"];
 const EXITS=[
@@ -87,9 +93,9 @@ const debug={files:0,loadedRows:0,validBars:0,rsiCount:0,candidates:0,errors:[],
 
 document.getElementById("loadBtn").addEventListener("click",loadCsvFiles);
 document.getElementById("runBtn").addEventListener("click",runResearch);
-document.getElementById("jsonBtn").addEventListener("click",()=>download("research_v30_results.json",JSON.stringify(results,null,2),"application/json"));
-document.getElementById("csvBtn").addEventListener("click",()=>download("research_v30_top_candidates.csv","\ufeff"+topCsv,"text/csv;charset=utf-8"));
-document.getElementById("recBtn").addEventListener("click",()=>download("research_v30_recommendation.json",JSON.stringify(recommendationJson,null,2),"application/json"));
+document.getElementById("jsonBtn").addEventListener("click",()=>download("research_v31_triple_engine_results.json",JSON.stringify(results,null,2),"application/json"));
+document.getElementById("csvBtn").addEventListener("click",()=>download("research_v31_triple_engine_top_candidates.csv","\ufeff"+topCsv,"text/csv;charset=utf-8"));
+document.getElementById("recBtn").addEventListener("click",()=>download("research_v31_triple_engine_recommendation.json",JSON.stringify(recommendationJson,null,2),"application/json"));
 function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}
 function setProgress(done,total){document.getElementById("progressBar").style.width=(total?Math.min(100,Math.round(done/total*100)):0)+"%";}
 function appendMany(target,source,chunkSize=10000){for(let i=0;i<source.length;i+=chunkSize){const end=Math.min(i+chunkSize,source.length);for(let j=i;j<end;j++)target.push(source[j]);}}
@@ -110,7 +116,7 @@ async function loadCsvFiles(){
     }
     bars=dedupeAndSortBars(merged);debug.files=files.length;debug.validBars=bars.length;
     enrichBars(bars);renderSummary();updateDebug();setProgress(100,100);
-    document.getElementById("runBtn").disabled=!bars.length;setStatus("CSV読み込み完了。Research v30を実行できます。");
+    document.getElementById("runBtn").disabled=!bars.length;setStatus("CSV読み込み完了。Research v31を実行できます。");
   }catch(e){debug.errors.push({scope:"loadCsvFiles",message:e.message});updateDebug();setStatus("CSV読み込み失敗: "+e.message,true);}
 }
 
@@ -139,23 +145,24 @@ async function runResearch(){
     }
     const rows=finalizeAgg(agg).sort((a,b)=>score(b)-score(a));
     const ranked=rows.filter(r=>r.count>=30&&r.expectancy>0&&r.profitFactor>=1.1);
-    const earlyBuy=ranked.filter(r=>r.group==="early"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Morning BUY",i));
-    const earlySell=ranked.filter(r=>r.group==="early"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Morning SELL",i));
-    const tokyoFrontBuy=ranked.filter(r=>r.group==="tokyoFront"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Front BUY",i));
-    const tokyoFrontSell=ranked.filter(r=>r.group==="tokyoFront"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Front SELL",i));
-    const tokyoBackBuy=ranked.filter(r=>r.group==="tokyoBack"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Back BUY",i));
-    const tokyoBackSell=ranked.filter(r=>r.group==="tokyoBack"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Back SELL",i));
+    const earlyBuy=ranked.filter(r=>r.group==="candidateG"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Candidate G BUY",i));
+    const earlySell=ranked.filter(r=>r.group==="candidateG"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Candidate G SELL",i));
+    const tokyoFrontBuy=ranked.filter(r=>r.group==="morning"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Morning Prime BUY",i));
+    const tokyoFrontSell=ranked.filter(r=>r.group==="morning"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Morning Prime SELL",i));
+    const tokyoBackBuy=ranked.filter(r=>r.group==="sellEngine"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"SELL Engine SELL",i));
+    const tokyoBackSell=ranked.filter(r=>r.group==="sellEngine"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"SELL Engine BUY",i));
     const overall=ranked.slice(0,30).map((r,i)=>nameRow(r,"Overall",i));
     const liveTop=ranked.filter(r=>["super","main","min"].includes(r.rankClass)).slice(0,10).map((r,i)=>nameLive(r,i));
     const worst=rows.filter(r=>r.count>=50).sort((a,b)=>a.expectancy-b.expectancy).slice(0,10).map((r,i)=>nameRow(r,"Worst",i));
     const biasRows=buildBiasRows(bias);
-    const coreCompare=buildCoreCompare(liveTop,overall);
+    const coreRuleE=buildCoreRuleEStats(spread);
+    const coreCompare=buildCoreCompare(liveTop,overall,coreRuleE);
     const finalCandidates=buildFinalCandidates(liveTop,overall);
     recommendationJson=buildRecommendation(finalCandidates,coreCompare);
-    results={meta:{version:"research-v30",generatedAt:new Date().toISOString(),sourceFiles:[...document.getElementById("csvFiles").files].map(f=>f.name),validBars:bars.length,startTime:bars[0]?fmtDate(bars[0].time):null,endTime:bars.at(-1)?fmtDate(bars.at(-1).time):null,spreadPips:spread},purpose:"03:00-06:00 JST blank-session rule discovery",existingRulesUnchanged:["Core Rule E","Candidate G","Morning Prime","Day Rule A","Evening Rule C","Honmei17"],dawn0304BuyTop20:earlyBuy,dawn0304SellTop20:earlySell,dawn0405BuyTop20:tokyoFrontBuy,dawn0405SellTop20:tokyoFrontSell,dawn0506BuyTop20:tokyoBackBuy,dawn0506SellTop20:tokyoBackSell,overallTop30:overall,liveCandidateTop10:liveTop,worstRejectedTop10:worst,sessionBias:biasRows,existingEaComparison:coreCompare,finalCandidates,recommendation:recommendationJson,ranking:ranked.slice(0,200)};
+    results={meta:{version:"research-v31-triple-engine",generatedAt:new Date().toISOString(),sourceFiles:[...document.getElementById("csvFiles").files].map(f=>f.name),validBars:bars.length,startTime:bars[0]?fmtDate(bars[0].time):null,endTime:bars.at(-1)?fmtDate(bars.at(-1).time):null,spreadPips:spread},purpose:"Triple Engine candidate discovery for Candidate G expansion, Morning Prime and SELL Engine",target:{winRate:90,profitFactor:3,annualTrades:300},existingRule:"Core Rule E",coreRuleE,candidateGBuyTop20:earlyBuy,candidateGSellTop20:earlySell,morningPrimeBuyTop20:tokyoFrontBuy,morningPrimeSellTop20:tokyoFrontSell,sellEngineSellTop20:tokyoBackBuy,sellEngineBuyTop20:tokyoBackSell,overallTop30:overall,liveCandidateTop10:liveTop,worstRejectedTop10:worst,sessionBias:biasRows,coreRuleEComparison:coreCompare,finalCandidates,recommendation:recommendationJson,ranking:ranked.slice(0,300)};
     topCsv=buildTopCsv([...liveTop,...overall].slice(0,40));
     renderTable("earlyBuy",earlyBuy);renderTable("earlySell",earlySell);renderTable("tokyoFrontBuy",tokyoFrontBuy);renderTable("tokyoFrontSell",tokyoFrontSell);renderTable("tokyoBackBuy",tokyoBackBuy);renderTable("tokyoBackSell",tokyoBackSell);renderTable("overall",overall);renderTable("liveTop",liveTop);renderTable("worst",worst);renderBias(biasRows);renderCoreCompare(coreCompare);renderRecommendation(finalCandidates,recommendationJson);
-    debug.candidates=rows.length;debug.lastRun=fmtDate(new Date());updateDebug();disableDownloads(false);setProgress(100,100);setStatus("Research v30分析完了。");
+    debug.candidates=rows.length;debug.lastRun=fmtDate(new Date());updateDebug();disableDownloads(false);setProgress(100,100);setStatus("Research v31分析完了。");
   }catch(e){debug.errors.push({scope:"runResearch",message:e.message,stack:e.stack});updateDebug();setStatus("分析失敗: "+e.message,true);}
   finally{document.getElementById("runBtn").disabled=false;}
 }
@@ -200,18 +207,36 @@ function metricsFromStats(s){
 function finalizeAgg(map){const out=[];for(const raw of map.values()){const info=JSON.parse(raw.key),m=metricsFromStats(raw.stats),yearStats={};for(const y of[2023,2024,2025,2026])yearStats[y]=metricsFromStats(raw.years[y]);const row={...info,...m,yearStats,annualTrades:annualTrades(m.count),averageHoldMinutes:holdFromExit(info.exit),minYearPF:minYearPf(yearStats)};row.adoption=adoption(row);row.rankClass=row.adoption.class;row.rejectReason=row.adoption.reason;out.push(row);}return out;}
 function adoption(r){
   const allYearOk=[2023,2024,2025,2026].every(y=>(r.yearStats[y]?.count||0)<5 || (r.yearStats[y]?.profitFactor||0)>1);
-  if(r.profitFactor>2&&r.expectancy>=3&&r.annualTrades>=100&&r.minYearPF>1.2&&r.maxDrawdown<600)return{class:"super",label:"超本命候補",reason:"PF>2 / EV+3以上 / 年100回以上 / MinYearPF>1.2"};
-  if(r.profitFactor>1.5&&r.expectancy>=2&&r.annualTrades>=100&&allYearOk&&r.maxDrawdown<700)return{class:"main",label:"本命候補",reason:"PF>1.5 / EV+2以上 / 年100回以上 / 年度安定"};
-  if(r.profitFactor>1.3&&r.expectancy>=1&&r.annualTrades>=50&&allYearOk)return{class:"min",label:"最低候補",reason:"PF>1.3 / EV+1以上 / 年50回以上"};
+  if(r.winRate>=90&&r.profitFactor>=3&&r.annualTrades>=300&&r.expectancy>0&&allYearOk&&r.maxDrawdown<800)return{class:"super",label:"Aランク 採用候補",reason:"勝率90%以上 / PF3以上 / 年300回以上 / 年度安定"};
+  if(r.winRate>=85&&r.profitFactor>=2&&r.annualTrades>=150&&r.expectancy>0&&allYearOk&&r.maxDrawdown<900)return{class:"main",label:"Bランク 保留",reason:"勝率85%以上 / PF2以上 / 年150回以上。追加検証候補"};
+  if(r.profitFactor>=1.3&&r.expectancy>0&&r.annualTrades>=80)return{class:"min",label:"Cランク 参考",reason:"期待値はプラスだが、採用基準には不足"};
   return{class:"reject",label:"却下",reason:rejectReason(r,allYearOk)};
 }
-function rejectReason(r,allYearOk){if(r.annualTrades<50)return"年間件数不足";if(r.expectancy<1)return"期待値不足";if(r.profitFactor<=1.3)return"PF不足";if(!allYearOk)return"年度安定性不足";if(r.maxDrawdown>=700)return"DD過大";return"採用基準未達";}
+function rejectReason(r,allYearOk){if(r.annualTrades<80)return"年間件数不足";if(r.expectancy<=0)return"期待値不足";if(r.profitFactor<1.3)return"PF不足";if(!allYearOk)return"年度安定性不足";if(r.maxDrawdown>=900)return"DD過大";return"採用基準未達";}
 function score(r){return(r.rankClass==="super"?260:r.rankClass==="main"?180:r.rankClass==="min"?90:0)+Math.min(r.profitFactor,6)*25+r.expectancy*28+Math.log(Math.max(1,r.count))*12+Math.min(r.annualTrades,250)*0.28+(r.minYearPF>1?20:0)-r.maxDrawdown*0.08;}
 function nameRow(r,prefix,i){return{...r,ruleName:`${prefix} ${i+1}`};}
-function nameLive(r,i){const names=["Dawn Rule A","Dawn Rule B","Post Candidate Rule A","Post Candidate Rule B","Early Extension Rule A","Candidate F","Candidate G","Candidate H","Candidate I","Candidate J"];return{...r,ruleName:names[i]||`Live Candidate ${i+1}`};}
+function nameLive(r,i){const names=["Triple Engine Candidate A","Triple Engine Candidate B","Triple Engine Candidate C","Candidate G Plus","Morning Prime Plus","SELL Engine A","SELL Engine B","Expansion Candidate H","Expansion Candidate I","Expansion Candidate J"];return{...r,ruleName:names[i]||`Live Candidate ${i+1}`};}
 function buildFinalCandidates(liveTop,overall){return (liveTop.length?liveTop:overall.filter(r=>r.expectancy>0).slice(0,5)).slice(0,5).map((r,i)=>({...r,eaPriority:i+1,eaAdoption:i===0&&["super","main"].includes(r.rankClass)?"EA化優先":"デモ検証"}));}
 function buildRecommendation(finalCandidates,coreCompare){const best=finalCandidates[0]||null;let grade="D",label="有効候補なし",reason="採用候補が見つかりません";if(best){if(["super","main"].includes(best.rankClass)){grade="A";label="即EA化候補あり";reason="採用基準を満たす候補があります";}else if(best.rankClass==="min"){grade="B";label="デモ検証候補あり";reason="最低候補はありますが、まずデモ検証推奨です";}else{grade="C";label="研究継続";reason="期待値は残る候補がありますがEA化には弱いです";}}return{grade,label,reason,bestCandidate:best,existingEaComparison:coreCompare};}
-function buildCoreCompare(liveTop,overall){const best=(liveTop[0]||overall[0]||null);let summary="有効候補なし",grade="D",reason="既存EAを補助できる候補なし";if(best){if(["super","main"].includes(best.rankClass)){grade="A";summary="補助EA候補あり";reason=`${best.timeWindow} ${best.direction} がPF ${fmtPf(best.profitFactor)} / EV ${sign(best.expectancy)}。Core Rule E / Candidate G の直後の空白時間帯なので補助価値あり。`;}else if(best.rankClass==="min"){grade="B";summary="デモ候補あり";reason="既存EAほど強くないが、03:00〜06:00の検証候補としては有効。";}else{grade="C";summary="研究継続";reason="既存EAの補助としてはまだ弱い。";}}return{grade,summary,reason,bestCandidate:best};}
+function buildCoreRuleEStats(spread){
+  const ex={id:"trail_10_5",label:"+10到達後-5戻し",type:"trail",start:10,back:5,max:180};
+  const stats=initStats(), years={};
+  for(let i=80;i<bars.length-MAX_HOLD-1;i++){
+    const b=bars[i];
+    if(!validFeatureBar(b))continue;
+    if(!(isJstRange(b.time,0,2)&&b.rsi<25&&b.recent3<=-10&&b.lowUpdate3===true))continue;
+    const pips=simulateExit(bars,i,"BUY",ex,spread);
+    if(pips==null)continue;
+    updateStats(stats,pips);
+    const y=b.time.getFullYear();
+    if(!years[y])years[y]=initStats();
+    updateStats(years[y],pips);
+  }
+  const m=metricsFromStats(stats), yearStats={};
+  for(const y of[2023,2024,2025,2026])yearStats[y]=metricsFromStats(years[y]);
+  return{ruleName:"Core Rule E",direction:"BUY",timeWindow:"00:00-02:00",conditions:"RSI<25 / Recent3Drop<=-10 / LowUpdate=true / Trail +10 -5",...m,annualTrades:annualTrades(m.count),yearStats,minYearPF:minYearPf(yearStats)};
+}
+function buildCoreCompare(liveTop,overall,coreRuleE){const best=(liveTop[0]||overall[0]||null);let summary="有効候補なし",grade="C",reason="Core Rule Eを補助できる候補なし";if(best){if(best.rankClass==="super"){grade="A";summary="採用候補あり";reason=`${best.timeWindow} ${best.direction} が勝率 ${fmt(best.winRate)}% / PF ${fmtPf(best.profitFactor)} / 年 ${fmt(best.annualTrades)} 回。Core Rule E(${fmt(coreRuleE.annualTrades)}回/年, PF ${fmtPf(coreRuleE.profitFactor)})の取引回数補強候補。`;}else if(best.rankClass==="main"){grade="B";summary="保留候補あり";reason=`目標値には少し届かないが追加検証価値あり。Core Rule Eは年 ${fmt(coreRuleE.annualTrades)} 回 / PF ${fmtPf(coreRuleE.profitFactor)}。`;}else{grade="C";summary="却下または参考";reason="勝率・PF・年間回数のいずれかが不足。過度な条件緩和は避けるべきです。";}}return{grade,summary,reason,coreRuleE,bestCandidate:best};}
 function addBiasTrade(map,w,dir,pips,time){const key=w.label+"|"+dir;let row=map.get(key);if(!row){row={timeWindow:w.label,direction:dir,stats:initStats()};map.set(key,row);}updateStats(row.stats,pips);}
 function buildBiasRows(map){const rows=[];for(const w of FOCUS_WINDOWS){const buy=finalizeBias(map.get(w+"|BUY")),sell=finalizeBias(map.get(w+"|SELL"));const winner=!buy&&!sell?"--":(buy?.profitFactor||0)>(sell?.profitFactor||0)?"BUY":"SELL";rows.push({timeWindow:w,buyPF:buy?.profitFactor||0,buyExpectancy:buy?.expectancy||0,buyCount:buy?.count||0,sellPF:sell?.profitFactor||0,sellExpectancy:sell?.expectancy||0,sellCount:sell?.count||0,winner});}return rows;}
 function finalizeBias(row){return row?metricsFromStats(row.stats):null;}
