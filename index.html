@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ScalpLayer Research v27</title>
+  <title>ScalpLayer Research v28</title>
   <style>
     :root{--bg:#08111f;--panel:#101b2c;--panel2:#0b1423;--line:#26364d;--text:#edf4ff;--muted:#a7b7d2;--gold:#d7b34c;--green:#39d889;--red:#ff6470;--yellow:#f6c951}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
@@ -16,231 +16,231 @@
     .progress{height:10px;background:#07101d;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:10px}.bar{height:100%;width:0;background:var(--gold)}
     .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:#081323;border:1px solid var(--line);border-radius:8px;padding:10px}.label{font-size:12px;color:var(--muted)}.value{font-weight:800;font-size:19px}
     .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;font-size:12px}
-    th,td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:right;white-space:nowrap}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){text-align:left}
-    th{background:#0a1626;color:#fff;position:sticky;top:0}tr.super{background:rgba(57,216,137,.12)}tr.main{background:rgba(57,216,137,.07)}tr.min{background:rgba(246,201,81,.08)}tr.reject{background:rgba(255,100,112,.06)}
-    .good{color:var(--green);font-weight:800}.bad{color:var(--red);font-weight:800}.warn{color:var(--yellow);font-weight:800}
+    th,td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:right;white-space:nowrap}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+    th{background:#0a1626;color:#fff;position:sticky;top:0}.good{color:var(--green);font-weight:800}.bad{color:var(--red);font-weight:800}.warn{color:var(--yellow);font-weight:800}
+    tr.goodrow{background:rgba(57,216,137,.09)}tr.warnrow{background:rgba(246,201,81,.08)}tr.badrow{background:rgba(255,100,112,.06)}
     pre{white-space:pre-wrap;max-height:300px;overflow:auto;background:#07101d;border:1px solid var(--line);border-radius:8px;padding:12px;color:#cfe0ff}
     @media(max-width:760px){.summary{grid-template-columns:repeat(2,1fr)}.controls>*{width:100%}th,td{font-size:11px;padding:6px}}
   </style>
 </head>
 <body>
 <header>
-  <h1>ScalpLayer Research v27</h1>
-  <p class="sub">06:00〜13:00 JST の空白時間帯を埋めるEA候補を探索します。既存の Core Rule E / Candidate G / Day Rule A / Evening Rule C / Honmei17 は変更しません。</p>
+  <h1>ScalpLayer Research v28</h1>
+  <p class="sub">Morning Rule A繧脱A蛹門燕縺ｫ譛邨よ､懆ｨｼ縺励∪縺吶よ眠隕上Ν繝ｼ繝ｫ謗｢邏｢縺ｯ陦後ｏ縺壹∵ｱｺ貂医・DD繝ｻ譎る俣蟶ｯ繝ｻ譌｢蟄櫓A縺ｨ縺ｮ邨ｱ蜷磯←諤ｧ縺縺代ｒ遒ｺ隱阪＠縺ｾ縺吶・/p>
 </header>
 
 <main class="grid">
   <section class="card">
-    <h2>1. CSV読み込み</h2>
-    <p class="note">USDJPY M1の3年分CSV、または複数CSVに対応。CSVは datetime/open/high/low/close を含むM1データを想定します。</p>
+    <h2>1. CSV隱ｭ縺ｿ霎ｼ縺ｿ</h2>
+    <p class="note">USDJPY M1縺ｮ3蟷ｴ蛻・SV縲√∪縺溘・隍・焚CSV縺ｫ蟇ｾ蠢懊よ錐逶翫・XM KIWAMI諠ｳ螳售pread謗ｧ髯､繧貞渚譏縺励∪縺吶・/p>
     <div class="controls">
       <input id="csvFiles" type="file" accept=".csv,.txt" multiple>
-      <label class="note">Spread控除 <input id="spreadInput" type="number" value="0.8" step="0.1"> pips</label>
-      <button id="loadBtn" type="button">CSVを読み込む</button>
-      <button id="runBtn" type="button" disabled>Research v27を実行</button>
-      <button id="jsonBtn" type="button" disabled>research_v27_results.json</button>
-      <button id="csvBtn" type="button" disabled>research_v27_top_candidates.csv</button>
-      <button id="recBtn" type="button" disabled>research_v27_recommendation.json</button>
+      <label class="note">Spread謗ｧ髯､ <input id="spreadInput" type="number" value="0.8" step="0.1"> pips</label>
+      <button id="loadBtn" type="button">CSV繧定ｪｭ縺ｿ霎ｼ繧</button>
+      <button id="runBtn" type="button" disabled>Research v28繧貞ｮ溯｡・/button>
+      <button id="jsonBtn" type="button" disabled>research_v28_results.json</button>
+      <button id="exitBtn" type="button" disabled>exit_comparison.csv</button>
+      <button id="filterBtn" type="button" disabled>filter_comparison.csv</button>
+      <button id="integrationBtn" type="button" disabled>integration.csv</button>
+      <button id="lotBtn" type="button" disabled>lot_simulation.csv</button>
+      <button id="recBtn" type="button" disabled>recommendation.json</button>
     </div>
     <div class="progress"><div id="progressBar" class="bar"></div></div>
-    <p id="status" class="note">CSVを選択してください。</p>
+    <p id="status" class="note">CSV繧帝∈謚槭＠縺ｦ縺上□縺輔＞縲・/p>
   </section>
 
-  <section class="card"><h2>2. データ概要</h2><div id="summary" class="summary"></div></section>
-  <section class="card"><h2>3. 早朝 BUY候補 TOP20</h2><div id="earlyBuy" class="tablewrap"></div></section>
-  <section class="card"><h2>4. 早朝 SELL候補 TOP20</h2><div id="earlySell" class="tablewrap"></div></section>
-  <section class="card"><h2>5. 東京前半 BUY候補 TOP20</h2><div id="tokyoFrontBuy" class="tablewrap"></div></section>
-  <section class="card"><h2>6. 東京前半 SELL候補 TOP20</h2><div id="tokyoFrontSell" class="tablewrap"></div></section>
-  <section class="card"><h2>7. 東京後半 BUY候補 TOP20</h2><div id="tokyoBackBuy" class="tablewrap"></div></section>
-  <section class="card"><h2>8. 東京後半 SELL候補 TOP20</h2><div id="tokyoBackSell" class="tablewrap"></div></section>
-  <section class="card"><h2>9. 06:00〜13:00 総合 TOP30</h2><div id="overall" class="tablewrap"></div></section>
-  <section class="card"><h2>10. 実運用候補 TOP10</h2><div id="liveTop" class="tablewrap"></div></section>
-  <section class="card"><h2>11. 却下条件 ワースト10</h2><div id="worst" class="tablewrap"></div></section>
-  <section class="card"><h2>12. 時間帯別 BUY/SELL 優位判定</h2><div id="biasTable" class="tablewrap"></div></section>
-  <section class="card"><h2>13. 既存EA比較</h2><div id="coreCompare" class="tablewrap"></div></section>
-  <section class="card"><h2>14. 最終推薦</h2><div id="recommendation" class="tablewrap"></div></section>
-  <section class="card"><h2>Debug Console</h2><pre id="debugLog">未実行</pre></section>
+  <section class="card"><h2>2. 繝・・繧ｿ讎りｦ・/h2><div id="summary" class="summary"></div></section>
+  <section class="card"><h2>3. Morning Rule A 蝓ｺ貅・/h2><div id="baseTable" class="tablewrap"></div></section>
+  <section class="card"><h2>4. 豎ｺ貂域婿豕墓ｯ碑ｼ・/h2><div id="exitTable" class="tablewrap"></div></section>
+  <section class="card"><h2>5. DD謾ｹ蝟・ヵ繧｣繝ｫ繧ｿ繝ｼ豈碑ｼ・/h2><div id="filterTable" class="tablewrap"></div></section>
+  <section class="card"><h2>6. 蟷ｴ蛻･蛻・梵</h2><div id="yearTable" class="tablewrap"></div></section>
+  <section class="card"><h2>7. 譛亥挨蛻・梵</h2><div id="monthTable" class="tablewrap"></div></section>
+  <section class="card"><h2>8. 譎る俣蟶ｯ邏ｰ蛻・喧</h2><div id="hourTable" class="tablewrap"></div></section>
+  <section class="card"><h2>9. 譌｢蟄櫓A縺ｨ縺ｮ邨ｱ蜷域ｯ碑ｼ・/h2><div id="integrationTable" class="tablewrap"></div></section>
+  <section class="card"><h2>10. 繝ｭ繝・ヨ驟榊・</h2><div id="lotTable" class="tablewrap"></div></section>
+  <section class="card"><h2>11. 譛邨ょ愛螳・/h2><div id="recommendationTable" class="tablewrap"></div></section>
+  <section class="card"><h2>Debug Console</h2><pre id="debugLog">譛ｪ螳溯｡・/pre></section>
 </main>
 
 <script>
 const PIP=100, RSI_PERIOD=14, EMA_PERIOD=20, BB_PERIOD=20, ATR_PERIOD=14, MAX_HOLD=180;
-const WINDOWS=[
-  {id:"m0609",group:"early",label:"06:00-09:00",start:6,end:9},
-  {id:"t0911",group:"tokyoFront",label:"09:00-11:00",start:9,end:11},
-  {id:"t1113",group:"tokyoBack",label:"11:00-13:00",start:11,end:13},
-  {id:"m0611",group:"early",label:"06:00-11:00",start:6,end:11},
-  {id:"t0913",group:"tokyo",label:"09:00-13:00",start:9,end:13},
-  {id:"all0613",group:"all",label:"06:00-13:00",start:6,end:13}
-];
-const FOCUS_WINDOWS=["06:00-09:00","09:00-11:00","11:00-13:00"];
-const RSI_BUY=[20,25,30,35,40], RSI_SELL=[60,65,70,75,80];
-const MOVES=[4,6,8,10], PERIODS=[3,5], STREAKS=[2,3,4,5], EMA_FILTERS=["Ignore","Up","Down"];
-const EXITS=[
-  {id:"tp10_sl15",label:"TP10 SL15",type:"tpsl",tp:10,sl:15,max:180},
-  {id:"tp8_sl12",label:"TP8 SL12",type:"tpsl",tp:8,sl:12,max:180},
-  {id:"time_60",label:"60分決済",type:"time",max:60},
-  {id:"time_180",label:"180分決済",type:"time",max:180},
-  {id:"trail_10_5",label:"+10到達後-5戻し",type:"trail",start:10,back:5,max:180},
-  {id:"trail_15_5",label:"+15到達後-5戻し",type:"trail",start:15,back:5,max:180}
-];let bars=[],results=null,topCsv="",recommendationJson=null;
-const debug={files:0,loadedRows:0,validBars:0,rsiCount:0,candidates:0,errors:[],lastRun:"--"};
+let bars=[],results=null,filesMeta=[],csvs={},recommendation=null;
+const debug={files:0,loadedRows:0,validBars:0,rsiCount:0,signals:0,errors:[],lastRun:"--"};
+const exits=[
+  {id:"time_180",name:"Time 180m",type:"time",max:180},
+  {id:"time_60",name:"Time 60m",type:"time",max:60},
+  {id:"time_90",name:"Time 90m",type:"time",max:90},
+  {id:"time_120",name:"Time 120m",type:"time",max:120},
+  {id:"tp10_sl15",name:"TP10 SL15",type:"tpsl",tp:10,sl:15,max:180},
+  {id:"tp15_sl15",name:"TP15 SL15",type:"tpsl",tp:15,sl:15,max:180},
+  {id:"tp20_sl15",name:"TP20 SL15",type:"tpsl",tp:20,sl:15,max:180},
+  {id:"trail_10_5",name:"Trail +10 -5",type:"trail",start:10,back:5,max:180},
+  {id:"trail_15_5",name:"Trail +15 -5",type:"trail",start:15,back:5,max:180}
+];const baseExit=exits[0], spread=()=>Number(document.getElementById("spreadInput").value)||0;
 
 document.getElementById("loadBtn").addEventListener("click",loadCsvFiles);
 document.getElementById("runBtn").addEventListener("click",runResearch);
-document.getElementById("jsonBtn").addEventListener("click",()=>download("research_v27_results.json",JSON.stringify(results,null,2),"application/json"));
-document.getElementById("csvBtn").addEventListener("click",()=>download("research_v27_top_candidates.csv","\ufeff"+topCsv,"text/csv;charset=utf-8"));
-document.getElementById("recBtn").addEventListener("click",()=>download("research_v27_recommendation.json",JSON.stringify(recommendationJson,null,2),"application/json"));
-function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}
-function setProgress(done,total){document.getElementById("progressBar").style.width=(total?Math.min(100,Math.round(done/total*100)):0)+"%";}
-function appendMany(target,source,chunkSize=10000){for(let i=0;i<source.length;i+=chunkSize){const end=Math.min(i+chunkSize,source.length);for(let j=i;j<end;j++)target.push(source[j]);}}
-const waitFrame=()=>new Promise(r=>setTimeout(r,0));
+document.getElementById("jsonBtn").addEventListener("click",()=>download("research_v28_results.json",JSON.stringify(results,null,2),"application/json"));
+document.getElementById("exitBtn").addEventListener("click",()=>download("research_v28_exit_comparison.csv","\ufeff"+csvs.exit,"text/csv;charset=utf-8"));
+document.getElementById("filterBtn").addEventListener("click",()=>download("research_v28_filter_comparison.csv","\ufeff"+csvs.filter,"text/csv;charset=utf-8"));
+document.getElementById("integrationBtn").addEventListener("click",()=>download("research_v28_integration.csv","\ufeff"+csvs.integration,"text/csv;charset=utf-8"));
+document.getElementById("lotBtn").addEventListener("click",()=>download("research_v28_lot_simulation.csv","\ufeff"+csvs.lot,"text/csv;charset=utf-8"));
+document.getElementById("recBtn").addEventListener("click",()=>download("research_v28_recommendation.json",JSON.stringify(recommendation,null,2),"application/json"));
 
 async function loadCsvFiles(){
   const files=[...document.getElementById("csvFiles").files];
-  if(!files.length){setStatus("CSVファイルを選択してください。",true);return;}
+  if(!files.length){setStatus("Select CSV file.",true);return;}
   reset();
   try{
     const merged=[];
     for(let i=0;i<files.length;i++){
-      setStatus(`CSV読み込み中 ${i+1}/${files.length}: ${files[i].name}`);
+      setStatus(`Loading CSV ${i+1}/${files.length}: ${files[i].name}`);
       setProgress(i,files.length);
       const parsed=parseCsvBars(await files[i].text(),files[i].name);
-      debug.loadedRows+=parsed.loadedRows;appendMany(debug.errors,parsed.errors);appendMany(merged,parsed.bars);
-      await waitFrame();
+      debug.loadedRows+=parsed.loadedRows;debug.errors.push(...parsed.errors);merged.push(...parsed.bars);
+      await wait();
     }
     bars=dedupeAndSortBars(merged);debug.files=files.length;debug.validBars=bars.length;
-    enrichBars(bars);renderSummary();updateDebug();setProgress(100,100);
-    document.getElementById("runBtn").disabled=!bars.length;setStatus("CSV読み込み完了。Research v27を実行できます。");
-  }catch(e){debug.errors.push({scope:"loadCsvFiles",message:e.message});updateDebug();setStatus("CSV読み込み失敗: "+e.message,true);}
+    enrichBars(bars);filesMeta=files.map(f=>f.name);renderSummary();updateDebug();setProgress(100,100);
+    document.getElementById("runBtn").disabled=!bars.length;setStatus("CSV loaded. Ready to run Research v28.");
+  }catch(e){debug.errors.push({scope:"loadCsvFiles",message:e.message});updateDebug();setStatus("Analysis failed: "+e.message,true);}
 }
 
 async function runResearch(){
-  if(!bars.length){setStatus("先にCSVを読み込んでください。",true);return;}
-  document.getElementById("runBtn").disabled=true;disableDownloads(true);
+  if(!bars.length){setStatus("Load CSV first.",true);return;}
+  disableDownloads(true);document.getElementById("runBtn").disabled=true;
   try{
-    const spread=Number(document.getElementById("spreadInput").value)||0;
-    const agg=new Map(), bias=new Map();
-    for(let i=80;i<bars.length-MAX_HOLD-1;i++){
-      if(i%10000===0){setProgress(i,bars.length);setStatus(`分析中 ${i.toLocaleString()} / ${bars.length.toLocaleString()}`);await waitFrame();}
-      const b=bars[i];if(!validFeatureBar(b))continue;
-      const wins=WINDOWS.filter(w=>isJstRange(b.time,w.start,w.end));
-      if(!wins.length)continue;
-      const exitPips={};
-      for(const ex of EXITS){exitPips["BUY|"+ex.id]=simulateExit(bars,i,"BUY",ex,spread);exitPips["SELL|"+ex.id]=simulateExit(bars,i,"SELL",ex,spread);}
-      for(const w of wins){
-        const buyBias=exitPips["BUY|time_60"], sellBias=exitPips["SELL|time_60"];
-        if(buyBias!=null)addBiasTrade(bias,w,"BUY",buyBias,b.time);
-        if(sellBias!=null)addBiasTrade(bias,w,"SELL",sellBias,b.time);
-        for(const ex of EXITS){
-          const bp=exitPips["BUY|"+ex.id];if(bp!=null)addBuyCandidates(agg,w,b,bp,ex,b.time);
-          const sp=exitPips["SELL|"+ex.id];if(sp!=null)addSellCandidates(agg,w,b,sp,ex,b.time);
-        }
-      }
+    const sp=spread();
+    const morningEntries=[], coreEntries=[], candidateGEntries=[];
+    for(let i=100;i<bars.length-MAX_HOLD-1;i++){
+      if(i%10000===0){setProgress(i,bars.length);setStatus(`Analyzing ${i.toLocaleString()} / ${bars.length.toLocaleString()}`);await wait();}
+      const b=bars[i]; if(!validFeatureBar(b))continue;
+      if(isMorningRuleA(b))morningEntries.push(makeEntry(i,"Morning Rule A","BUY"));
+      if(isCoreRuleE(b))coreEntries.push(makeEntry(i,"Core Rule E","BUY"));
+      if(isCandidateG(b))candidateGEntries.push(makeEntry(i,"Candidate G","BUY"));
     }
-    const rows=finalizeAgg(agg).sort((a,b)=>score(b)-score(a));
-    const ranked=rows.filter(r=>r.count>=30&&r.expectancy>0&&r.profitFactor>=1.1);
-    const earlyBuy=ranked.filter(r=>r.group==="early"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Morning BUY",i));
-    const earlySell=ranked.filter(r=>r.group==="early"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Morning SELL",i));
-    const tokyoFrontBuy=ranked.filter(r=>r.group==="tokyoFront"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Front BUY",i));
-    const tokyoFrontSell=ranked.filter(r=>r.group==="tokyoFront"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Front SELL",i));
-    const tokyoBackBuy=ranked.filter(r=>r.group==="tokyoBack"&&r.direction==="BUY").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Back BUY",i));
-    const tokyoBackSell=ranked.filter(r=>r.group==="tokyoBack"&&r.direction==="SELL").slice(0,20).map((r,i)=>nameRow(r,"Tokyo Back SELL",i));
-    const overall=ranked.slice(0,30).map((r,i)=>nameRow(r,"Overall",i));
-    const liveTop=ranked.filter(r=>["super","main","min"].includes(r.rankClass)).slice(0,10).map((r,i)=>nameLive(r,i));
-    const worst=rows.filter(r=>r.count>=50).sort((a,b)=>a.expectancy-b.expectancy).slice(0,10).map((r,i)=>nameRow(r,"Worst",i));
-    const biasRows=buildBiasRows(bias);
-    const coreCompare=buildCoreCompare(liveTop,overall);
-    const finalCandidates=buildFinalCandidates(liveTop,overall);
-    recommendationJson=buildRecommendation(finalCandidates,coreCompare);
-    results={meta:{version:"research-v27",generatedAt:new Date().toISOString(),sourceFiles:[...document.getElementById("csvFiles").files].map(f=>f.name),validBars:bars.length,startTime:bars[0]?fmtDate(bars[0].time):null,endTime:bars.at(-1)?fmtDate(bars.at(-1).time):null,spreadPips:spread},purpose:"06:00-13:00 JST blank-session rule discovery",existingRulesUnchanged:["Core Rule E","Candidate G","Day Rule A","Evening Rule C","Honmei17"],earlyBuyTop20:earlyBuy,earlySellTop20:earlySell,tokyoFrontBuyTop20:tokyoFrontBuy,tokyoFrontSellTop20:tokyoFrontSell,tokyoBackBuyTop20:tokyoBackBuy,tokyoBackSellTop20:tokyoBackSell,overallTop30:overall,liveCandidateTop10:liveTop,worstRejectedTop10:worst,sessionBias:biasRows,existingEaComparison:coreCompare,finalCandidates,recommendation:recommendationJson,ranking:ranked.slice(0,200)};
-    topCsv=buildTopCsv([...liveTop,...overall].slice(0,40));
-    renderTable("earlyBuy",earlyBuy);renderTable("earlySell",earlySell);renderTable("tokyoFrontBuy",tokyoFrontBuy);renderTable("tokyoFrontSell",tokyoFrontSell);renderTable("tokyoBackBuy",tokyoBackBuy);renderTable("tokyoBackSell",tokyoBackSell);renderTable("overall",overall);renderTable("liveTop",liveTop);renderTable("worst",worst);renderBias(biasRows);renderCoreCompare(coreCompare);renderRecommendation(finalCandidates,recommendationJson);
-    debug.candidates=rows.length;debug.lastRun=fmtDate(new Date());updateDebug();disableDownloads(false);setProgress(100,100);setStatus("Research v27分析完了。");
-  }catch(e){debug.errors.push({scope:"runResearch",message:e.message,stack:e.stack});updateDebug();setStatus("分析失敗: "+e.message,true);}
+    debug.signals=morningEntries.length;
+    const exitComparison=exits.map(ex=>analyzeEntries(morningEntries,ex,sp,ex.name));
+    const baseResult=analyzeEntries(morningEntries,baseExit,sp,"Morning Rule A / Time 180m");
+    const filterComparison=buildFilterComparison(sp);
+    const yearAnalysis=groupAnalyze(morningEntries,baseExit,sp,e=>String(bars[e.index].time.getFullYear()),"year");
+    const monthAnalysis=groupAnalyze(morningEntries,baseExit,sp,e=>monthKey(bars[e.index].time),"month");
+    const hourAnalysis=groupAnalyze(morningEntries,baseExit,sp,e=>`${pad(bars[e.index].time.getHours())}:00-${pad(bars[e.index].time.getHours()+1)}:00`,"hour");
+    const integrationRows=buildIntegration(coreEntries,candidateGEntries,morningEntries,sp);
+    const lotRows=buildLotSimulation(coreEntries,candidateGEntries,morningEntries,sp);
+    recommendation=buildRecommendation(baseResult,exitComparison,filterComparison,yearAnalysis,integrationRows,lotRows);
+    results={meta:{version:"research-v28",generatedAt:new Date().toISOString(),sourceFiles:filesMeta,validBars:bars.length,startTime:bars[0]?fmtDate(bars[0].time):null,endTime:bars.at(-1)?fmtDate(bars.at(-1).time):null,spreadPips:sp},fixedRule:{name:"Morning Rule A",direction:"BUY",timeWindow:"09:00-13:00 JST",conditions:["RSI < 35","Recent3Drop <= -6 pips","BearStreak >= 3","BB = Lower","ATR = Mid","Vol = High","LowUpdate = Ignore"],baseExit:"Time 180m"},baseResult,exitComparison,filterComparison,yearAnalysis,monthAnalysis,hourAnalysis,integrationRows,lotRows,recommendation};
+    csvs.exit=toCsv(exitComparison);csvs.filter=toCsv(filterComparison);csvs.integration=toCsv(integrationRows);csvs.lot=toCsv(lotRows);
+    renderTable("baseTable",[baseResult]);renderTable("exitTable",exitComparison);renderTable("filterTable",filterComparison);renderTable("yearTable",yearAnalysis);renderTable("monthTable",monthAnalysis);renderTable("hourTable",hourAnalysis);renderTable("integrationTable",integrationRows);renderTable("lotTable",lotRows);renderRecommendation();
+    updateDebug();disableDownloads(false);setProgress(100,100);setStatus("Research v28 completed.");
+  }catch(e){debug.errors.push({scope:"runResearch",message:e.message,stack:e.stack});updateDebug();setStatus("Analysis failed: "+e.message,true);}
   finally{document.getElementById("runBtn").disabled=false;}
 }
 
-function addBuyCandidates(map,w,b,pips,ex,time){
-  const rsiHits=RSI_BUY.filter(v=>b.rsi<v),moveHits=buyMoveHits(b),emaHits=EMA_FILTERS.filter(v=>v==="Ignore"||v===b.emaDirection),bearHits=STREAKS.filter(v=>b.bearStreak>=v);
-  if(!rsiHits.length||!moveHits.length||!bearHits.length)return;
-  const lowFilters=["Ignore",true,false].filter(v=>v==="Ignore"||v===b.lowUpdate3);
-  for(const r of rsiHits)for(const mv of moveHits)for(const low of lowFilters)for(const st of bearHits)for(const ema of emaHits)addTrade(map,makeKey(w,"BUY",`RSI<${r}`,mv,low==="Ignore"?"LowUpdate=Ignore":`LowUpdate=${low}`,`BearStreak>=${st}`,b.bbPosition,`EMA=${ema}`,`ATR=${b.atrBand}`,`Vol=${b.volBand}`,ex.label),pips,time);
+function isMorningRuleA(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.recent3<=-6&&b.bearStreak>=3&&b.bbPosition==="Lower"&&b.atrBand==="Mid"&&b.volBand==="High";}
+function isCoreRuleE(b){return isJstRange(b.time,0,2)&&b.rsi<25&&b.recent3<=-10&&b.lowUpdate3===true;}
+function isCandidateG(b){return isJstRange(b.time,2,3)&&b.rsi<20&&b.recent3<=-10&&b.bearStreak>=3&&b.bbPosition==="Lower"&&b.atrBand==="High"&&b.volBand==="High";}
+function makeEntry(index,ruleName,direction){return{index,ruleName,direction,time:bars[index].time,entry:bars[index].close};}
+function buildFilterComparison(sp){
+  const specs=[
+    ["Current",b=>isMorningRuleA(b)],
+    ["RSI<30",b=>baseNoRsi(b)&&b.rsi<30],["RSI<35",b=>baseNoRsi(b)&&b.rsi<35],["RSI<40",b=>baseNoRsi(b)&&b.rsi<40],
+    ["Drop<=-4",b=>baseNoDrop(b)&&b.recent3<=-4],["Drop<=-6",b=>baseNoDrop(b)&&b.recent3<=-6],["Drop<=-8",b=>baseNoDrop(b)&&b.recent3<=-8],
+    ["Bear>=2",b=>baseNoBear(b)&&b.bearStreak>=2],["Bear>=3",b=>baseNoBear(b)&&b.bearStreak>=3],["Bear>=4",b=>baseNoBear(b)&&b.bearStreak>=4],
+    ["BB Lower",b=>baseNoBb(b)&&b.bbPosition==="Lower"],["BB MiddleLower or Lower",b=>baseNoBb(b)&&(b.bbPosition==="MiddleLower"||b.bbPosition==="Lower")],
+    ["ATR Mid",b=>baseNoAtr(b)&&b.atrBand==="Mid"],["ATR Mid or High",b=>baseNoAtr(b)&&(b.atrBand==="Mid"||b.atrBand==="High")],
+    ["Vol High",b=>baseNoVol(b)&&b.volBand==="High"],["Vol Mid or High",b=>baseNoVol(b)&&(b.volBand==="Mid"||b.volBand==="High")]
+  ];
+  return specs.map(([name,pred])=>analyzeEntries(entriesByPredicate(pred,"Morning Rule A Filter"),baseExit,sp,name));
 }
-function addSellCandidates(map,w,b,pips,ex,time){
-  const rsiHits=RSI_SELL.filter(v=>b.rsi>v),moveHits=sellMoveHits(b),emaHits=EMA_FILTERS.filter(v=>v==="Ignore"||v===b.emaDirection),bullHits=STREAKS.filter(v=>b.bullStreak>=v);
-  if(!rsiHits.length||!moveHits.length||!bullHits.length)return;
-  const highFilters=["Ignore",true,false].filter(v=>v==="Ignore"||v===b.highUpdate3);
-  for(const r of rsiHits)for(const mv of moveHits)for(const high of highFilters)for(const st of bullHits)for(const ema of emaHits)addTrade(map,makeKey(w,"SELL",`RSI>${r}`,mv,high==="Ignore"?"HighUpdate=Ignore":`HighUpdate=${high}`,`BullStreak>=${st}`,b.bbPosition,`EMA=${ema}`,`ATR=${b.atrBand}`,`Vol=${b.volBand}`,ex.label),pips,time);
+function baseNoRsi(b){return isJstRange(b.time,9,13)&&b.recent3<=-6&&b.bearStreak>=3&&b.bbPosition==="Lower"&&b.atrBand==="Mid"&&b.volBand==="High";}
+function baseNoDrop(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.bearStreak>=3&&b.bbPosition==="Lower"&&b.atrBand==="Mid"&&b.volBand==="High";}
+function baseNoBear(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.recent3<=-6&&b.bbPosition==="Lower"&&b.atrBand==="Mid"&&b.volBand==="High";}
+function baseNoBb(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.recent3<=-6&&b.bearStreak>=3&&b.atrBand==="Mid"&&b.volBand==="High";}
+function baseNoAtr(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.recent3<=-6&&b.bearStreak>=3&&b.bbPosition==="Lower"&&b.volBand==="High";}
+function baseNoVol(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.recent3<=-6&&b.bearStreak>=3&&b.bbPosition==="Lower"&&b.atrBand==="Mid";}
+function entriesByPredicate(pred,ruleName){const out=[];for(let i=100;i<bars.length-MAX_HOLD-1;i++){const b=bars[i];if(validFeatureBar(b)&&pred(b))out.push(makeEntry(i,ruleName,"BUY"));}return out;}
+function analyzeEntries(entries,exit,sp,name){
+  const trades=entries.map(e=>simulateExit(e.index,e.direction,exit,sp)).filter(x=>x&&Number.isFinite(x.pips));
+  const vals=trades.map(t=>t.pips), m=metrics(vals);
+  return{name,count:m.count,winRate:m.winRate,profitFactor:m.profitFactor,expectancy:m.expectancy,totalPips:m.totalPips,maxDrawdown:m.maxDrawdown,maxLossStreak:maxLossStreak(vals),avgHoldMinutes:avg(trades.map(t=>t.hold)),negativeMonths:negativeMonthCount(entries,trades),grade:grade(m),note:noteFor(m)};
 }
-function buyMoveHits(b){const out=[];for(const p of PERIODS)for(const m of MOVES)if(b[`recent${p}`]<=-m)out.push(`Recent${p}Drop<=-${m}`);return out;}
-function sellMoveHits(b){const out=[];for(const p of PERIODS)for(const m of MOVES)if(b[`recent${p}`]>=m)out.push(`Recent${p}Rise>=${m}`);return out;}
-function makeKey(w,direction,rsi,move,update,streak,bb,ema,atr,vol,exit){return JSON.stringify({group:w.group,timeWindow:w.label,direction,rsi,move,update,streak,bb,ema,atr,vol,exit});}
-function addTrade(map,key,pips,time){
-  let row=map.get(key);
-  if(!row){row={key,stats:initStats(),years:{}};map.set(key,row);}
-  updateStats(row.stats,pips);
-  const y=time.getFullYear();
-  if(!row.years[y])row.years[y]=initStats();
-  updateStats(row.years[y],pips);
+function groupAnalyze(entries,exit,sp,keyFn,label){
+  const map=new Map();
+  for(const e of entries){const k=keyFn(e);if(!map.has(k))map.set(k,[]);map.get(k).push(e);}
+  return [...map.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0]))).map(([k,es])=>({group:k,...analyzeEntries(es,exit,sp,`${label}:${k}`)}));
 }
-function initStats(){return{count:0,wins:0,grossProfit:0,grossLoss:0,totalPips:0,equity:0,peak:0,maxDrawdown:0};}
-function updateStats(s,pips){
-  s.count++;
-  if(pips>0){s.wins++;s.grossProfit+=pips;}else if(pips<0){s.grossLoss+=Math.abs(pips);}
-  s.totalPips+=pips;
-  s.equity+=pips;
-  if(s.equity>s.peak)s.peak=s.equity;
-  const dd=s.peak-s.equity;
-  if(dd>s.maxDrawdown)s.maxDrawdown=dd;
+function buildIntegration(core,cand,morning,sp){
+  const sets=[
+    ["Core Rule E縺ｮ縺ｿ",core],
+    ["Core Rule E + Candidate G",[...core,...cand]],
+    ["Morning Rule A縺ｮ縺ｿ",morning],
+    ["Core Rule E + Candidate G + Morning Rule A",[...core,...cand,...morning]]
+  ];
+  return sets.map(([name,entries])=>analyzeEntries(sortEntries(entries),ruleExitByEntry,sp,name));
 }
-function metricsFromStats(s){
-  const c=s?.count||0,gp=s?.grossProfit||0,gl=s?.grossLoss||0,total=s?.totalPips||0;
-  return{count:c,winRate:c?(s.wins/c*100):0,profitFactor:gl>0?gp/gl:(gp>0?999:0),expectancy:c?total/c:0,totalPips:total,maxDrawdown:s?.maxDrawdown||0};
+function buildLotSimulation(core,cand,morning,sp){
+  const plans=[
+    {name:"A Core0.10 CandidateG0.03 Morning0.03",core:0.10,cand:0.03,morning:0.03},
+    {name:"B Core0.10 CandidateG0.03 Morning0.05",core:0.10,cand:0.03,morning:0.05},
+    {name:"C Core0.05 CandidateG0.03 Morning0.03",core:0.05,cand:0.03,morning:0.03},
+    {name:"D Core0.03 CandidateG0.01 Morning0.01",core:0.03,cand:0.01,morning:0.01}
+  ];
+  return plans.map(p=>simulateLotPlan(p,core,cand,morning,sp));
 }
-function finalizeAgg(map){const out=[];for(const raw of map.values()){const info=JSON.parse(raw.key),m=metricsFromStats(raw.stats),yearStats={};for(const y of[2023,2024,2025,2026])yearStats[y]=metricsFromStats(raw.years[y]);const row={...info,...m,yearStats,annualTrades:annualTrades(m.count),averageHoldMinutes:holdFromExit(info.exit),minYearPF:minYearPf(yearStats)};row.adoption=adoption(row);row.rankClass=row.adoption.class;row.rejectReason=row.adoption.reason;out.push(row);}return out;}
-function adoption(r){
-  const allYearOk=[2023,2024,2025,2026].every(y=>(r.yearStats[y]?.count||0)<5 || (r.yearStats[y]?.profitFactor||0)>1);
-  if(r.profitFactor>2&&r.expectancy>=3&&r.annualTrades>=100&&r.minYearPF>1.2&&r.maxDrawdown<600)return{class:"super",label:"超本命候補",reason:"PF>2 / EV+3以上 / 年100回以上 / MinYearPF>1.2"};
-  if(r.profitFactor>1.5&&r.expectancy>=2&&r.annualTrades>=100&&allYearOk&&r.maxDrawdown<700)return{class:"main",label:"本命候補",reason:"PF>1.5 / EV+2以上 / 年100回以上 / 年度安定"};
-  if(r.profitFactor>1.3&&r.expectancy>=1&&r.annualTrades>=50&&allYearOk)return{class:"min",label:"最低候補",reason:"PF>1.3 / EV+1以上 / 年50回以上"};
-  return{class:"reject",label:"却下",reason:rejectReason(r,allYearOk)};
+function simulateLotPlan(plan,core,cand,morning,sp){
+  const items=[
+    ...core.map(e=>({...e,lot:plan.core,exit:{type:"trail",start:10,back:5,max:180}})),
+    ...cand.map(e=>({...e,lot:plan.cand,exit:{type:"trail",start:15,back:5,max:180}})),
+    ...morning.map(e=>({...e,lot:plan.morning,exit:baseExit}))
+  ].sort((a,b)=>a.time-b.time);
+  const month=new Map(), yenVals=[];
+  for(const e of items){const t=simulateExit(e.index,e.direction,e.exit,sp);if(!t)continue;const yen=t.pips*1000*e.lot;yenVals.push(yen);const mk=monthKey(e.time);month.set(mk,(month.get(mk)||0)+yen);}
+  const yearly=sum(yenVals)/(yearSpan()||3), worstMonth=Math.min(0,...month.values()), dd=maxDrawdown(yenVals);
+  return{name:plan.name,annualProfitYen:yearly,maxDrawdownYen:dd,worstMonthYen:worstMonth,monthlyAverageYen:month.size?sum([...month.values()])/month.size:0,ruinRisk:dd>100000?"High":dd>50000?"Mid":"Low",trades:yenVals.length};
 }
-function rejectReason(r,allYearOk){if(r.annualTrades<50)return"年間件数不足";if(r.expectancy<1)return"期待値不足";if(r.profitFactor<=1.3)return"PF不足";if(!allYearOk)return"年度安定性不足";if(r.maxDrawdown>=700)return"DD過大";return"採用基準未達";}
-function score(r){return(r.rankClass==="super"?260:r.rankClass==="main"?180:r.rankClass==="min"?90:0)+Math.min(r.profitFactor,6)*25+r.expectancy*28+Math.log(Math.max(1,r.count))*12+Math.min(r.annualTrades,250)*0.28+(r.minYearPF>1?20:0)-r.maxDrawdown*0.08;}
-function nameRow(r,prefix,i){return{...r,ruleName:`${prefix} ${i+1}`};}
-function nameLive(r,i){const names=["Morning Rule A","Morning Rule B","Tokyo Rule A","Tokyo Rule B","Daytime Rule A","Candidate F","Candidate G","Candidate H","Candidate I","Candidate J"];return{...r,ruleName:names[i]||`Live Candidate ${i+1}`};}
-function buildFinalCandidates(liveTop,overall){return (liveTop.length?liveTop:overall.filter(r=>r.expectancy>0).slice(0,5)).slice(0,5).map((r,i)=>({...r,eaPriority:i+1,eaAdoption:i===0&&["super","main"].includes(r.rankClass)?"EA化優先":"デモ検証"}));}
-function buildRecommendation(finalCandidates,coreCompare){const best=finalCandidates[0]||null;let grade="D",label="有効候補なし",reason="採用候補が見つかりません";if(best){if(["super","main"].includes(best.rankClass)){grade="A";label="即EA化候補あり";reason="採用基準を満たす候補があります";}else if(best.rankClass==="min"){grade="B";label="デモ検証候補あり";reason="最低候補はありますが、まずデモ検証推奨です";}else{grade="C";label="研究継続";reason="期待値は残る候補がありますがEA化には弱いです";}}return{grade,label,reason,bestCandidate:best,existingEaComparison:coreCompare};}
-function buildCoreCompare(liveTop,overall){const best=(liveTop[0]||overall[0]||null);let summary="有効候補なし",grade="D",reason="既存EAを補助できる候補なし";if(best){if(["super","main"].includes(best.rankClass)){grade="A";summary="補助EA候補あり";reason=`${best.timeWindow} ${best.direction} がPF ${fmtPf(best.profitFactor)} / EV ${sign(best.expectancy)}。既存EAの空白時間帯なので補助価値あり。`;}else if(best.rankClass==="min"){grade="B";summary="デモ候補あり";reason="既存EAほど強くないが、06:00〜13:00の検証候補としては有効。";}else{grade="C";summary="研究継続";reason="既存EAの補助としてはまだ弱い。";}}return{grade,summary,reason,bestCandidate:best};}
-function addBiasTrade(map,w,dir,pips,time){const key=w.label+"|"+dir;let row=map.get(key);if(!row){row={timeWindow:w.label,direction:dir,stats:initStats()};map.set(key,row);}updateStats(row.stats,pips);}
-function buildBiasRows(map){const rows=[];for(const w of FOCUS_WINDOWS){const buy=finalizeBias(map.get(w+"|BUY")),sell=finalizeBias(map.get(w+"|SELL"));const winner=!buy&&!sell?"--":(buy?.profitFactor||0)>(sell?.profitFactor||0)?"BUY":"SELL";rows.push({timeWindow:w,buyPF:buy?.profitFactor||0,buyExpectancy:buy?.expectancy||0,buyCount:buy?.count||0,sellPF:sell?.profitFactor||0,sellExpectancy:sell?.expectancy||0,sellCount:sell?.count||0,winner});}return rows;}
-function finalizeBias(row){return row?metricsFromStats(row.stats):null;}
+function sortEntries(entries){return entries.slice().sort((a,b)=>a.time-b.time);}
+function ruleExitByEntry(e){if(e.ruleName==="Core Rule E")return{type:"trail",start:10,back:5,max:180};if(e.ruleName==="Candidate G")return{type:"trail",start:15,back:5,max:180};return baseExit;}
+function buildRecommendation(base,exitRows,filterRows,yearRows,integrationRows,lotRows){
+  const bestExit=exitRows.slice().sort((a,b)=>scoreRow(b)-scoreRow(a))[0];
+  const y2026=yearRows.find(r=>r.group==="2026");
+  const annual=base.count/(yearSpan()||3);
+  const accept=base.profitFactor>=1.5&&base.expectancy>=3&&annual>=100&&(!y2026||y2026.profitFactor>=1.5);
+  let grade="D",label="不採用",reason="採用基準未達";
+  if(accept){grade="A";label="Morning Rule AをEAに統合";reason="単体基準と2026条件を満たします。";}
+  else if(base.profitFactor>=1.3&&base.expectancy>1){grade="B";label="別EAでデモ";reason="優位性はありますが統合前にデモ検証が必要です。";}
+  else if(base.expectancy>0){grade="C";label="追加研究";reason="期待値はプラスですが実運用基準には不足します。";}
+  return{grade,label,reason,bestExit,baseResult:base,year2026:y2026,integrationBest:integrationRows.slice().sort((a,b)=>scoreRow(b)-scoreRow(a))[0],lotSuggestion:lotRows.slice().sort((a,b)=>b.annualProfitYen-a.annualProfitYen)[0]};
+}
+function scoreRow(r){return Math.min(r.profitFactor||0,8)*20+(r.expectancy||0)*20+Math.log(Math.max(1,r.count||r.trades||1))*8-(r.maxDrawdown||0)*0.05-(r.maxDrawdownYen||0)*0.0005;}
+function grade(m){if(m.profitFactor>=2&&m.expectancy>=3)return"A";if(m.profitFactor>=1.5&&m.expectancy>=2)return"B";if(m.expectancy>0)return"C";return"D";}
+function noteFor(m){if(m.count<30)return"莉ｶ謨ｰ荳崎ｶｳ";if(m.profitFactor<1.5)return"PF荳崎ｶｳ";if(m.expectancy<3)return"譛溷ｾ・､荳崎ｶｳ";return"濶ｯ螂ｽ";}
+function negativeMonthCount(entries,trades){const map=new Map();for(let i=0;i<Math.min(entries.length,trades.length);i++){const k=monthKey(entries[i].time);map.set(k,(map.get(k)||0)+trades[i].pips);}return [...map.values()].filter(v=>v<0).length;}
 
-function simulateExit(data,i,dir,ex,spread){const entry=data[i]?.close;if(!Number.isFinite(entry))return null;const max=Math.min(data.length-1,i+(ex.max||180));let best=entry,worst=entry;for(let j=i+1;j<=max;j++){const b=data[j];if(!validBar(b))continue;if(dir==="BUY"){if(b.high>best)best=b.high;if(b.low<worst)worst=b.low;}else{if(b.low<best)best=b.low;if(b.high>worst)worst=b.high;}const favorable=Math.abs(best-entry)*PIP,adverse=Math.abs(worst-entry)*PIP;if(ex.type==="trail"&&favorable>=ex.start&&adverseFromBest(dir,b,best)>=ex.back){if(dir==="BUY"){const p=best-ex.back/PIP;return(p-entry)*PIP-spread;}const p=best+ex.back/PIP;return(entry-p)*PIP-spread;}if(ex.type==="tpsl"){if(favorable>=ex.tp)return ex.tp-spread;if(adverse>=ex.sl)return-ex.sl-spread;}}const close=data[max]?.close;if(!Number.isFinite(close))return null;return(dir==="BUY"?(close-entry):(entry-close))*PIP-spread;}
+function simulateExit(i,dir,exOrFn,sp){
+  const ex=typeof exOrFn==="function"?exOrFn({ruleName:"Morning Rule A"}):exOrFn;
+  const entry=bars[i]?.close;if(!Number.isFinite(entry))return null;const max=Math.min(bars.length-1,i+(ex.max||180));let best=entry,worst=entry;
+  for(let j=i+1;j<=max;j++){
+    const b=bars[j];if(!validBar(b))continue;
+    if(dir==="BUY"){if(b.high>best)best=b.high;if(b.low<worst)worst=b.low;}else{if(b.low<best)best=b.low;if(b.high>worst)worst=b.high;}
+    const favorable=Math.abs(best-entry)*PIP,adverse=Math.abs(worst-entry)*PIP;
+    if(ex.type==="trail"&&favorable>=ex.start&&adverseFromBest(dir,b,best)>=ex.back){const price=dir==="BUY"?best-ex.back/PIP:best+ex.back/PIP;return{pips:(dir==="BUY"?(price-entry):(entry-price))*PIP-sp,hold:j-i};}
+    if(ex.type==="tpsl"){if(favorable>=ex.tp)return{pips:ex.tp-sp,hold:j-i};if(adverse>=ex.sl)return{pips:-ex.sl-sp,hold:j-i};}
+  }
+  const close=bars[max]?.close;if(!Number.isFinite(close))return null;return{pips:(dir==="BUY"?(close-entry):(entry-close))*PIP-sp,hold:max-i};
+}
 function adverseFromBest(dir,bar,best){return dir==="BUY"?(best-bar.low)*PIP:(bar.high-best)*PIP;}
+function metrics(values){const count=values.length,wins=values.filter(v=>v>0),losses=values.filter(v=>v<0),gp=sum(wins),gl=Math.abs(sum(losses)),total=sum(values);return{count,winRate:count?wins.length/count*100:0,profitFactor:gl>0?gp/gl:(gp>0?999:0),expectancy:count?total/count:0,totalPips:total,maxDrawdown:maxDrawdown(values)};}
+function maxLossStreak(vals){let cur=0,max=0;for(const v of vals){if(v<0){cur++;max=Math.max(max,cur);}else cur=0;}return max;}
 
-function enrichBars(data){let gains=0,losses=0,ema=null,atr=null;const volValues=[];for(let i=1;i<data.length;i++){const b=data[i],p=data[i-1],diff=b.close-p.close;if(i<=RSI_PERIOD){if(diff>=0)gains+=diff;else losses-=diff;}if(i===RSI_PERIOD){b.avgGain=gains/RSI_PERIOD;b.avgLoss=losses/RSI_PERIOD;b.rsi=rsiFrom(b.avgGain,b.avgLoss);debug.rsiCount++;}else if(i>RSI_PERIOD){const g=Math.max(diff,0),l=Math.max(-diff,0);b.avgGain=(p.avgGain*(RSI_PERIOD-1)+g)/RSI_PERIOD;b.avgLoss=(p.avgLoss*(RSI_PERIOD-1)+l)/RSI_PERIOD;b.rsi=rsiFrom(b.avgGain,b.avgLoss);debug.rsiCount++;}if(i===EMA_PERIOD){ema=avg(data.slice(1,EMA_PERIOD+1).map(x=>x.close));b.ema20=ema;}else if(i>EMA_PERIOD){ema=b.close*(2/(EMA_PERIOD+1))+ema*(1-2/(EMA_PERIOD+1));b.ema20=ema;}const tr=Math.max(b.high-b.low,Math.abs(b.high-p.close),Math.abs(b.low-p.close))*PIP;if(i===ATR_PERIOD){atr=avg(data.slice(1,ATR_PERIOD+1).map((x,k)=>{const prev=data[k];return Math.max(x.high-x.low,Math.abs(x.high-prev.close),Math.abs(x.low-prev.close))*PIP;}));b.atr14=atr;}else if(i>ATR_PERIOD){atr=(atr*(ATR_PERIOD-1)+tr)/ATR_PERIOD;b.atr14=atr;}if(i>=3){b.recent3=(b.close-data[i-3].close)*PIP;b.lowUpdate3=b.low<=Math.min(data[i-1].low,data[i-2].low,data[i-3].low);b.highUpdate3=b.high>=Math.max(data[i-1].high,data[i-2].high,data[i-3].high);}if(i>=5)b.recent5=(b.close-data[i-5].close)*PIP;if(i>=BB_PERIOD){const closes=data.slice(i-BB_PERIOD+1,i+1).map(x=>x.close),mid=avg(closes),sd=std(closes,mid),upper=mid+2*sd,lower=mid-2*sd;b.bbPosition=bbLabel(b.close,upper,mid,lower);}if(i>=EMA_PERIOD&&Number.isFinite(b.ema20))b.emaDirection=b.close>=b.ema20?"Up":"Down";b.bullStreak=b.close>b.open?(p.bullStreak||0)+1:0;b.bearStreak=b.close<b.open?(p.bearStreak||0)+1:0;b.volatility=(b.high-b.low)*PIP;volValues.push(b.volatility);}const sortedVol=[...volValues].sort((a,b)=>a-b),q1=quantile(sortedVol,.33),q2=quantile(sortedVol,.66);const atrVals=data.map(b=>b.atr14).filter(Number.isFinite).sort((a,b)=>a-b),a1=quantile(atrVals,.33),a2=quantile(atrVals,.66);for(const b of data){if(Number.isFinite(b.volatility))b.volBand=b.volatility<=q1?"Low":b.volatility<=q2?"Mid":"High";if(Number.isFinite(b.atr14))b.atrBand=b.atr14<=a1?"Low":b.atr14<=a2?"Mid":"High";}}
-function bbLabel(c,upper,mid,lower){if(c>=upper)return"Upper";if(c>=mid)return"MiddleUpper";if(c>lower)return"MiddleLower";return"Lower";}
-function rsiFrom(g,l){if(l===0)return 100;const rs=g/l;return 100-100/(1+rs);}function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:0;}function std(a,m){return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/a.length);}function quantile(a,q){if(!a.length)return NaN;return a[Math.min(a.length-1,Math.max(0,Math.floor((a.length-1)*q)))];}
-function calcMetrics(values){const c=values.length,wins=values.filter(x=>x>0),losses=values.filter(x=>x<0),grossProfit=sum(wins),grossLoss=Math.abs(sum(losses)),total=sum(values);return{count:c,winRate:c?wins.length/c*100:0,profitFactor:grossLoss>0?grossProfit/grossLoss:(grossProfit>0?999:0),expectancy:c?total/c:0,totalPips:total,maxDrawdown:maxDrawdown(values)};}
-function maxDrawdown(values){let equity=0,peak=0,dd=0;for(const x of values){equity+=x;if(equity>peak)peak=equity;dd=Math.max(dd,peak-equity);}return dd;}function sum(a){return a.reduce((x,y)=>x+y,0);}
-function minYearPf(ys){const vals=[2023,2024,2025,2026].map(y=>ys[y]).filter(m=>m&&m.count>=5).map(m=>m.profitFactor);return vals.length>=3?Math.min(...vals):0;}
-function annualTrades(count){const years=bars.length&&bars[0]&&bars.at(-1)?(bars.at(-1).time-bars[0].time)/(365.25*24*3600*1000):3;return years>0?count/years:0;}
-function holdFromExit(exit){if(exit==="60分決済")return 60;if(exit==="180分決済")return 180;return 180;}
-function validFeatureBar(b){return validBar(b)&&Number.isFinite(b.rsi)&&Number.isFinite(b.recent3)&&Number.isFinite(b.recent5)&&b.bbPosition&&b.emaDirection&&b.atrBand&&b.volBand;}
+function enrichBars(data){let gains=0,losses=0,ema=null,atr=null;const volValues=[];for(let i=1;i<data.length;i++){const b=data[i],p=data[i-1],diff=b.close-p.close;if(i<=RSI_PERIOD){if(diff>=0)gains+=diff;else losses-=diff;}if(i===RSI_PERIOD){b.avgGain=gains/RSI_PERIOD;b.avgLoss=losses/RSI_PERIOD;b.rsi=rsiFrom(b.avgGain,b.avgLoss);debug.rsiCount++;}else if(i>RSI_PERIOD){const g=Math.max(diff,0),l=Math.max(-diff,0);b.avgGain=(p.avgGain*(RSI_PERIOD-1)+g)/RSI_PERIOD;b.avgLoss=(p.avgLoss*(RSI_PERIOD-1)+l)/RSI_PERIOD;b.rsi=rsiFrom(b.avgGain,b.avgLoss);debug.rsiCount++;}if(i===EMA_PERIOD){ema=avg(data.slice(1,EMA_PERIOD+1).map(x=>x.close));b.ema20=ema;}else if(i>EMA_PERIOD){ema=b.close*(2/(EMA_PERIOD+1))+ema*(1-2/(EMA_PERIOD+1));b.ema20=ema;}const tr=Math.max(b.high-b.low,Math.abs(b.high-p.close),Math.abs(b.low-p.close))*PIP;if(i===ATR_PERIOD){atr=avg(data.slice(1,ATR_PERIOD+1).map((x,k)=>{const prev=data[k];return Math.max(x.high-x.low,Math.abs(x.high-prev.close),Math.abs(x.low-prev.close))*PIP;}));b.atr14=atr;}else if(i>ATR_PERIOD){atr=(atr*(ATR_PERIOD-1)+tr)/ATR_PERIOD;b.atr14=atr;}if(i>=3){b.recent3=(b.close-data[i-3].close)*PIP;b.lowUpdate3=b.low<=Math.min(data[i-1].low,data[i-2].low,data[i-3].low);b.highUpdate3=b.high>=Math.max(data[i-1].high,data[i-2].high,data[i-3].high);}if(i>=BB_PERIOD){const closes=data.slice(i-BB_PERIOD+1,i+1).map(x=>x.close),mid=avg(closes),sd=std(closes,mid),upper=mid+2*sd,lower=mid-2*sd;b.bbPosition=bbLabel(b.close,upper,mid,lower);}if(i>=EMA_PERIOD&&Number.isFinite(b.ema20))b.emaDirection=b.close>=b.ema20?"Up":"Down";b.bullStreak=b.close>b.open?(p.bullStreak||0)+1:0;b.bearStreak=b.close<b.open?(p.bearStreak||0)+1:0;b.volatility=(b.high-b.low)*PIP;volValues.push(b.volatility);}const sortedVol=[...volValues].sort((a,b)=>a-b),q1=quantile(sortedVol,.33),q2=quantile(sortedVol,.66);const atrVals=data.map(b=>b.atr14).filter(Number.isFinite).sort((a,b)=>a-b),a1=quantile(atrVals,.33),a2=quantile(atrVals,.66);for(const b of data){if(Number.isFinite(b.volatility))b.volBand=b.volatility<=q1?"Low":b.volatility<=q2?"Mid":"High";if(Number.isFinite(b.atr14))b.atrBand=b.atr14<=a1?"Low":b.atr14<=a2?"Mid":"High";}}
+function validFeatureBar(b){return validBar(b)&&Number.isFinite(b.rsi)&&Number.isFinite(b.recent3)&&b.bbPosition&&b.atrBand&&b.volBand&&Number.isFinite(b.bearStreak);}
 function parseCsvBars(text,fileName){const rows=parseCsv(text).filter(r=>r.some(c=>String(c).trim()!==""));if(!rows.length)return{bars:[],loadedRows:0,errors:[]};const header=rows[0].map(h=>String(h).trim().toLowerCase()),idx=detectColumns(header),start=idx.hasHeader?1:0,out=[],errors=[];for(let r=start;r<rows.length;r++){const row=rows[r],b={sourceFile:fileName,time:parseDate(row[idx.time]),open:toNumber(row[idx.open]),high:toNumber(row[idx.high]),low:toNumber(row[idx.low]),close:toNumber(row[idx.close])};if(validBar(b))out.push(b);else if(errors.length<20)errors.push({fileName,row:r+1,message:"invalid row"});}return{bars:out,loadedRows:Math.max(0,rows.length-start),errors};}
 function detectColumns(h){
   const hasHeader=h.some(x=>/(time|date|datetime|日時|日付|時間|open|high|low|close|始値|高値|安値|終値)/i.test(x));
   if(!hasHeader)return{hasHeader:false,time:0,open:1,high:2,low:3,close:4};
   const find=patterns=>h.findIndex(x=>patterns.some(p=>p.test(x)));
-  const idx={
-    hasHeader:true,
-    time:find([/datetime/i,/time/i,/date/i,/日時/,/日付/,/時間/]),
-    open:find([/^open$/i,/始値/,/^始$/]),
-    high:find([/^high$/i,/高値/,/^高$/]),
-    low:find([/^low$/i,/安値/,/^安$/]),
-    close:find([/^close$/i,/終値/,/^終$/])
-  };
+  const idx={hasHeader:true,time:find([/datetime/i,/time/i,/date/i,/日時/,/日付/,/時間/]),open:find([/^open$/i,/始値/,/^始$/]),high:find([/^high$/i,/高値/,/^高$/]),low:find([/^low$/i,/安値/,/^安$/]),close:find([/^close$/i,/終値/,/^終$/])};
   for(const k of["time","open","high","low","close"])if(idx[k]<0)idx[k]={time:0,open:1,high:2,low:3,close:4}[k];
   return idx;
 }
@@ -248,26 +248,28 @@ function parseCsv(text){const rows=[];let row=[],cell="",quote=false;for(let i=0
 function parseDate(v){const raw=String(v||"").trim();if(!raw)return null;const s=raw.replace(/\./g,"-").replace(/\//g,"-").replace("T"," ");const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);if(m){const[,y,mo,d,h="0",mi="0",sec="0"]=m;return new Date(+y,+mo-1,+d,+h,+mi,+sec);}const d=new Date(raw);return Number.isNaN(d.getTime())?null:d;}
 function toNumber(v){const n=Number(String(v??"").trim().replace(/,/g,""));return Number.isFinite(n)?n:NaN;}function validBar(b){return b&&b.time instanceof Date&&!Number.isNaN(b.time.getTime())&&[b.open,b.high,b.low,b.close].every(Number.isFinite);}
 function dedupeAndSortBars(data){const map=new Map();for(const b of data)map.set(b.time.getTime(),b);return[...map.values()].sort((a,b)=>a.time-b.time);}function isJstRange(d,start,end){const h=d.getHours();return start<end?h>=start&&h<end:h>=start||h<end;}
-function renderSummary(){document.getElementById("summary").innerHTML=[metric("ファイル数",debug.files),metric("読み込み行数",debug.loadedRows.toLocaleString()),metric("有効バー数",bars.length.toLocaleString()),metric("開始日時",bars[0]?fmtDate(bars[0].time):"--"),metric("終了日時",bars.at(-1)?fmtDate(bars.at(-1).time):"--"),metric("対象年",collectYears(bars).join(", ")||"--"),metric("Spread控除",(Number(document.getElementById("spreadInput").value)||0).toFixed(1)+"pips"),metric("候補数",debug.candidates.toLocaleString())].join("");}
-function metric(label,value){return`<div class="metric"><div class="label">${esc(String(label))}</div><div class="value">${esc(String(value))}</div></div>`;}
-function renderTable(id,rows){document.getElementById(id).innerHTML=tableHtml(rows);}
-function rowClass(r){return r.rankClass==="super"?"super":r.rankClass==="main"?"main":r.rankClass==="min"?"min":"reject";}
-function tableHtml(rows){if(!rows.length)return`<p class="note">該当候補なし</p>`;return`<table><thead><tr><th>Rule</th><th>時間帯</th><th>方向</th><th>条件</th><th>PF</th><th>勝率</th><th>期待値</th><th>年間回数</th><th>DD</th><th>採用</th><th>件数</th><th>総pips</th><th>2023PF</th><th>2024PF</th><th>2025PF</th><th>2026PF</th><th>MinYearPF</th></tr></thead><tbody>${rows.map(r=>`<tr class="${rowClass(r)}"><td>${esc(r.ruleName||"")}</td><td>${esc(r.timeWindow)}</td><td>${esc(r.direction)}</td><td>${esc(conditionText(r))}</td><td>${fmtPf(r.profitFactor)}</td><td>${fmt(r.winRate)}%</td><td>${sign(r.expectancy)}</td><td>${fmt(r.annualTrades)}</td><td>${fmt(r.maxDrawdown)}</td><td>${esc(r.adoption?.label||r.eaAdoption||"")}</td><td>${fmtInt(r.count)}</td><td>${sign(r.totalPips)}</td><td>${fmtPf(r.yearStats?.[2023]?.profitFactor)}</td><td>${fmtPf(r.yearStats?.[2024]?.profitFactor)}</td><td>${fmtPf(r.yearStats?.[2025]?.profitFactor)}</td><td>${fmtPf(r.yearStats?.[2026]?.profitFactor)}</td><td>${fmtPf(r.minYearPF)}</td></tr>`).join("")}</tbody></table>`;}
-function conditionText(r){return[r.rsi,r.move,r.update,r.streak,r.bb,r.ema,r.atr,r.vol,r.exit].filter(Boolean).join(" / ");}
-function renderBias(rows){document.getElementById("biasTable").innerHTML=`<table><thead><tr><th>時間帯</th><th>優位</th><th>BUY件数</th><th>BUY PF</th><th>BUY EV</th><th>SELL件数</th><th>SELL PF</th><th>SELL EV</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.timeWindow)}</td><td>${esc(r.winner)}</td><td>${fmtInt(r.buyCount)}</td><td>${fmtPf(r.buyPF)}</td><td>${sign(r.buyExpectancy)}</td><td>${fmtInt(r.sellCount)}</td><td>${fmtPf(r.sellPF)}</td><td>${sign(r.sellExpectancy)}</td></tr>`).join("")}</tbody></table>`;}
-function renderCoreCompare(c){document.getElementById("coreCompare").innerHTML=`<table><thead><tr><th>評価</th><th>概要</th><th>理由</th></tr></thead><tbody><tr><td>${esc(c.grade)}</td><td>${esc(c.summary)}</td><td>${esc(c.reason)}</td></tr></tbody></table>`;}
-function renderRecommendation(cands,rec){document.getElementById("recommendation").innerHTML=`<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>最終判定</td><td>${esc(rec.grade)}: ${esc(rec.label)}</td></tr><tr><td>理由</td><td>${esc(rec.reason)}</td></tr><tr><td>候補</td><td>${esc(cands.map(c=>`${c.ruleName} ${c.direction} ${c.timeWindow} ${conditionText(c)}`).join(" / ")||"なし")}</td></tr></tbody></table>`;}
-function buildTopCsv(rows){const cols=["RuleName","Direction","TimeWindow","Conditions","Count","AnnualTrades","WinRate","PF","Expectancy","TotalPips","MaxDrawdown","AverageHoldMinutes","2023PF","2024PF","2025PF","2026PF","MinYearPF","AdoptionGrade","RejectReason"];return[cols.join(","),...rows.map(r=>cols.map(c=>csvCell(({RuleName:r.ruleName,Direction:r.direction,TimeWindow:r.timeWindow,Conditions:conditionText(r),Count:r.count,AnnualTrades:r.annualTrades,WinRate:r.winRate,PF:r.profitFactor,Expectancy:r.expectancy,TotalPips:r.totalPips,MaxDrawdown:r.maxDrawdown,AverageHoldMinutes:r.averageHoldMinutes,"2023PF":r.yearStats?.[2023]?.profitFactor,"2024PF":r.yearStats?.[2024]?.profitFactor,"2025PF":r.yearStats?.[2025]?.profitFactor,"2026PF":r.yearStats?.[2026]?.profitFactor,MinYearPF:r.minYearPF,AdoptionGrade:r.adoption?.label,RejectReason:r.rejectReason})[c])).join(","))].join("\n");}
-function csvCell(v){return`"${String(v??"").replace(/"/g,'""')}"`;}
-function disableDownloads(v){for(const id of["jsonBtn","csvBtn","recBtn"])document.getElementById(id).disabled=v;}
+function bbLabel(c,upper,mid,lower){if(c>=upper)return"Upper";if(c>=mid)return"MiddleUpper";if(c>lower)return"MiddleLower";return"Lower";}function rsiFrom(g,l){if(l===0)return 100;const rs=g/l;return 100-100/(1+rs);}function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:0;}function std(a,m){return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/a.length);}function quantile(a,q){if(!a.length)return NaN;return a[Math.min(a.length-1,Math.max(0,Math.floor((a.length-1)*q)))];}
+function yearSpan(){return bars.length&&bars[0]&&bars.at(-1)?Math.max(0.1,(bars.at(-1).time-bars[0].time)/(365.25*24*3600*1000)):3;}function monthKey(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}`;}function sum(a){return a.reduce((x,y)=>x+y,0);}function maxDrawdown(values){let equity=0,peak=0,dd=0;for(const x of values){equity+=x;if(equity>peak)peak=equity;dd=Math.max(dd,peak-equity);}return dd;}
+function renderSummary(){document.getElementById("summary").innerHTML=[metric("Files",debug.files),metric("Loaded rows",debug.loadedRows.toLocaleString()),metric("Valid bars",bars.length.toLocaleString()),metric("Start",bars[0]?fmtDate(bars[0].time):"--"),metric("End",bars.at(-1)?fmtDate(bars.at(-1).time):"--"),metric("Years",[...new Set(bars.map(b=>b.time.getFullYear()))].join(", ")||"--"),metric("Spread",spread().toFixed(1)+"pips"),metric("Morning count",debug.signals.toLocaleString())].join("");}
+function metric(label,value){return`<div class="metric"><div class="label">${esc(label)}</div><div class="value">${esc(String(value))}</div></div>`;}
+function renderTable(id,rows){document.getElementById(id).innerHTML=table(rows);}
+function table(rows){if(!rows.length)return`<p class="note">隧ｲ蠖薙↑縺・/p>`;const keys=Object.keys(rows[0]);return`<table><thead><tr>${keys.map(k=>`<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr class="${rowClass(r)}">${keys.map(k=>`<td>${formatCell(r[k])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;}
+function rowClass(r){const pf=Number(r.profitFactor||r.PF||0),ev=Number(r.expectancy||0);return pf>=1.5&&ev>0?"goodrow":ev>0?"warnrow":"badrow";}
+function formatCell(v){if(typeof v==="number")return Number.isInteger(v)?v.toLocaleString():v.toFixed(2);return esc(v??"");}
+function renderRecommendation(){document.getElementById("recommendationTable").innerHTML=table([{grade:recommendation.grade,label:recommendation.label,reason:recommendation.reason,bestExit:recommendation.bestExit?.name||"",basePF:recommendation.baseResult?.profitFactor||0,baseExpectancy:recommendation.baseResult?.expectancy||0}]);}
+function toCsv(rows){if(!rows.length)return"";const cols=Object.keys(rows[0]);return[cols.join(","),...rows.map(r=>cols.map(c=>csvCell(r[c])).join(","))].join("\n");}
+function csvCell(v){const s=String(v??"");return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}
+function disableDownloads(v){for(const id of["jsonBtn","exitBtn","filterBtn","integrationBtn","lotBtn","recBtn"])document.getElementById(id).disabled=v;}
 function download(name,text,type){if(!text)return;const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
-function reset(){bars=[];results=null;topCsv="";recommendationJson=null;Object.assign(debug,{files:0,loadedRows:0,validBars:0,rsiCount:0,candidates:0,errors:[],lastRun:"--"});for(const id of["summary","earlyBuy","earlySell","tokyoFrontBuy","tokyoFrontSell","tokyoBackBuy","tokyoBackSell","overall","liveTop","worst","biasTable","coreCompare","recommendation"])document.getElementById(id).innerHTML="";disableDownloads(true);setProgress(0,100);updateDebug();}
-function updateDebug(){document.getElementById("debugLog").textContent=[`ファイル数: ${debug.files}`,`読み込み行数: ${debug.loadedRows}`,`有効バー数: ${debug.validBars}`,`RSI計算件数: ${debug.rsiCount}`,`候補数: ${debug.candidates}`,`最終実行: ${debug.lastRun}`,"","Errors:",...(debug.errors.length?debug.errors.slice(-40).map(e=>JSON.stringify(e)):["なし"])].join("\n");}
-function collectYears(data){const s=new Set();for(const b of data)if(b?.time)s.add(b.time.getFullYear());return[...s].sort((a,b)=>a-b);}function fmtDate(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}function pad(n){return String(n).padStart(2,"0");}function fmt(n){return Number.isFinite(Number(n))?Number(n).toFixed(2):"--";}function fmtPf(n){return Number(n)>=999?"∞":fmt(n);}function sign(n){return Number.isFinite(Number(n))?(Number(n)>=0?"+":"")+Number(n).toFixed(2):"--";}function fmtInt(n){return Number.isFinite(Number(n))?Number(n).toLocaleString():"--";}function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function reset(){bars=[];results=null;csvs={};recommendation=null;Object.assign(debug,{files:0,loadedRows:0,validBars:0,rsiCount:0,signals:0,errors:[],lastRun:"--"});for(const id of["summary","baseTable","exitTable","filterTable","yearTable","monthTable","hourTable","integrationTable","lotTable","recommendationTable"])document.getElementById(id).innerHTML="";disableDownloads(true);setProgress(0,100);updateDebug();}
+function updateDebug(){document.getElementById("debugLog").textContent=[`Files: ${debug.files}`,`Loaded rows: ${debug.loadedRows}`,`Valid bars: ${debug.validBars}`,`RSI count: ${debug.rsiCount}`,`Morning count: ${debug.signals}`,`Last run: ${debug.lastRun}`,"","Errors:",...(debug.errors.length?debug.errors.slice(-40).map(e=>JSON.stringify(e)):["none"])].join("\n");}function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}function setProgress(done,total){document.getElementById("progressBar").style.width=(total?Math.min(100,Math.round(done/total*100)):0)+"%";}function wait(){return new Promise(r=>setTimeout(r,0));}
+function fmtDate(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}function pad(n){return String(n).padStart(2,"0");}function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
 updateDebug();
 </script>
 </body>
 </html>
+
+
 
 
 
