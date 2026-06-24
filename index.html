@@ -97,7 +97,9 @@ async function loadCsvFiles(){
       setStatus(`Loading CSV ${i+1}/${files.length}: ${files[i].name}`);
       setProgress(i,files.length);
       const parsed=parseCsvBars(await files[i].text(),files[i].name);
-      debug.loadedRows+=parsed.loadedRows;debug.errors.push(...parsed.errors);merged.push(...parsed.bars);
+      debug.loadedRows+=parsed.loadedRows;
+      appendMany(debug.errors,parsed.errors);
+      appendMany(merged,parsed.bars);
       await wait();
     }
     bars=dedupeAndSortBars(merged);debug.files=files.length;debug.validBars=bars.length;
@@ -161,7 +163,7 @@ function baseNoAtr(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.recent3<=-6&&b
 function baseNoVol(b){return isJstRange(b.time,9,13)&&b.rsi<35&&b.recent3<=-6&&b.bearStreak>=3&&b.bbPosition==="Lower"&&b.atrBand==="Mid";}
 function entriesByPredicate(pred,ruleName){const out=[];for(let i=100;i<bars.length-MAX_HOLD-1;i++){const b=bars[i];if(validFeatureBar(b)&&pred(b))out.push(makeEntry(i,ruleName,"BUY"));}return out;}
 function analyzeEntries(entries,exit,sp,name){
-  const trades=entries.map(e=>simulateExit(e.index,e.direction,exit,sp)).filter(x=>x&&Number.isFinite(x.pips));
+  const trades=entries.map(e=>simulateExitEntry(e,exit,sp)).filter(x=>x&&Number.isFinite(x.pips));
   const vals=trades.map(t=>t.pips), m=metrics(vals);
   return{name,count:m.count,winRate:m.winRate,profitFactor:m.profitFactor,expectancy:m.expectancy,totalPips:m.totalPips,maxDrawdown:m.maxDrawdown,maxLossStreak:maxLossStreak(vals),avgHoldMinutes:avg(trades.map(t=>t.hold)),negativeMonths:negativeMonthCount(entries,trades),grade:grade(m),note:noteFor(m)};
 }
@@ -173,9 +175,9 @@ function groupAnalyze(entries,exit,sp,keyFn,label){
 function buildIntegration(core,cand,morning,sp){
   const sets=[
     ["Core Rule E縺ｮ縺ｿ",core],
-    ["Core Rule E + Candidate G",[...core,...cand]],
+    ["Core Rule E + Candidate G",concatMany(core,cand)],
     ["Morning Rule A縺ｮ縺ｿ",morning],
-    ["Core Rule E + Candidate G + Morning Rule A",[...core,...cand,...morning]]
+    ["Core Rule E + Candidate G + Morning Rule A",concatMany(core,cand,morning)]
   ];
   return sets.map(([name,entries])=>analyzeEntries(sortEntries(entries),ruleExitByEntry,sp,name));
 }
@@ -189,11 +191,11 @@ function buildLotSimulation(core,cand,morning,sp){
   return plans.map(p=>simulateLotPlan(p,core,cand,morning,sp));
 }
 function simulateLotPlan(plan,core,cand,morning,sp){
-  const items=[
-    ...core.map(e=>({...e,lot:plan.core,exit:{type:"trail",start:10,back:5,max:180}})),
-    ...cand.map(e=>({...e,lot:plan.cand,exit:{type:"trail",start:15,back:5,max:180}})),
-    ...morning.map(e=>({...e,lot:plan.morning,exit:baseExit}))
-  ].sort((a,b)=>a.time-b.time);
+  const items=[];
+  for(const e of core)items.push({...e,lot:plan.core,exit:{type:"trail",start:10,back:5,max:180}});
+  for(const e of cand)items.push({...e,lot:plan.cand,exit:{type:"trail",start:15,back:5,max:180}});
+  for(const e of morning)items.push({...e,lot:plan.morning,exit:baseExit});
+  items.sort((a,b)=>a.time-b.time);
   const month=new Map(), yenVals=[];
   for(const e of items){const t=simulateExit(e.index,e.direction,e.exit,sp);if(!t)continue;const yen=t.pips*1000*e.lot;yenVals.push(yen);const mk=monthKey(e.time);month.set(mk,(month.get(mk)||0)+yen);}
   const yearly=sum(yenVals)/(yearSpan()||3), worstMonth=Math.min(0,...month.values()), dd=maxDrawdown(yenVals);
@@ -229,6 +231,10 @@ function simulateExit(i,dir,exOrFn,sp){
   }
   const close=bars[max]?.close;if(!Number.isFinite(close))return null;return{pips:(dir==="BUY"?(close-entry):(entry-close))*PIP-sp,hold:max-i};
 }
+function simulateExitEntry(entry,exOrFn,sp){
+  const ex=typeof exOrFn==="function"?exOrFn(entry):exOrFn;
+  return simulateExit(entry.index,entry.direction,ex,sp);
+}
 function adverseFromBest(dir,bar,best){return dir==="BUY"?(best-bar.low)*PIP:(bar.high-best)*PIP;}
 function metrics(values){const count=values.length,wins=values.filter(v=>v>0),losses=values.filter(v=>v<0),gp=sum(wins),gl=Math.abs(sum(losses)),total=sum(values);return{count,winRate:count?wins.length/count*100:0,profitFactor:gl>0?gp/gl:(gp>0?999:0),expectancy:count?total/count:0,totalPips:total,maxDrawdown:maxDrawdown(values)};}
 function maxLossStreak(vals){let cur=0,max=0;for(const v of vals){if(v<0){cur++;max=Math.max(max,cur);}else cur=0;}return max;}
@@ -261,6 +267,8 @@ function toCsv(rows){if(!rows.length)return"";const cols=Object.keys(rows[0]);re
 function csvCell(v){const s=String(v??"");return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}
 function disableDownloads(v){for(const id of["jsonBtn","exitBtn","filterBtn","integrationBtn","lotBtn","recBtn"])document.getElementById(id).disabled=v;}
 function download(name,text,type){if(!text)return;const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+function appendMany(target,items){if(!items||!items.length)return;for(let i=0;i<items.length;i+=5000){Array.prototype.push.apply(target,items.slice(i,i+5000));}}
+function concatMany(){const out=[];for(const arr of arguments)appendMany(out,arr||[]);return out;}
 function reset(){bars=[];results=null;csvs={};recommendation=null;Object.assign(debug,{files:0,loadedRows:0,validBars:0,rsiCount:0,signals:0,errors:[],lastRun:"--"});for(const id of["summary","baseTable","exitTable","filterTable","yearTable","monthTable","hourTable","integrationTable","lotTable","recommendationTable"])document.getElementById(id).innerHTML="";disableDownloads(true);setProgress(0,100);updateDebug();}
 function updateDebug(){document.getElementById("debugLog").textContent=[`Files: ${debug.files}`,`Loaded rows: ${debug.loadedRows}`,`Valid bars: ${debug.validBars}`,`RSI count: ${debug.rsiCount}`,`Morning count: ${debug.signals}`,`Last run: ${debug.lastRun}`,"","Errors:",...(debug.errors.length?debug.errors.slice(-40).map(e=>JSON.stringify(e)):["none"])].join("\n");}function setStatus(text,bad=false){const el=document.getElementById("status");el.textContent=text;el.className=bad?"bad":"note";}function setProgress(done,total){document.getElementById("progressBar").style.width=(total?Math.min(100,Math.round(done/total*100)):0)+"%";}function wait(){return new Promise(r=>setTimeout(r,0));}
 function fmtDate(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}function pad(n){return String(n).padStart(2,"0");}function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
